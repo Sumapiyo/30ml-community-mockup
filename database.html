@@ -309,7 +309,7 @@
                   </div>
                   <div class="flex items-center justify-between gap-12 border-t border-ink-50 px-16 py-12 pb-[max(12px,env(safe-area-inset-bottom))]">
                     <button data-filter-clear="item" class="text-[13px] font-semibold text-ink-500 hover:text-ink-900">すべてクリア</button>
-                    <button data-filter-apply="item" class="h-40 flex-1 rounded-full bg-brand-600 px-16 text-[14px] font-bold text-white hover:bg-brand-700 lg:flex-none">結果を見る</button>
+                    <button data-filter-apply="item" class="h-40 flex-1 rounded-full bg-brand-600 px-16 text-[14px] font-bold text-white hover:bg-brand-700 lg:flex-none">絞り込む</button>
                   </div>
                 </div>
               </div>
@@ -385,7 +385,7 @@
                   </div>
                   <div class="flex items-center justify-between gap-12 border-t border-ink-50 px-16 py-12 pb-[max(12px,env(safe-area-inset-bottom))]">
                     <button data-filter-clear="glossary" class="text-[13px] font-semibold text-ink-500 hover:text-ink-900">すべてクリア</button>
-                    <button data-filter-apply="glossary" class="h-40 flex-1 rounded-full bg-brand-600 px-16 text-[14px] font-bold text-white hover:bg-brand-700 lg:flex-none">結果を見る</button>
+                    <button data-filter-apply="glossary" class="h-40 flex-1 rounded-full bg-brand-600 px-16 text-[14px] font-bold text-white hover:bg-brand-700 lg:flex-none">絞り込む</button>
                   </div>
                 </div>
               </div>
@@ -489,6 +489,22 @@
       /* ====== 状態 ====== */
       const itemState = { q: '', brand: new Set(), kind: new Set(), mfcat: new Set(), faction: new Set(), sort: 'new', shown: 24 };
       const gloState = { q: '', gcat: new Set(), gfaction: new Set() };
+      // モーダル内の作業用ドラフト（「絞り込む」押下時に itemState/gloState へ反映）
+      const itemDraft = { brand: new Set(), kind: new Set(), mfcat: new Set(), faction: new Set() };
+      const gloDraft = { gcat: new Set(), gfaction: new Set() };
+      function snapItemDraft() {
+        ['brand', 'kind', 'mfcat', 'faction'].forEach((k) => { itemDraft[k] = new Set(itemState[k]); });
+      }
+      function snapGloDraft() {
+        ['gcat', 'gfaction'].forEach((k) => { gloDraft[k] = new Set(gloState[k]); });
+      }
+      function commitItemDraft() {
+        ['brand', 'kind', 'mfcat', 'faction'].forEach((k) => { itemState[k] = new Set(itemDraft[k]); });
+        itemState.shown = 24;
+      }
+      function commitGloDraft() {
+        ['gcat', 'gfaction'].forEach((k) => { gloState[k] = new Set(gloDraft[k]); });
+      }
 
       /* ====== ファセットチップ生成 ====== */
       function countItems(predicate) {
@@ -512,8 +528,8 @@
         fb.innerHTML = '';
         BRANDS.forEach((b) => {
           const c = countItems((it) => it.b === b);
-          const chip = makeChip(b, c, itemState.brand.has(b));
-          chip.onclick = () => { toggleSet(itemState.brand, b); itemState.shown = 24; syncMfRows(); renderItemFacets(); };
+          const chip = makeChip(b, c, itemDraft.brand.has(b));
+          chip.onclick = () => { toggleSet(itemDraft.brand, b); syncMfRows(); renderItemFacets(); };
           fb.appendChild(chip);
         });
         // 種類
@@ -521,8 +537,8 @@
         fk.innerHTML = '';
         KINDS.forEach((k) => {
           const c = countItems((it) => it.k === k);
-          const chip = makeChip(KIND_LABEL[k], c, itemState.kind.has(k));
-          chip.onclick = () => { toggleSet(itemState.kind, k); itemState.shown = 24; renderItemFacets(); };
+          const chip = makeChip(KIND_LABEL[k], c, itemDraft.kind.has(k));
+          chip.onclick = () => { toggleSet(itemDraft.kind, k); renderItemFacets(); };
           fk.appendChild(chip);
         });
         // 30MFカテゴリ
@@ -530,8 +546,8 @@
         fm.innerHTML = '';
         MFCATS.forEach((m) => {
           const c = countItems((it) => it.b === '30MF' && it.mfcat === m);
-          const chip = makeChip(m, c, itemState.mfcat.has(m));
-          chip.onclick = () => { toggleSet(itemState.mfcat, m); itemState.shown = 24; renderItemFacets(); };
+          const chip = makeChip(m, c, itemDraft.mfcat.has(m));
+          chip.onclick = () => { toggleSet(itemDraft.mfcat, m); renderItemFacets(); };
           fm.appendChild(chip);
         });
         // 勢力
@@ -539,18 +555,17 @@
         ff.innerHTML = '';
         MF_FACTIONS.forEach((f) => {
           const c = countItems((it) => it.faction === f);
-          const chip = makeChip(f, c, itemState.faction.has(f));
-          chip.onclick = () => { toggleSet(itemState.faction, f); itemState.shown = 24; renderItemFacets(); };
+          const chip = makeChip(f, c, itemDraft.faction.has(f));
+          chip.onclick = () => { toggleSet(itemDraft.faction, f); renderItemFacets(); };
           ff.appendChild(chip);
         });
-        renderItemChips();
-        applyItem();
       }
 
+      // 30MFカテゴリ/勢力の行はドラフトで30MFが選ばれている時のみ表示
       function syncMfRows() {
-        const show = itemState.brand.has('30MF');
+        const show = itemDraft.brand.has('30MF');
         document.querySelectorAll('[data-only-mf]').forEach((el) => el.classList.toggle('hidden', !show));
-        if (!show) { itemState.mfcat.clear(); itemState.faction.clear(); }
+        if (!show) { itemDraft.mfcat.clear(); itemDraft.faction.clear(); }
       }
 
       function toggleSet(set, v) { set.has(v) ? set.delete(v) : set.add(v); }
@@ -571,7 +586,12 @@
           const chip = document.createElement('button');
           chip.className = 'inline-flex items-center gap-4 rounded-full bg-brand-50 px-10 py-4 text-[12px] font-semibold text-brand-700 ring-1 ring-brand-100';
           chip.innerHTML = label + ' <span class="text-[14px] leading-none">×</span>';
-          chip.onclick = () => { itemState[facet].delete(v); syncMfRows(); renderItemFacets(); };
+          chip.onclick = () => {
+            itemState[facet].delete(v);
+            if (facet === 'brand' && v === '30MF') { itemState.mfcat.clear(); itemState.faction.clear(); }
+            itemState.shown = 24;
+            renderItemChips(); applyItem();
+          };
           wrap.appendChild(chip);
         });
         const clr = document.createElement('button');
@@ -581,9 +601,15 @@
         wrap.appendChild(clr);
       }
 
+      // 適用済みフィルタをすべて解除（チップバーの「クリア」）
       function clearItem() {
         itemState.brand.clear(); itemState.kind.clear(); itemState.mfcat.clear(); itemState.faction.clear();
         itemState.shown = 24;
+        renderItemChips(); applyItem();
+      }
+      // モーダル内ドラフトをすべて解除（モーダルの「すべてクリア」）
+      function clearItemDraft() {
+        itemDraft.brand.clear(); itemDraft.kind.clear(); itemDraft.mfcat.clear(); itemDraft.faction.clear();
         syncMfRows(); renderItemFacets();
       }
 
@@ -677,20 +703,18 @@
         gc.innerHTML = '';
         GCATS.forEach((c) => {
           const cnt = GLOSSARY.filter((g) => g.cat === c).length;
-          const chip = makeChip(c, cnt, gloState.gcat.has(c));
-          chip.onclick = () => { toggleSet(gloState.gcat, c); renderGloFacets(); };
+          const chip = makeChip(c, cnt, gloDraft.gcat.has(c));
+          chip.onclick = () => { toggleSet(gloDraft.gcat, c); renderGloFacets(); };
           gc.appendChild(chip);
         });
         const gf = document.getElementById('g-faction');
         gf.innerHTML = '';
         MF_FACTIONS.forEach((f) => {
           const cnt = GLOSSARY.filter((g) => g.faction === f).length;
-          const chip = makeChip(f, cnt, gloState.gfaction.has(f));
-          chip.onclick = () => { toggleSet(gloState.gfaction, f); renderGloFacets(); };
+          const chip = makeChip(f, cnt, gloDraft.gfaction.has(f));
+          chip.onclick = () => { toggleSet(gloDraft.gfaction, f); renderGloFacets(); };
           gf.appendChild(chip);
         });
-        renderGloChips();
-        applyGlo();
       }
       function renderGloChips() {
         const wrap = document.getElementById('glo-chips');
@@ -703,9 +727,13 @@
           const chip = document.createElement('button');
           chip.className = 'inline-flex items-center gap-4 rounded-full bg-brand-50 px-10 py-4 text-[12px] font-semibold text-brand-700 ring-1 ring-brand-100';
           chip.innerHTML = label + ' <span class="text-[14px] leading-none">×</span>';
-          chip.onclick = () => { gloState[facet].delete(v); renderGloFacets(); };
+          chip.onclick = () => { gloState[facet].delete(v); renderGloChips(); applyGlo(); };
           wrap.appendChild(chip);
         });
+      }
+      function clearGloDraft() {
+        gloDraft.gcat.clear(); gloDraft.gfaction.clear();
+        renderGloFacets();
       }
       function applyGlo() {
         let list = GLOSSARY.filter((g) => {
@@ -740,18 +768,28 @@
       document.querySelectorAll('.tab-btn').forEach((b) => b.addEventListener('click', () => setTab(b.dataset.tab)));
 
       function openFilter(key) {
+        // 開くたびに適用済み状態をドラフトへ複製してからモーダルを描画
+        if (key === 'item') { snapItemDraft(); syncMfRows(); renderItemFacets(); }
+        else { snapGloDraft(); renderGloFacets(); }
         document.querySelector('[data-filter-panel="' + key + '"]').classList.remove('hidden');
         document.body.style.overflow = 'hidden';
       }
       function closeFilter(key) {
+        // 反映せず閉じる（ドラフトは破棄）
         document.querySelector('[data-filter-panel="' + key + '"]').classList.add('hidden');
         document.body.style.overflow = '';
+      }
+      function applyFilter(key) {
+        // 「絞り込む」押下時にドラフトを反映
+        if (key === 'item') { commitItemDraft(); renderItemChips(); applyItem(); }
+        else { commitGloDraft(); renderGloChips(); applyGlo(); }
+        closeFilter(key);
       }
       document.querySelectorAll('[data-filter-toggle]').forEach((btn) => {
         btn.addEventListener('click', () => openFilter(btn.dataset.filterToggle));
       });
       document.querySelectorAll('[data-filter-apply]').forEach((btn) => {
-        btn.addEventListener('click', () => closeFilter(btn.dataset.filterApply));
+        btn.addEventListener('click', () => applyFilter(btn.dataset.filterApply));
       });
       document.querySelectorAll('[data-filter-panel]').forEach((panel) => {
         const key = panel.dataset.filterPanel;
@@ -761,8 +799,8 @@
       document.addEventListener('keydown', (e) => {
         if (e.key === 'Escape') document.querySelectorAll('[data-filter-panel]:not(.hidden)').forEach((p) => closeFilter(p.dataset.filterPanel));
       });
-      document.querySelector('[data-filter-clear="item"]').addEventListener('click', clearItem);
-      document.querySelector('[data-filter-clear="glossary"]').addEventListener('click', () => { gloState.gcat.clear(); gloState.gfaction.clear(); renderGloFacets(); });
+      document.querySelector('[data-filter-clear="item"]').addEventListener('click', clearItemDraft);
+      document.querySelector('[data-filter-clear="glossary"]').addEventListener('click', clearGloDraft);
 
       document.getElementById('item-search').addEventListener('input', (e) => { itemState.q = e.target.value; itemState.shown = 24; applyItem(); });
       document.getElementById('item-sort').addEventListener('change', (e) => { itemState.sort = e.target.value; applyItem(); });
@@ -771,9 +809,15 @@
 
       /* ====== 初期化 ====== */
       setTab('item');
+      snapItemDraft();
       syncMfRows();
       renderItemFacets();
+      renderItemChips();
+      applyItem();
+      snapGloDraft();
       renderGloFacets();
+      renderGloChips();
+      applyGlo();
     </script>
   </body>
 </html>
