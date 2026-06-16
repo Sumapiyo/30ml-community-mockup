@@ -271,35 +271,46 @@
               </div>
 
               <!-- 展開パネル -->
-              <div data-filter-panel="item" class="mt-10 hidden rounded-lg bg-white p-16 shadow-card">
-                <div class="grid gap-14">
-                  <div data-facet-row>
-                    <div class="mb-6 text-[11px] font-bold tracking-wide text-ink-500">ブランド</div>
-                    <div id="f-brand" class="flex flex-wrap gap-6" data-facet="brand"></div>
+              <!-- フィルタモーダル（モバイル=ボトムシート / PC=中央ダイアログ） -->
+              <div data-filter-panel="item" class="fixed inset-0 z-40 hidden">
+                <div data-filter-backdrop class="absolute inset-0 bg-ink-900/50"></div>
+                <div class="absolute inset-x-0 bottom-0 flex max-h-[85vh] flex-col rounded-t-lg bg-white shadow-cardLg lg:inset-x-auto lg:bottom-auto lg:left-1/2 lg:top-1/2 lg:max-h-[80vh] lg:w-[480px] lg:-translate-x-1/2 lg:-translate-y-1/2 lg:rounded-lg">
+                  <div class="mx-auto mt-8 h-4 w-36 rounded-full bg-ink-200 lg:hidden"></div>
+                  <div class="flex items-center justify-between px-16 py-12">
+                    <div class="text-[15px] font-bold">絞り込み</div>
+                    <button data-filter-close class="grid h-32 w-32 place-items-center rounded-full text-ink-500 hover:bg-ink-25">
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="m6 6 12 12M18 6 6 18" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" /></svg>
+                    </button>
                   </div>
-                  <div data-facet-row>
-                    <div class="mb-6 text-[11px] font-bold tracking-wide text-ink-500">種類</div>
-                    <div id="f-kind" class="flex flex-wrap gap-6" data-facet="kind"></div>
-                  </div>
-                  <!-- 30MF選択時のみ表示（階層依存） -->
-                  <div data-facet-row data-only-mf class="hidden">
-                    <div class="mb-6 flex items-center gap-6 text-[11px] font-bold tracking-wide text-ink-500">
-                      30MFカテゴリ
-                      <span class="rounded-full bg-gold/15 px-6 py-1 text-[10px] font-semibold text-gold">30MF選択時</span>
+                  <div class="grid gap-14 overflow-y-auto border-t border-ink-50 px-16 py-16">
+                    <div data-facet-row>
+                      <div class="mb-6 text-[11px] font-bold tracking-wide text-ink-500">ブランド</div>
+                      <div id="f-brand" class="flex flex-wrap gap-6" data-facet="brand"></div>
                     </div>
-                    <div id="f-mfcat" class="flex flex-wrap gap-6" data-facet="mfcat"></div>
-                  </div>
-                  <div data-facet-row data-only-mf class="hidden">
-                    <div class="mb-6 flex items-center gap-6 text-[11px] font-bold tracking-wide text-ink-500">
-                      勢力
-                      <span class="rounded-full bg-gold/15 px-6 py-1 text-[10px] font-semibold text-gold">30MF選択時</span>
+                    <div data-facet-row>
+                      <div class="mb-6 text-[11px] font-bold tracking-wide text-ink-500">種類</div>
+                      <div id="f-kind" class="flex flex-wrap gap-6" data-facet="kind"></div>
                     </div>
-                    <div id="f-faction" class="flex flex-wrap gap-6" data-facet="faction"></div>
+                    <!-- 30MF選択時のみ表示（階層依存） -->
+                    <div data-facet-row data-only-mf class="hidden">
+                      <div class="mb-6 flex items-center gap-6 text-[11px] font-bold tracking-wide text-ink-500">
+                        30MFカテゴリ
+                        <span class="rounded-full bg-gold/15 px-6 py-1 text-[10px] font-semibold text-gold">30MF選択時</span>
+                      </div>
+                      <div id="f-mfcat" class="flex flex-wrap gap-6" data-facet="mfcat"></div>
+                    </div>
+                    <div data-facet-row data-only-mf class="hidden">
+                      <div class="mb-6 flex items-center gap-6 text-[11px] font-bold tracking-wide text-ink-500">
+                        勢力
+                        <span class="rounded-full bg-gold/15 px-6 py-1 text-[10px] font-semibold text-gold">30MF選択時</span>
+                      </div>
+                      <div id="f-faction" class="flex flex-wrap gap-6" data-facet="faction"></div>
+                    </div>
                   </div>
-                </div>
-                <div class="mt-14 flex items-center justify-between border-t border-ink-50 pt-12">
-                  <button data-filter-clear="item" class="text-[12px] font-semibold text-ink-500 hover:text-ink-900">すべてクリア</button>
-                  <button data-filter-apply="item" class="h-32 rounded-full bg-brand-600 px-16 text-[13px] font-bold text-white hover:bg-brand-700">結果を見る</button>
+                  <div class="flex items-center justify-between gap-12 border-t border-ink-50 px-16 py-12 pb-[max(12px,env(safe-area-inset-bottom))]">
+                    <button data-filter-clear="item" class="text-[13px] font-semibold text-ink-500 hover:text-ink-900">すべてクリア</button>
+                    <button data-filter-apply="item" class="h-40 flex-1 rounded-full bg-brand-600 px-16 text-[14px] font-bold text-white hover:bg-brand-700 lg:flex-none">結果を見る</button>
+                  </div>
                 </div>
               </div>
             </div>
@@ -352,20 +363,30 @@
                 <div id="glo-chips" class="flex flex-1 flex-wrap items-center gap-6"></div>
               </div>
 
-              <div data-filter-panel="glossary" class="mt-10 hidden rounded-lg bg-white p-16 shadow-card">
-                <div class="grid gap-14">
-                  <div data-facet-row>
-                    <div class="mb-6 text-[11px] font-bold tracking-wide text-ink-500">カテゴリ</div>
-                    <div id="g-cat" class="flex flex-wrap gap-6" data-facet="gcat"></div>
+              <div data-filter-panel="glossary" class="fixed inset-0 z-40 hidden">
+                <div data-filter-backdrop class="absolute inset-0 bg-ink-900/50"></div>
+                <div class="absolute inset-x-0 bottom-0 flex max-h-[85vh] flex-col rounded-t-lg bg-white shadow-cardLg lg:inset-x-auto lg:bottom-auto lg:left-1/2 lg:top-1/2 lg:max-h-[80vh] lg:w-[480px] lg:-translate-x-1/2 lg:-translate-y-1/2 lg:rounded-lg">
+                  <div class="mx-auto mt-8 h-4 w-36 rounded-full bg-ink-200 lg:hidden"></div>
+                  <div class="flex items-center justify-between px-16 py-12">
+                    <div class="text-[15px] font-bold">絞り込み</div>
+                    <button data-filter-close class="grid h-32 w-32 place-items-center rounded-full text-ink-500 hover:bg-ink-25">
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="m6 6 12 12M18 6 6 18" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" /></svg>
+                    </button>
                   </div>
-                  <div data-facet-row>
-                    <div class="mb-6 text-[11px] font-bold tracking-wide text-ink-500">勢力</div>
-                    <div id="g-faction" class="flex flex-wrap gap-6" data-facet="gfaction"></div>
+                  <div class="grid gap-14 overflow-y-auto border-t border-ink-50 px-16 py-16">
+                    <div data-facet-row>
+                      <div class="mb-6 text-[11px] font-bold tracking-wide text-ink-500">カテゴリ</div>
+                      <div id="g-cat" class="flex flex-wrap gap-6" data-facet="gcat"></div>
+                    </div>
+                    <div data-facet-row>
+                      <div class="mb-6 text-[11px] font-bold tracking-wide text-ink-500">勢力</div>
+                      <div id="g-faction" class="flex flex-wrap gap-6" data-facet="gfaction"></div>
+                    </div>
                   </div>
-                </div>
-                <div class="mt-14 flex items-center justify-between border-t border-ink-50 pt-12">
-                  <button data-filter-clear="glossary" class="text-[12px] font-semibold text-ink-500 hover:text-ink-900">すべてクリア</button>
-                  <button data-filter-apply="glossary" class="h-32 rounded-full bg-brand-600 px-16 text-[13px] font-bold text-white hover:bg-brand-700">結果を見る</button>
+                  <div class="flex items-center justify-between gap-12 border-t border-ink-50 px-16 py-12 pb-[max(12px,env(safe-area-inset-bottom))]">
+                    <button data-filter-clear="glossary" class="text-[13px] font-semibold text-ink-500 hover:text-ink-900">すべてクリア</button>
+                    <button data-filter-apply="glossary" class="h-40 flex-1 rounded-full bg-brand-600 px-16 text-[14px] font-bold text-white hover:bg-brand-700 lg:flex-none">結果を見る</button>
+                  </div>
                 </div>
               </div>
             </div>
@@ -718,16 +739,27 @@
       /* ====== イベント結線 ====== */
       document.querySelectorAll('.tab-btn').forEach((b) => b.addEventListener('click', () => setTab(b.dataset.tab)));
 
+      function openFilter(key) {
+        document.querySelector('[data-filter-panel="' + key + '"]').classList.remove('hidden');
+        document.body.style.overflow = 'hidden';
+      }
+      function closeFilter(key) {
+        document.querySelector('[data-filter-panel="' + key + '"]').classList.add('hidden');
+        document.body.style.overflow = '';
+      }
       document.querySelectorAll('[data-filter-toggle]').forEach((btn) => {
-        btn.addEventListener('click', () => {
-          const key = btn.dataset.filterToggle;
-          document.querySelector('[data-filter-panel="' + key + '"]').classList.toggle('hidden');
-        });
+        btn.addEventListener('click', () => openFilter(btn.dataset.filterToggle));
       });
       document.querySelectorAll('[data-filter-apply]').forEach((btn) => {
-        btn.addEventListener('click', () => {
-          document.querySelector('[data-filter-panel="' + btn.dataset.filterApply + '"]').classList.add('hidden');
-        });
+        btn.addEventListener('click', () => closeFilter(btn.dataset.filterApply));
+      });
+      document.querySelectorAll('[data-filter-panel]').forEach((panel) => {
+        const key = panel.dataset.filterPanel;
+        panel.querySelector('[data-filter-backdrop]').addEventListener('click', () => closeFilter(key));
+        panel.querySelector('[data-filter-close]').addEventListener('click', () => closeFilter(key));
+      });
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') document.querySelectorAll('[data-filter-panel]:not(.hidden)').forEach((p) => closeFilter(p.dataset.filterPanel));
       });
       document.querySelector('[data-filter-clear="item"]').addEventListener('click', clearItem);
       document.querySelector('[data-filter-clear="glossary"]').addEventListener('click', () => { gloState.gcat.clear(); gloState.gfaction.clear(); renderGloFacets(); });
