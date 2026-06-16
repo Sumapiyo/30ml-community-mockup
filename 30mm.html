@@ -1,0 +1,852 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>BLUE DANUBE（ブルー・ダニューブ）｜30 MINUTES MISSIONS ZONE</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;500;600;700&family=Noto+Sans+JP:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <script>
+      tailwind.config = {
+        theme: {
+          // BNの4pxグリッドに上書き
+          spacing: {
+            0: '0px', 1: '1px', 2: '2px', 4: '4px', 6: '6px', 8: '8px',
+            10: '10px', 12: '12px', 14: '14px', 16: '16px', 18: '18px',
+            20: '20px', 24: '24px', 28: '28px', 32: '32px', 36: '36px',
+            40: '40px', 44: '44px', 48: '48px', 52: '52px', 56: '56px',
+            60: '60px', 64: '64px', 72: '72px', 80: '80px', 88: '88px',
+            96: '96px', 112: '112px', 128: '128px',
+            px: '1px', 0.5: '2px',
+          },
+          borderRadius: {
+            none: '0px', xs: '2px', DEFAULT: '4px', sm: '4px',
+            md: '8px', lg: '16px', full: '9999px',
+          },
+          extend: {
+            fontFamily: {
+              sans: ['Open Sans', 'Noto Sans JP', 'system-ui', 'sans-serif'],
+            },
+            colors: {
+              // BN semantic tokens (light)
+              ink: {
+                900: '#1A1A1A',
+                700: '#474747',
+                600: '#5C5C5C',
+                500: '#737373',
+                400: '#949494',
+                300: '#B3B3B3',
+                200: '#D1D1D1',
+                100: '#E8E8E8',
+                50: '#F5F5F5',
+                25: '#FAFAFA',
+              },
+              // tenant accent (30ML — purple/gold trace)
+              brand: {
+                25: '#FCF7FF',
+                50: '#F9EDFF',
+                100: '#F0D7FC',
+                300: '#D79DF5',
+                500: '#A93DE0',
+                600: '#8C21C2',
+                700: '#6E05A3',
+              },
+              gold: '#C6A35A',
+              like: '#E5097B',
+            },
+            boxShadow: {
+              card: '0px 0px 4px rgba(0,0,0,0.08), 0px 0px 8px rgba(0,0,0,0.06)',
+              cardLg: '0px 0px 8px rgba(0,0,0,0.08), 0px 0px 16px rgba(0,0,0,0.06)',
+            },
+          },
+        },
+      };
+    </script>
+    <style>
+      body {
+        font-family:
+          'Open Sans', 'Noto Sans JP', system-ui, sans-serif;
+        background: #fafafa;
+        color: #1a1a1a;
+      }
+      .placeholder {
+        background:
+          linear-gradient(135deg, #efe6f8 0%, #f7f1ff 40%, #fbeef3 100%);
+        position: relative;
+        overflow: hidden;
+      }
+      .placeholder::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background-image:
+          radial-gradient(circle at 30% 40%, rgba(255, 255, 255, 0.55), transparent 45%),
+          radial-gradient(circle at 70% 70%, rgba(169, 61, 224, 0.18), transparent 50%);
+      }
+      .placeholder > .label {
+        position: absolute;
+        bottom: 12px;
+        left: 12px;
+        padding: 4px 10px;
+        border-radius: 9999px;
+        background: rgba(26, 26, 26, 0.55);
+        color: #fff;
+        font-size: 11px;
+        letter-spacing: 0.06em;
+        backdrop-filter: blur(4px);
+      }
+      .placeholder.dark {
+        background:
+          linear-gradient(135deg, #2a1340 0%, #1a1a1a 60%, #38183d 100%);
+      }
+      .placeholder.dark::before {
+        background-image:
+          radial-gradient(circle at 25% 30%, rgba(198, 163, 90, 0.25), transparent 45%),
+          radial-gradient(circle at 75% 75%, rgba(169, 61, 224, 0.3), transparent 50%);
+      }
+      .scrollbar-hide::-webkit-scrollbar {
+        display: none;
+      }
+      .scrollbar-hide {
+        scrollbar-width: none;
+      }
+    </style>
+  </head>
+  <body class="min-h-screen">
+    <!-- ===================== Desktop Header (BN風) ===================== -->
+    <header
+      class="fixed inset-x-0 top-0 z-20 hidden h-[60px] border-b border-ink-50 bg-white lg:flex"
+    >
+      <div class="mx-auto flex w-full max-w-screen-xl items-center gap-24 px-24">
+        <!-- Logo (テナント切替ドロップダウン) -->
+        <div class="relative" data-tenant-switcher>
+          <button type="button" class="flex items-center gap-8 rounded-md p-2 hover:bg-ink-25" data-tenant-button>
+            <span
+              class="flex h-32 w-32 items-center justify-center rounded-md bg-gradient-to-br from-brand-600 to-brand-300 font-bold text-white"
+              >30</span
+            >
+            <div class="leading-tight text-left">
+              <div class="text-[15px] font-bold tracking-wide">
+                30 MINUTES MISSIONS ZONE
+              </div>
+              <div class="text-[10px] tracking-widest text-ink-500">
+                POWERED BY BUILDERS NOTE
+              </div>
+            </div>
+            <svg width="14" height="14" viewBox="0 0 24 24" class="text-ink-400">
+              <path d="m6 9 6 6 6-6" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round" />
+            </svg>
+          </button>
+          <div class="absolute left-0 top-full z-30 mt-8 hidden w-[280px] flex-col overflow-hidden rounded-lg bg-white ring-1 ring-ink-100 shadow-cardLg" data-tenant-menu>
+            <a href="30ms.html" class="flex items-center gap-12 px-12 py-10 hover:bg-ink-25">
+              <span class="flex h-32 w-32 items-center justify-center rounded-md bg-gradient-to-br from-brand-600 to-brand-300 text-[12px] font-bold text-white">MS</span>
+              <div class="leading-tight">
+                <div class="text-[13px] font-bold">30 MINUTES SISTERS</div>
+                <div class="text-[11px] text-ink-500">美少女プラモコミュニティ</div>
+              </div>
+            </a>
+            <a href="30mm.html" class="flex items-center gap-12 bg-brand-50 px-12 py-10">
+              <span class="flex h-32 w-32 items-center justify-center rounded-md bg-gradient-to-br from-ink-700 to-ink-500 text-[12px] font-bold text-white">MM</span>
+              <div class="leading-tight">
+                <div class="text-[13px] font-bold text-brand-700">30 MINUTES MISSIONS</div>
+                <div class="text-[11px] text-ink-500">メカプラモコミュニティ</div>
+              </div>
+              <span class="ml-auto text-[10px] font-bold text-brand-700">●</span>
+            </a>
+            <a href="30mf.html" class="flex items-center gap-12 px-12 py-10 hover:bg-ink-25">
+              <span class="flex h-32 w-32 items-center justify-center rounded-md bg-gradient-to-br from-gold to-brand-300 text-[12px] font-bold text-white">MF</span>
+              <div class="leading-tight">
+                <div class="text-[13px] font-bold">30 MINUTES FANTASY</div>
+                <div class="text-[11px] text-ink-500">ファンタジー造形コミュニティ</div>
+              </div>
+            </a>
+          </div>
+        </div>
+
+        <!-- Search -->
+        <div class="flex-1">
+          <label
+            class="flex h-36 items-center gap-8 rounded-full bg-ink-25 px-16 text-ink-500 ring-1 ring-inset ring-ink-50 focus-within:ring-brand-500"
+          >
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+              <circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="1.6" />
+              <path d="m20 20-3.5-3.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" />
+            </svg>
+            <input
+              type="text"
+              placeholder="作品・ユーザー・キットで検索"
+              class="flex-1 bg-transparent text-sm text-ink-900 placeholder:text-ink-400 focus:outline-none"
+            />
+          </label>
+        </div>
+
+        <!-- Header actions -->
+        <div class="flex items-center gap-8">
+          <button class="relative grid h-36 w-36 place-items-center rounded-full hover:bg-ink-25">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+              <path
+                d="M6 8a6 6 0 1 1 12 0v4l1.5 3h-15L6 12V8Z"
+                stroke="#1A1A1A"
+                stroke-width="1.5"
+                stroke-linejoin="round"
+              />
+              <path d="M10 18a2 2 0 0 0 4 0" stroke="#1A1A1A" stroke-width="1.5" />
+            </svg>
+            <span
+              class="absolute right-2 top-2 grid h-[14px] w-[14px] place-items-center rounded-full bg-like text-[9px] font-bold text-white"
+              >3</span
+            >
+          </button>
+          <button class="grid h-36 w-36 place-items-center rounded-full hover:bg-ink-25">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+              <path
+                d="M4 6.5A2.5 2.5 0 0 1 6.5 4h11A2.5 2.5 0 0 1 20 6.5v8A2.5 2.5 0 0 1 17.5 17H9l-4 3v-3H6.5A2.5 2.5 0 0 1 4 14.5v-8Z"
+                stroke="#1A1A1A"
+                stroke-width="1.5"
+                stroke-linejoin="round"
+              />
+            </svg>
+          </button>
+          <div class="ml-4 flex items-center gap-8 rounded-full bg-ink-25 py-4 pl-4 pr-12">
+            <span
+              class="grid h-28 w-28 place-items-center rounded-full bg-gradient-to-br from-brand-500 to-brand-300 text-[11px] font-bold text-white"
+              >R</span
+            >
+            <span class="text-[13px] font-semibold">リオ</span>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- ===================== Mobile Header (BN風) ===================== -->
+    <header
+      class="fixed inset-x-0 top-0 z-20 flex h-48 items-center justify-between border-b border-ink-50 bg-white px-16 lg:hidden"
+    >
+      <button class="grid h-32 w-32 place-items-center">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+          <path d="M3 6h18M3 12h18M3 18h18" stroke="#1A1A1A" stroke-width="1.6" stroke-linecap="round" />
+        </svg>
+      </button>
+      <div class="relative" data-tenant-switcher>
+        <button type="button" class="flex items-center gap-8 rounded-md p-2 hover:bg-ink-25" data-tenant-button>
+          <span class="flex h-24 w-24 items-center justify-center rounded bg-gradient-to-br from-brand-600 to-brand-300 text-[11px] font-bold text-white">30</span>
+          <span class="text-[13px] font-bold tracking-wide">30MM ZONE</span>
+          <svg width="12" height="12" viewBox="0 0 24 24" class="text-ink-400">
+            <path d="m6 9 6 6 6-6" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round" />
+          </svg>
+        </button>
+        <div class="absolute left-1/2 top-full z-30 mt-8 hidden w-[240px] -translate-x-1/2 flex-col overflow-hidden rounded-lg bg-white ring-1 ring-ink-100 shadow-cardLg" data-tenant-menu>
+          <a href="30ms.html" class="flex items-center gap-10 px-12 py-10 hover:bg-ink-25">
+            <span class="flex h-28 w-28 items-center justify-center rounded-md bg-gradient-to-br from-brand-600 to-brand-300 text-[11px] font-bold text-white">MS</span>
+            <div class="leading-tight">
+              <div class="text-[12px] font-bold">30 MINUTES SISTERS</div>
+            </div>
+          </a>
+          <a href="30mm.html" class="flex items-center gap-10 bg-brand-50 px-12 py-10">
+            <span class="flex h-28 w-28 items-center justify-center rounded-md bg-gradient-to-br from-ink-700 to-ink-500 text-[11px] font-bold text-white">MM</span>
+            <div class="leading-tight">
+              <div class="text-[12px] font-bold text-brand-700">30 MINUTES MISSIONS</div>
+            </div>
+          </a>
+          <a href="30mf.html" class="flex items-center gap-10 px-12 py-10 hover:bg-ink-25">
+            <span class="flex h-28 w-28 items-center justify-center rounded-md bg-gradient-to-br from-gold to-brand-300 text-[11px] font-bold text-white">MF</span>
+            <div class="leading-tight">
+              <div class="text-[12px] font-bold">30 MINUTES FANTASY</div>
+            </div>
+          </a>
+        </div>
+      </div>
+      <button class="grid h-32 w-32 place-items-center">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+          <circle cx="11" cy="11" r="7" stroke="#1A1A1A" stroke-width="1.6" />
+          <path d="m20 20-3.5-3.5" stroke="#1A1A1A" stroke-width="1.6" stroke-linecap="round" />
+        </svg>
+      </button>
+    </header>
+
+    <!-- ===================== Main grid ===================== -->
+    <div class="pb-[80px] pt-48 lg:pb-0 lg:pt-[60px]">
+      <div class="mx-auto grid w-full max-w-screen-xl gap-16 lg:grid-cols-12 lg:p-24">
+        <!-- ============== SideMenu (Desktop) ============== -->
+        <aside class="hidden lg:col-span-4 lg:block xl:col-span-3">
+          <nav class="sticky top-[84px] flex flex-col gap-4 rounded-lg bg-white p-12 shadow-card">
+            <a
+              href="#"
+              class="flex items-center gap-12 rounded-md px-12 py-10 text-[14px] font-semibold text-ink-900 hover:bg-ink-25"
+            >
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                <path
+                  d="M3 11.5 12 4l9 7.5V20a1 1 0 0 1-1 1h-5v-6h-6v6H4a1 1 0 0 1-1-1v-8.5Z"
+                  stroke="#1A1A1A"
+                  stroke-width="1.5"
+                  stroke-linejoin="round"
+                />
+              </svg>
+              ホーム
+            </a>
+            <a
+              href="#"
+              class="flex items-center gap-12 rounded-md bg-brand-50 px-12 py-10 text-[14px] font-semibold text-brand-700"
+            >
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                <rect x="3" y="5" width="18" height="14" rx="2" stroke="#6E05A3" stroke-width="1.5" />
+                <path d="M3 9h18M7 13h6M7 16h4" stroke="#6E05A3" stroke-width="1.5" stroke-linecap="round" />
+              </svg>
+              タイムライン
+            </a>
+            <a
+              href="tags.html"
+              class="flex items-center gap-12 rounded-md px-12 py-10 text-[14px] font-semibold text-ink-900 hover:bg-ink-25"
+            >
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                <path d="m20.5 11.5-8.5 8.5a2 2 0 0 1-2.8 0L3 13.8a2 2 0 0 1 0-2.8L11.5 2.5a2 2 0 0 1 1.5-.6h6.6a1.4 1.4 0 0 1 1.4 1.4v6.6a2 2 0 0 1-.5 1.6Z" stroke="#1A1A1A" stroke-width="1.5" stroke-linejoin="round" />
+                <circle cx="16.5" cy="7.5" r="1.4" fill="#1A1A1A" />
+              </svg>
+              作品を探す
+            </a>
+            <a
+              href="mykits.html"
+              class="flex items-center gap-12 rounded-md px-12 py-10 text-[14px] font-semibold text-ink-900 hover:bg-ink-25"
+            >
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                <path d="M3 7.5 12 3l9 4.5v9L12 21l-9-4.5v-9Z" stroke="#1A1A1A" stroke-width="1.5" stroke-linejoin="round" />
+                <path d="m3 7.5 9 4.5 9-4.5M12 12v9" stroke="#1A1A1A" stroke-width="1.5" stroke-linejoin="round" />
+              </svg>
+              マイキット
+            </a>
+            <a
+              href="#"
+              class="flex items-center gap-12 rounded-md px-12 py-10 text-[14px] font-semibold text-ink-900 hover:bg-ink-25"
+            >
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                <path
+                  d="M4 6.5A2.5 2.5 0 0 1 6.5 4h11A2.5 2.5 0 0 1 20 6.5v8A2.5 2.5 0 0 1 17.5 17H9l-4 3v-3H6.5A2.5 2.5 0 0 1 4 14.5v-8Z"
+                  stroke="#1A1A1A"
+                  stroke-width="1.5"
+                />
+              </svg>
+              トーク・DM
+              <span class="ml-auto grid h-18 min-w-[18px] place-items-center rounded-full bg-like px-4 text-[10px] font-bold text-white"
+                >2</span
+              >
+            </a>
+            <a
+              href="#"
+              class="flex items-center gap-12 rounded-md px-12 py-10 text-[14px] font-semibold text-ink-900 hover:bg-ink-25"
+            >
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                <path
+                  d="M5 7h14l-1.5 10a2 2 0 0 1-2 1.7H8.5a2 2 0 0 1-2-1.7L5 7Z"
+                  stroke="#1A1A1A"
+                  stroke-width="1.5"
+                  stroke-linejoin="round"
+                />
+                <path d="M9 7V5a3 3 0 0 1 6 0v2" stroke="#1A1A1A" stroke-width="1.5" />
+              </svg>
+              ストア
+            </a>
+            <a
+              href="#"
+              class="flex items-center gap-12 rounded-md px-12 py-10 text-[14px] font-semibold text-ink-900 hover:bg-ink-25"
+            >
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                <circle cx="12" cy="8" r="4" stroke="#1A1A1A" stroke-width="1.5" />
+                <path d="M4 21c0-4 4-6 8-6s8 2 8 6" stroke="#1A1A1A" stroke-width="1.5" />
+              </svg>
+              マイページ
+            </a>
+
+            <div class="my-8 border-t border-ink-50"></div>
+
+            <!-- 投稿CTA -->
+            <button
+              class="flex items-center justify-center gap-8 rounded-full bg-ink-900 px-16 py-12 text-[14px] font-bold text-white hover:bg-ink-700"
+            >
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                <path d="M12 5v14M5 12h14" stroke="white" stroke-width="2" stroke-linecap="round" />
+              </svg>
+              作品を投稿する
+            </button>
+
+            <!-- Section: Topics -->
+            <div class="mt-16 px-12">
+              <div class="mb-8 text-[11px] font-bold tracking-widest text-ink-500">TRENDING TOPICS</div>
+              <div class="flex flex-wrap gap-6">
+                <span class="rounded-full bg-ink-25 px-8 py-4 text-[12px] text-ink-700">#SIS-X02</span>
+                <span class="rounded-full bg-ink-25 px-8 py-4 text-[12px] text-ink-700">#新作キット</span>
+                <span class="rounded-full bg-ink-25 px-8 py-4 text-[12px] text-ink-700">#塗装レシピ</span>
+                <span class="rounded-full bg-ink-25 px-8 py-4 text-[12px] text-ink-700">#改造</span>
+                <span class="rounded-full bg-ink-25 px-8 py-4 text-[12px] text-ink-700">#初投稿</span>
+              </div>
+            </div>
+          </nav>
+        </aside>
+
+        <!-- ============== Main column ============== -->
+        <main class="lg:col-span-8 xl:col-span-9">
+          <!-- Back row -->
+          <div class="mb-12 flex items-center gap-8 px-4 text-[13px] text-ink-500">
+            <a href="30ms.html" class="hover:underline">タイムライン</a>
+            <svg width="12" height="12" viewBox="0 0 24 24"><path d="m9 6 6 6-6 6" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" /></svg>
+            <span class="text-ink-700">作品詳細</span>
+          </div>
+
+          <!-- ============== Post Card ============== -->
+          <article class="overflow-hidden bg-white shadow-card lg:rounded-lg">
+            <!-- Poster header -->
+            <div class="flex items-start justify-between gap-12 px-16 pt-16 lg:px-24 lg:pt-24">
+              <a href="#" class="flex min-w-0 items-center gap-12">
+                <span
+                  class="grid h-44 w-44 shrink-0 place-items-center rounded-full bg-gradient-to-br from-ink-700 via-ink-500 to-brand-500 text-[15px] font-bold text-white ring-2 ring-white"
+                  >G</span
+                >
+                <div class="min-w-0">
+                  <div class="flex items-center gap-6">
+                    <span class="truncate text-[15px] font-bold">GUN道P</span>
+                  </div>
+                  <div class="flex flex-wrap items-center gap-x-8 gap-y-1 text-[12px] text-ink-500">
+                    <span>@gundo_p</span>
+                    <span>·</span>
+                    <span>2026/04/30</span>
+                    <span>·</span>
+                    <span class="inline-flex items-center gap-2">
+                      <svg width="11" height="11" viewBox="0 0 24 24" fill="none">
+                        <path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12Z" stroke="currentColor" stroke-width="1.5" />
+                        <circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="1.5" />
+                      </svg>
+                      254
+                    </span>
+                  </div>
+                </div>
+              </a>
+              <div class="flex items-center gap-8">
+                <button
+                  class="hidden h-32 items-center gap-6 rounded-full bg-ink-900 px-14 text-[12px] font-bold text-white hover:bg-ink-700 lg:inline-flex"
+                >
+                  <svg width="12" height="12" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14" stroke="white" stroke-width="2" stroke-linecap="round" /></svg>
+                  フォロー
+                </button>
+                <button class="grid h-32 w-32 place-items-center rounded-full hover:bg-ink-25">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="#5C5C5C">
+                    <circle cx="5" cy="12" r="1.8" /><circle cx="12" cy="12" r="1.8" /><circle cx="19" cy="12" r="1.8" />
+                  </svg>
+                </button>
+              </div>
+            </div>
+
+            <!-- Topics (タグ群) -->
+            <div class="mt-12 flex flex-wrap gap-6 px-16 lg:px-24">
+              <span class="rounded-md border border-ink-50 bg-ink-25 px-8 py-4 text-[11px] text-ink-700">#加工あり</span>
+              <span class="rounded-md border border-ink-50 bg-ink-25 px-8 py-4 text-[11px] text-ink-700">#複合・その他</span>
+              <span class="rounded-md border border-ink-50 bg-ink-25 px-8 py-4 text-[11px] text-ink-700">#グレー</span>
+              <span class="rounded-md border border-ink-50 bg-ink-25 px-8 py-4 text-[11px] text-ink-700">#ブルー</span>
+              <span class="rounded-md border border-ink-50 bg-ink-25 px-8 py-4 text-[11px] text-ink-700">#オリジナル機体</span>
+            </div>
+
+            <!-- Title -->
+            <h1 class="mt-16 px-16 text-[22px] font-bold leading-snug lg:px-24 lg:text-[28px]">
+              BLUE DANUBE（ブルー・ダニューブ）
+            </h1>
+
+            <!-- Hero image -->
+            <div class="mt-16 lg:mt-20 lg:px-24">
+              <img
+                src="images/MM_main.jpg"
+                alt="BLUE DANUBE メインカット"
+                class="block w-full object-cover lg:rounded-lg"
+                loading="lazy"
+              />
+            </div>
+
+            <!-- Description (本文は構造踏襲の自前リライト) -->
+            <div class="space-y-12 px-16 pt-20 text-[14px] leading-relaxed text-ink-700 lg:px-24 lg:text-[15px]">
+              <p>
+                30MMのMELANDER、シエルノヴァカスタム(宇宙仕様)、レヴィニクス(TYPE-B)、フォレスティエリ02、アルト(陸戦仕様)を複合ミキシングしたオリジナル機体です。
+                武装はオプションパーツセット15・19、HGBCボールデンアームアームズから流用。エグザビークル各種で大型ブースターも組み込んでいます。
+              </p>
+              <p>
+                配色はグレーをベースに、ブルーをエッジに散らして対比をつけたパターン。
+                塗装前のサフ状態と塗装後を並べて、改造前後の差分が見えるようにしています。
+              </p>
+            </div>
+
+            <!-- ============================================================ -->
+            <!-- ★使用キット & パーツ（提案の肝） ★-->
+            <!-- ============================================================ -->
+            <section class="mt-24 px-16 lg:px-24">
+              <div class="rounded-lg border border-brand-100 bg-brand-25">
+                <header class="flex items-center justify-between gap-12 border-b border-brand-100 px-16 py-12 lg:px-20">
+                  <div class="flex items-center gap-10">
+                    <span class="grid h-28 w-28 place-items-center rounded-md bg-brand-500 text-white">
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                        <path
+                          d="M4 7 12 3l8 4-8 4-8-4Zm0 5 8 4 8-4M4 17l8 4 8-4"
+                          stroke="white"
+                          stroke-width="1.6"
+                          stroke-linejoin="round"
+                        />
+                      </svg>
+                    </span>
+                    <div>
+                      <div class="text-[15px] font-bold text-brand-700">使用キット</div>
+                      <div class="text-[11px] text-ink-500">この作品で使用したキット一覧です</div>
+                    </div>
+                  </div>
+                  <span class="hidden rounded-full bg-white px-10 py-4 text-[11px] font-semibold text-brand-700 ring-1 ring-brand-100 lg:inline-flex"
+                    >9アイテム</span
+                  >
+                </header>
+
+                <!-- 30MM 機体 -->
+                <div class="px-16 pt-16 lg:px-20 lg:pt-20">
+                  <div class="mb-10 flex items-center gap-6 text-[11px] font-bold tracking-widest text-brand-700">
+                    <span class="h-1 w-12 bg-brand-300"></span>
+                    30 MINUTES MISSIONS ／ 機体ベース
+                  </div>
+                </div>
+                <div class="grid gap-12 px-16 lg:grid-cols-2 lg:px-20">
+                  <!-- MELANDER -->
+                  <a href="kit.html"
+                    class="flex gap-12 rounded-md bg-white p-12 shadow-card hover:shadow-cardLg">
+                    <img src="https://m.media-amazon.com/images/I/61p9xCDem3L._AC_SX679_.jpg"
+                      alt="30MM ARMORED CORE Ⅵ BD-011 MELANDER"
+                      class="aspect-square w-[88px] shrink-0 rounded-md bg-white object-contain" loading="lazy" />
+                    <div class="min-w-0 flex-1">
+                      <div class="text-[10px] font-semibold tracking-widest text-brand-600">● 30MM AC6</div>
+                      <div class="mt-2 text-[13px] font-bold leading-snug text-ink-900">
+                        BD-011 MELANDER<br />
+                        <span class="text-ink-700">ARMORED CORE Ⅵ コラボキット</span>
+                      </div>
+                      <div class="mt-2 text-[11px] text-ink-500">バンダイスピリッツ ／ 1/144</div>
+                      <div class="mt-6 flex items-center justify-between">
+                        <span class="text-[13px] font-bold text-ink-900">¥1,902 <span class="text-[10px] font-normal text-ink-500">税込</span></span>
+                        <div class="flex gap-4">
+                          <span class="rounded-md bg-ink-900 px-8 py-4 text-[10px] font-semibold text-white">Amazon</span>
+                          <span class="rounded-md bg-white px-8 py-4 text-[10px] font-semibold text-ink-900 ring-1 ring-ink-100">楽天</span>
+                        </div>
+                      </div>
+                    </div>
+                  </a>
+
+                  <!-- シエルノヴァ宇宙仕様 -->
+                  <a href="https://www.amazon.co.jp/dp/B0CL3TFRF9" target="_blank" rel="noopener noreferrer"
+                    class="flex gap-12 rounded-md bg-white p-12 shadow-card hover:shadow-cardLg">
+                    <img src="https://m.media-amazon.com/images/I/51lEzuEnUcL._AC_SX679_.jpg"
+                      alt="30MM bEXM-C14TS シエルノヴァカスタム(宇宙仕様)"
+                      class="aspect-square w-[88px] shrink-0 rounded-md bg-white object-contain" loading="lazy" />
+                    <div class="min-w-0 flex-1">
+                      <div class="text-[10px] font-semibold tracking-widest text-brand-600">● 30MM CUSTOM</div>
+                      <div class="mt-2 text-[13px] font-bold leading-snug text-ink-900">
+                        bEXM-C14TS シエルノヴァカスタム<br />
+                        <span class="text-ink-700">(宇宙仕様)</span>
+                      </div>
+                      <div class="mt-2 text-[11px] text-ink-500">バンダイスピリッツ ／ 1/144</div>
+                      <div class="mt-6 flex items-center justify-between">
+                        <span class="text-[13px] font-bold text-ink-900">¥2,860 <span class="text-[10px] font-normal text-ink-500">税込</span></span>
+                        <div class="flex gap-4">
+                          <span class="rounded-md bg-ink-900 px-8 py-4 text-[10px] font-semibold text-white">Amazon</span>
+                          <span class="rounded-md bg-white px-8 py-4 text-[10px] font-semibold text-ink-900 ring-1 ring-ink-100">楽天</span>
+                        </div>
+                      </div>
+                    </div>
+                  </a>
+
+                  <!-- レヴィニクス TYPE-B -->
+                  <a href="https://www.amazon.co.jp/dp/B0FBLR2WGD" target="_blank" rel="noopener noreferrer"
+                    class="flex gap-12 rounded-md bg-white p-12 shadow-card hover:shadow-cardLg">
+                    <img src="https://m.media-amazon.com/images/I/61luWQa4wbL._AC_SX679_.jpg"
+                      alt="30MM EXM-X20B レヴィニクス(TYPE-B)"
+                      class="aspect-square w-[88px] shrink-0 rounded-md bg-white object-contain" loading="lazy" />
+                    <div class="min-w-0 flex-1">
+                      <div class="text-[10px] font-semibold tracking-widest text-brand-600">● 30MM MELEE</div>
+                      <div class="mt-2 text-[13px] font-bold leading-snug text-ink-900">
+                        EXM-X20B レヴィニクス<br />
+                        <span class="text-ink-700">(TYPE-B)</span>
+                      </div>
+                      <div class="mt-2 text-[11px] text-ink-500">バンダイスピリッツ ／ 1/144</div>
+                      <div class="mt-6 flex items-center justify-between">
+                        <span class="text-[13px] font-bold text-ink-900">¥1,848 <span class="text-[10px] font-normal text-ink-500">税込</span></span>
+                        <div class="flex gap-4">
+                          <span class="rounded-md bg-ink-900 px-8 py-4 text-[10px] font-semibold text-white">Amazon</span>
+                          <span class="rounded-md bg-white px-8 py-4 text-[10px] font-semibold text-ink-900 ring-1 ring-ink-100">楽天</span>
+                        </div>
+                      </div>
+                    </div>
+                  </a>
+
+                  <!-- フォレスティエリ02 -->
+                  <a href="https://www.amazon.co.jp/dp/B09VGDK9P2" target="_blank" rel="noopener noreferrer"
+                    class="flex gap-12 rounded-md bg-white p-12 shadow-card hover:shadow-cardLg">
+                    <img src="https://m.media-amazon.com/images/I/61BIm0VoO6L._AC_SX679_.jpg"
+                      alt="30MM eEXM-S02M フォレスティエリ 02"
+                      class="aspect-square w-[88px] shrink-0 rounded-md bg-white object-contain" loading="lazy" />
+                    <div class="min-w-0 flex-1">
+                      <div class="text-[10px] font-semibold tracking-widest text-brand-600">● 30MM EARTH</div>
+                      <div class="mt-2 text-[13px] font-bold leading-snug text-ink-900">
+                        eEXM-S02M<br />
+                        <span class="text-ink-700">フォレスティエリ 02</span>
+                      </div>
+                      <div class="mt-2 text-[11px] text-ink-500">バンダイスピリッツ ／ 1/144</div>
+                      <div class="mt-6 flex items-center justify-between">
+                        <span class="text-[13px] font-bold text-ink-900">¥1,210 <span class="text-[10px] font-normal text-ink-500">税込</span></span>
+                        <div class="flex gap-4">
+                          <span class="rounded-md bg-ink-900 px-8 py-4 text-[10px] font-semibold text-white">Amazon</span>
+                          <span class="rounded-md bg-white px-8 py-4 text-[10px] font-semibold text-ink-900 ring-1 ring-ink-100">楽天</span>
+                        </div>
+                      </div>
+                    </div>
+                  </a>
+                </div>
+
+                <!-- 武装オプション -->
+                <div class="mt-16 px-16 lg:px-20">
+                  <div class="mb-10 flex items-center gap-6 text-[11px] font-bold tracking-widest text-brand-700">
+                    <span class="h-1 w-12 bg-brand-300"></span>
+                    武装・オプション流用
+                  </div>
+                  <ul class="space-y-4 pb-20 text-[13px] text-ink-700">
+                    <li>・ 30MM オプションパーツセット15</li>
+                    <li>・ 30MM オプションパーツセット19</li>
+                    <li>・ HGBC ボールデンアームアームズ</li>
+                    <li>・ 30MM アルト(陸戦仕様)</li>
+                    <li>・ 30MM エグザビークル各種（ブースター用）</li>
+                  </ul>
+                </div>
+
+                <footer class="flex items-center justify-between gap-12 border-t border-brand-100 bg-white px-16 py-12 lg:rounded-b-lg lg:px-20">
+                  <span class="text-[11px] text-ink-500">機体ベース 4点合計 <span class="font-bold text-ink-900">¥7,820</span> ／ 同じ機体構成で挑戦したい方向け</span>
+                  <button
+                    class="inline-flex shrink-0 items-center gap-6 rounded-full bg-brand-500 px-14 py-8 text-[12px] font-bold text-white hover:bg-brand-600"
+                  >
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+                      <path d="M5 7h14l-1.5 10a2 2 0 0 1-2 1.7H8.5a2 2 0 0 1-2-1.7L5 7Z" stroke="white" stroke-width="1.6" />
+                      <circle cx="9" cy="20" r="1.4" fill="white" /><circle cx="16" cy="20" r="1.4" fill="white" />
+                    </svg>
+                    まとめてカートに追加
+                  </button>
+                </footer>
+              </div>
+            </section>
+
+            <!-- ============== 画像ギャラリー（縦並び・BNスタイル） ============== -->
+            <section class="mt-20 flex flex-col gap-12 lg:px-24">
+              <img src="images/MM_front.jpg" alt="" class="block w-full object-cover lg:rounded-lg" loading="lazy" />
+              <img src="images/MM_back.jpg" alt="" class="block w-full object-cover lg:rounded-lg" loading="lazy" />
+              <img src="images/MM_boostkick.jpg" alt="" class="block w-full object-cover lg:rounded-lg" loading="lazy" />
+              <img src="images/MM_booster.jpg" alt="" class="block w-full object-cover lg:rounded-lg" loading="lazy" />
+              <img src="images/MM_pre_front.jpg" alt="" class="block w-full object-cover lg:rounded-lg" loading="lazy" />
+              <img src="images/MM_pre_back.jpg" alt="" class="block w-full object-cover lg:rounded-lg" loading="lazy" />
+            </section>
+
+            <!-- Reactions / Footer -->
+            <div class="mt-20 flex items-center justify-between border-t border-ink-50 px-16 py-12 lg:px-24">
+              <div class="flex items-center gap-16">
+                <button class="group flex items-center gap-6 text-[13px] text-ink-600 hover:text-like">
+                  <span class="grid h-32 w-32 place-items-center rounded-full ring-1 ring-ink-100 group-hover:bg-pink-50 group-hover:ring-pink-100">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                      <path
+                        d="M12 20s-7-4.5-9-9.5C1.5 6.5 5 4 7.5 4 9.5 4 11 5 12 6.5 13 5 14.5 4 16.5 4 19 4 22.5 6.5 21 10.5c-2 5-9 9.5-9 9.5Z"
+                        stroke="currentColor"
+                        stroke-width="1.5"
+                        stroke-linejoin="round"
+                      />
+                    </svg>
+                  </span>
+                  <span class="font-semibold">0</span>
+                </button>
+                <button class="group flex items-center gap-6 text-[13px] text-ink-600 hover:text-brand-600">
+                  <span class="grid h-32 w-32 place-items-center rounded-full ring-1 ring-ink-100 group-hover:bg-brand-50 group-hover:ring-brand-100">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                      <path
+                        d="M4 5.5A1.5 1.5 0 0 1 5.5 4h13A1.5 1.5 0 0 1 20 5.5v10A1.5 1.5 0 0 1 18.5 17H9l-4 3v-3H5.5A1.5 1.5 0 0 1 4 15.5v-10Z"
+                        stroke="currentColor"
+                        stroke-width="1.5"
+                      />
+                    </svg>
+                  </span>
+                  <span class="font-semibold">4</span>
+                </button>
+                <button class="group flex items-center gap-6 text-[13px] text-ink-600 hover:text-ink-900">
+                  <span class="grid h-32 w-32 place-items-center rounded-full ring-1 ring-ink-100 group-hover:bg-ink-25">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                      <path d="M4 12v6a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
+                      <path d="M12 3v12m-5-7 5-5 5 5" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round" />
+                    </svg>
+                  </span>
+                  <span class="font-semibold">シェア</span>
+                </button>
+              </div>
+              <button class="grid h-32 w-32 place-items-center rounded-full ring-1 ring-ink-100 text-ink-600 hover:bg-ink-25">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                  <path d="M6 4h12v17l-6-4-6 4V4Z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round" />
+                </svg>
+              </button>
+            </div>
+          </article>
+
+          <!-- ============== Author card ============== -->
+          <section class="mt-16 overflow-hidden rounded-lg bg-white shadow-card">
+            <div class="flex items-center gap-16 p-16 lg:p-20">
+              <span
+                class="grid h-56 w-56 shrink-0 place-items-center rounded-full bg-gradient-to-br from-ink-700 via-ink-500 to-brand-500 text-[20px] font-bold text-white"
+                >G</span
+              >
+              <div class="min-w-0 flex-1">
+                <div class="flex items-center gap-6">
+                  <span class="truncate text-[16px] font-bold">GUN道P</span>
+                </div>
+                <div class="text-[12px] text-ink-500">@gundo_p</div>
+              </div>
+              <button class="hidden h-32 items-center gap-6 rounded-full bg-ink-900 px-14 text-[12px] font-bold text-white hover:bg-ink-700 lg:inline-flex">
+                フォロー
+              </button>
+            </div>
+          </section>
+
+          <!-- ============== GUN道Pさんの他の作品 ============== -->
+          <section class="mt-24">
+            <div class="mb-12 flex items-center justify-between px-4">
+              <h3 class="text-[16px] font-bold">GUN道Pさんの他の作品</h3>
+              <a href="#" class="text-[12px] text-brand-700 hover:underline">すべて見る ›</a>
+            </div>
+            <div class="grid grid-cols-2 gap-12 lg:grid-cols-3">
+              <a class="group block overflow-hidden rounded-lg bg-white shadow-card transition hover:shadow-cardLg">
+                <div class="placeholder dark aspect-[4/3]"><span class="label">イグライト・エア</span></div>
+                <div class="p-12">
+                  <div class="line-clamp-2 text-[13px] font-bold">イグライト・エア</div>
+                  <div class="mt-4 flex items-center justify-between text-[11px] text-ink-500">
+                    <span>GUN道P</span>
+                    <span>♥ 14</span>
+                  </div>
+                </div>
+              </a>
+              <a class="group block overflow-hidden rounded-lg bg-white shadow-card transition hover:shadow-cardLg">
+                <div class="placeholder dark aspect-[4/3]"><span class="label">イグライト・ドラグーン</span></div>
+                <div class="p-12">
+                  <div class="line-clamp-2 text-[13px] font-bold">イグライト・ドラグーン</div>
+                  <div class="mt-4 flex items-center justify-between text-[11px] text-ink-500">
+                    <span>GUN道P</span>
+                    <span>♥ 22</span>
+                  </div>
+                </div>
+              </a>
+              <a class="group block overflow-hidden rounded-lg bg-white shadow-card transition hover:shadow-cardLg">
+                <div class="placeholder dark aspect-[4/3]"><span class="label">大気圏内外両用駆逐艦「エクリプス」級</span></div>
+                <div class="p-12">
+                  <div class="line-clamp-2 text-[13px] font-bold">大気圏内外両用駆逐艦「エクリプス」級</div>
+                  <div class="mt-4 flex items-center justify-between text-[11px] text-ink-500">
+                    <span>GUN道P</span>
+                    <span>♥ 31</span>
+                  </div>
+                </div>
+              </a>
+              <a class="group block overflow-hidden rounded-lg bg-white shadow-card transition hover:shadow-cardLg">
+                <div class="placeholder dark aspect-[4/3]"><span class="label">イグライト・イーグル</span></div>
+                <div class="p-12">
+                  <div class="line-clamp-2 text-[13px] font-bold">イグライト・イーグル</div>
+                  <div class="mt-4 flex items-center justify-between text-[11px] text-ink-500">
+                    <span>GUN道P</span>
+                    <span>♥ 18</span>
+                  </div>
+                </div>
+              </a>
+              <a class="group block overflow-hidden rounded-lg bg-white shadow-card transition hover:shadow-cardLg">
+                <div class="placeholder dark aspect-[4/3]"><span class="label">イグライト02 対艦攻撃パッケージ</span></div>
+                <div class="p-12">
+                  <div class="line-clamp-2 text-[13px] font-bold">イグライト02 対艦攻撃パッケージ</div>
+                  <div class="mt-4 flex items-center justify-between text-[11px] text-ink-500">
+                    <span>GUN道P</span>
+                    <span>♥ 9</span>
+                  </div>
+                </div>
+              </a>
+              <a class="group block overflow-hidden rounded-lg bg-white shadow-card transition hover:shadow-cardLg">
+                <div class="placeholder dark aspect-[4/3]"><span class="label">大気圏内外両用戦闘母艦 SBCV-61「ビッグワン」</span></div>
+                <div class="p-12">
+                  <div class="line-clamp-2 text-[13px] font-bold">大気圏内外両用戦闘母艦 SBCV-61「ビッグワン」</div>
+                  <div class="mt-4 flex items-center justify-between text-[11px] text-ink-500">
+                    <span>GUN道P</span>
+                    <span>♥ 47</span>
+                  </div>
+                </div>
+              </a>
+            </div>
+          </section>
+
+          <!-- ============== コメント (BNスタイル：インライン、カード無し) ============== -->
+          <section class="mt-24 px-4">
+            <div class="flex items-center gap-12 py-12">
+              <span class="grid h-36 w-36 shrink-0 place-items-center rounded-full bg-gradient-to-br from-brand-500 to-brand-300 text-[13px] font-bold text-white">R</span>
+              <label class="flex flex-1 items-center gap-8 rounded-full bg-white px-16 py-8 ring-1 ring-inset ring-ink-100 focus-within:ring-brand-500">
+                <input type="text" placeholder="この作品にコメントする" class="flex-1 bg-transparent text-[13px] text-ink-900 placeholder:text-ink-400 focus:outline-none" />
+                <button class="text-[12px] font-bold text-brand-700">送信</button>
+              </label>
+            </div>
+            <p class="px-12 pt-16 text-center text-[12px] text-ink-400">コメント 4件</p>
+          </section>
+
+          <!-- spacer -->
+          <div class="h-32"></div>
+        </main>
+      </div>
+    </div>
+
+    <!-- ===================== Mobile BottomTab ===================== -->
+    <nav class="fixed inset-x-0 bottom-0 z-20 grid grid-cols-5 border-t border-ink-50 bg-white lg:hidden">
+      <button class="flex flex-col items-center gap-2 py-8 text-[10px] text-ink-500">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+          <path d="M3 11.5 12 4l9 7.5V20a1 1 0 0 1-1 1h-5v-6h-6v6H4a1 1 0 0 1-1-1v-8.5Z" stroke="#5C5C5C" stroke-width="1.5" stroke-linejoin="round" />
+        </svg>
+        ホーム
+      </button>
+      <button class="flex flex-col items-center gap-2 py-8 text-[10px] font-bold text-brand-700">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+          <rect x="3" y="5" width="18" height="14" rx="2" stroke="#6E05A3" stroke-width="1.5" />
+          <path d="M3 9h18M7 13h6M7 16h4" stroke="#6E05A3" stroke-width="1.5" stroke-linecap="round" />
+        </svg>
+        タイムライン
+      </button>
+      <button class="relative -mt-12 flex flex-col items-center">
+        <span class="grid h-48 w-48 place-items-center rounded-full bg-ink-900 text-white shadow-cardLg ring-4 ring-white">
+          <svg width="20" height="20" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14" stroke="white" stroke-width="2" stroke-linecap="round" /></svg>
+        </span>
+      </button>
+      <button class="flex flex-col items-center gap-2 py-8 text-[10px] text-ink-500">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+          <path d="M5 7h14l-1.5 10a2 2 0 0 1-2 1.7H8.5a2 2 0 0 1-2-1.7L5 7Z" stroke="#5C5C5C" stroke-width="1.5" />
+        </svg>
+        ストア
+      </button>
+      <button class="flex flex-col items-center gap-2 py-8 text-[10px] text-ink-500">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+          <circle cx="12" cy="8" r="4" stroke="#5C5C5C" stroke-width="1.5" />
+          <path d="M4 21c0-4 4-6 8-6s8 2 8 6" stroke="#5C5C5C" stroke-width="1.5" />
+        </svg>
+        マイページ
+      </button>
+    </nav>
+
+    <script>
+      document.querySelectorAll('[data-tenant-switcher]').forEach((root) => {
+        const btn = root.querySelector('[data-tenant-button]');
+        const menu = root.querySelector('[data-tenant-menu]');
+        btn?.addEventListener('click', (e) => {
+          e.stopPropagation();
+          menu?.classList.toggle('hidden');
+        });
+      });
+      document.addEventListener('click', (e) => {
+        document.querySelectorAll('[data-tenant-switcher]').forEach((root) => {
+          if (!root.contains(e.target)) {
+            root.querySelector('[data-tenant-menu]')?.classList.add('hidden');
+          }
+        });
+      });
+    </script>
+  </body>
+</html>
