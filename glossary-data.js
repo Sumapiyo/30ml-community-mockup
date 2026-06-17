@@ -40,6 +40,11 @@ window.GLOSSARY = [
         { cat: 'キャラクター', brand: '30MS', faction: null, name: 'アルディート・フォーム', desc: '好奇心旺盛なシスターのフォーム。宇宙空間での活動に特化し、未知の世界へ大胆に挑む。', tone: 'dark' },
         { cat: '用語', brand: '30MS', faction: null, name: 'キャラクターカスタマイズ', desc: '髪型・顔・ボディ・衣装などのパーツを組み合わせ、自分だけのシスターを作る30MSの遊び。', tone: 'light' },
         { cat: '用語', brand: '30MS', faction: null, name: '年3XXX', desc: '30MSの舞台となる時代設定。30MMと地続きの宇宙の、はるか未来とされる。', tone: 'dark' },
+
+        // ===== レーベル（シリーズ） =====
+        { cat: 'レーベル', brand: '30MM', faction: null, name: '30MM', desc: '30 MINUTES MISSIONS。約30分で組み立てられる、カスタマイズ可能なメカ系プラモデルシリーズ。豊富なオプションパーツで自分だけの機体を作れる。', tone: 'dark' },
+        { cat: 'レーベル', brand: '30MS', faction: null, name: '30MS', desc: '30 MINUTES SISTERS。美少女キャラクターを、髪型・顔・ボディなどのパーツ換装で自由にカスタマイズして作るプラモデルシリーズ。', tone: 'light' },
+        { cat: 'レーベル', brand: '30MF', faction: null, name: '30MF', desc: '30 MINUTES FANTASY。剣と魔法のファンタジー世界が舞台。素体（シルエット）にアーマーや武装を組み合わせ、ジョブチェンジして作るプラモデルシリーズ。', tone: 'dark' },
       ];
 
 // 各エントリに一意IDを付与（ブランド+勢力+名称）
