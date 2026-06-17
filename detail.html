@@ -269,7 +269,7 @@
           .sort((a, b) => a.k - b.k)
           .map((o) => o.x);
         const words = order.map((x) => {
-          const size = Math.round(13 + ((x.c - min) / (max - min)) * 31); // 13〜44px
+          const size = Math.round(13 + ((x.c - min) / (max - min)) * 19); // 13〜32px
           const color = palette[(x.w.length + x.c) % palette.length];
           const weight = x.c >= 20 ? 'font-bold' : x.c >= 10 ? 'font-semibold' : 'font-medium';
           return '<span class="' + color + ' ' + weight + '" style="font-size:' + size + 'px;line-height:1.05">' + esc(x.w) + '</span>';
