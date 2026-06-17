@@ -252,6 +252,39 @@
         );
       }
 
+      // よく使われるワード（作例投稿から集計したモック）。出現頻度で大きさ・濃さを変える
+      const FREQ_WORDS = [
+        { w: '越境ビルド', c: 42 }, { w: '全塗装', c: 36 }, { w: 'かっこいい', c: 31 }, { w: '騎士', c: 27 },
+        { w: 'メタリック', c: 24 }, { w: '改造', c: 21 }, { w: 'リーベル', c: 19 }, { w: '翼', c: 18 },
+        { w: '紫', c: 16 }, { w: '武装強化', c: 14 }, { w: 'ドラゴニア', c: 12 }, { w: '部分塗装', c: 11 },
+        { w: 'ナイト', c: 9 }, { w: '夜', c: 8 }, { w: 'ガンメタル', c: 7 }, { w: '素組み', c: 6 },
+        { w: 'スミ入れ', c: 5 }, { w: 'ジオラマ', c: 4 },
+      ];
+      function wordCloud() {
+        const max = 42, min = 4;
+        const words = FREQ_WORDS.slice().sort((a, b) => b.c - a.c);
+        const chips = words.map((x) => {
+          const size = Math.round(12 + ((x.c - min) / (max - min)) * 13); // 12〜25px
+          let cls;
+          if (x.c >= 28) cls = 'bg-brand-600 text-white';
+          else if (x.c >= 17) cls = 'bg-brand-100 text-brand-700';
+          else if (x.c >= 10) cls = 'bg-ink-50 text-ink-700';
+          else cls = 'bg-ink-25 text-ink-400';
+          const weight = x.c >= 17 ? 'font-bold' : 'font-semibold';
+          return '<span class="inline-flex items-center rounded-full px-12 py-4 ' + cls + ' ' + weight + '" style="font-size:' + size + 'px;line-height:1.4">' + esc(x.w) + '</span>';
+        }).join('');
+        return (
+          '<section class="mt-16 overflow-hidden rounded-lg bg-white shadow-card">' +
+            '<header class="flex items-center justify-between border-b border-ink-50 px-16 py-12 lg:px-20">' +
+              '<div><div class="text-[15px] font-bold">よく使われるワード</div>' +
+              '<div class="mt-2 text-[11px] text-ink-500">この作例の投稿でよく登場するワード</div></div>' +
+              '<span class="rounded-full bg-brand-50 px-10 py-4 text-[11px] font-semibold text-brand-700">準備中</span>' +
+            '</header>' +
+            '<div class="flex flex-wrap items-center gap-8 p-16 lg:p-20">' + chips + '</div>' +
+          '</section>'
+        );
+      }
+
       // ＜＞で切り替えるギャラリー（複数画像のモック。実画像があれば1枚目に表示）
       function gallery(it) {
         const slides = [];
@@ -369,6 +402,9 @@
               SAMPLE_WORKS.map(workCard).join('') +
             '</div>' +
           '</section>' +
+
+          // よく使われるワード（ワードクラウド）
+          wordCloud() +
 
           // 関連アイテム
           (related.length
