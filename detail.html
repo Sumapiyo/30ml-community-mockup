@@ -262,16 +262,17 @@
       ];
       function wordCloud() {
         const max = 42, min = 4;
-        const words = FREQ_WORDS.slice().sort((a, b) => b.c - a.c);
-        const chips = words.map((x) => {
-          const size = Math.round(12 + ((x.c - min) / (max - min)) * 13); // 12〜25px
-          let cls;
-          if (x.c >= 28) cls = 'bg-brand-600 text-white';
-          else if (x.c >= 17) cls = 'bg-brand-100 text-brand-700';
-          else if (x.c >= 10) cls = 'bg-ink-50 text-ink-700';
-          else cls = 'bg-ink-25 text-ink-400';
-          const weight = x.c >= 17 ? 'font-bold' : 'font-semibold';
-          return '<span class="inline-flex items-center rounded-full px-12 py-4 ' + cls + ' ' + weight + '" style="font-size:' + size + 'px;line-height:1.4">' + esc(x.w) + '</span>';
+        // ワードクラウド風：色とサイズがバラついた文字を密に配置（大小を混ぜるため出現順を撹拌）
+        const palette = ['text-brand-700', 'text-brand-500', 'text-brand-300', 'text-gold', 'text-ink-700', 'text-ink-500', 'text-ink-400', 'text-like'];
+        const order = FREQ_WORDS
+          .map((x) => ({ x, k: (x.w.length * 7 + x.c * 3) % 11 }))
+          .sort((a, b) => a.k - b.k)
+          .map((o) => o.x);
+        const words = order.map((x) => {
+          const size = Math.round(13 + ((x.c - min) / (max - min)) * 31); // 13〜44px
+          const color = palette[(x.w.length + x.c) % palette.length];
+          const weight = x.c >= 20 ? 'font-bold' : x.c >= 10 ? 'font-semibold' : 'font-medium';
+          return '<span class="' + color + ' ' + weight + '" style="font-size:' + size + 'px;line-height:1.05">' + esc(x.w) + '</span>';
         }).join('');
         return (
           '<section class="mt-16 overflow-hidden rounded-lg bg-white shadow-card">' +
@@ -280,7 +281,7 @@
               '<div class="mt-2 text-[11px] text-ink-500">この作例の投稿でよく登場するワード</div></div>' +
               '<span class="rounded-full bg-brand-50 px-10 py-4 text-[11px] font-semibold text-brand-700">準備中</span>' +
             '</header>' +
-            '<div class="flex flex-wrap items-center gap-8 p-16 lg:p-20">' + chips + '</div>' +
+            '<div class="flex flex-wrap items-center justify-center gap-x-12 gap-y-4 p-20 lg:p-24">' + words + '</div>' +
           '</section>'
         );
       }
