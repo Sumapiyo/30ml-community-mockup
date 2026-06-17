@@ -62,6 +62,8 @@
           radial-gradient(circle at 25% 30%, rgba(198, 163, 90, 0.18), transparent 45%),
           radial-gradient(circle at 75% 75%, rgba(169, 61, 224, 0.22), transparent 50%);
       }
+      .scrollbar-hide::-webkit-scrollbar { display: none; }
+      .scrollbar-hide { scrollbar-width: none; }
     </style>
   </head>
   <body class="min-h-screen">
@@ -227,7 +229,7 @@
 
       function termCard(t) {
         return (
-          '<a href="glossary.html?id=' + encodeURIComponent(t.id) + '" class="group block overflow-hidden rounded-lg bg-white shadow-card transition hover:shadow-cardLg">' +
+          '<a href="glossary.html?id=' + encodeURIComponent(t.id) + '" class="group block w-[150px] shrink-0 snap-start overflow-hidden rounded-lg bg-white shadow-card ring-1 ring-ink-50 transition hover:shadow-cardLg lg:w-[180px]">' +
             '<div class="placeholder ' + (t.tone === 'dark' ? 'ph-dark' : '') + ' relative aspect-[4/3]">' +
               '<div class="absolute left-8 top-8">' + catBadge(t.cat) + '</div>' +
               '<div class="absolute right-8 top-8">' + brandBadge(t.brand) + '</div>' +
@@ -317,12 +319,12 @@
 
         root.innerHTML =
           // Breadcrumb
-          '<div class="mb-12 flex items-center gap-8 text-[13px] text-ink-500">' +
-            '<a href="database.html" class="hover:underline">データベース</a>' +
-            '<svg width="12" height="12" viewBox="0 0 24 24"><path d="m9 6 6 6-6 6" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" /></svg>' +
-            '<a href="database.html" class="hover:underline">用語集</a>' +
-            '<svg width="12" height="12" viewBox="0 0 24 24"><path d="m9 6 6 6-6 6" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" /></svg>' +
-            '<span class="line-clamp-1 text-ink-700">' + esc(g.name) + '</span>' +
+          '<div class="mb-12 flex min-w-0 items-center gap-8 whitespace-nowrap text-[13px] text-ink-500">' +
+            '<a href="database.html" class="shrink-0 hover:underline">データベース</a>' +
+            '<svg width="12" height="12" viewBox="0 0 24 24" class="shrink-0"><path d="m9 6 6 6-6 6" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" /></svg>' +
+            '<a href="database.html" class="shrink-0 hover:underline">用語集</a>' +
+            '<svg width="12" height="12" viewBox="0 0 24 24" class="shrink-0"><path d="m9 6 6 6-6 6" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" /></svg>' +
+            '<span class="min-w-0 flex-1 truncate text-ink-700">' + esc(g.name) + '</span>' +
           '</div>' +
 
           // Hero
@@ -341,7 +343,7 @@
 
           // 関連する用語
           (relTerms.length
-            ? sectionWrap('関連する用語', '同じシリーズの設定', '<div class="grid grid-cols-2 gap-12 lg:grid-cols-3">' + relTerms.map(termCard).join('') + '</div>')
+            ? sectionWrap('関連する用語', '同じシリーズの設定（横にスクロール）', '<div class="-mx-16 flex snap-x snap-mandatory gap-12 overflow-x-auto scrollbar-hide px-16 pb-4 lg:-mx-20 lg:px-20">' + relTerms.map(termCard).join('') + '</div>')
             : '') +
 
           // 関連する作例

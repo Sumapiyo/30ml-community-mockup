@@ -286,12 +286,12 @@
 
         root.innerHTML =
           // Breadcrumb
-          '<div class="mb-12 flex items-center gap-8 text-[13px] text-ink-500">' +
-            '<a href="database.html" class="hover:underline">データベース</a>' +
-            '<svg width="12" height="12" viewBox="0 0 24 24"><path d="m9 6 6 6-6 6" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" /></svg>' +
-            '<a href="database.html" class="hover:underline">アイテム</a>' +
-            '<svg width="12" height="12" viewBox="0 0 24 24"><path d="m9 6 6 6-6 6" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" /></svg>' +
-            '<span class="line-clamp-1 text-ink-700">' + esc(it.n) + '</span>' +
+          '<div class="mb-12 flex min-w-0 items-center gap-8 whitespace-nowrap text-[13px] text-ink-500">' +
+            '<a href="database.html" class="shrink-0 hover:underline">データベース</a>' +
+            '<svg width="12" height="12" viewBox="0 0 24 24" class="shrink-0"><path d="m9 6 6 6-6 6" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" /></svg>' +
+            '<a href="database.html" class="shrink-0 hover:underline">アイテム</a>' +
+            '<svg width="12" height="12" viewBox="0 0 24 24" class="shrink-0"><path d="m9 6 6 6-6 6" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" /></svg>' +
+            '<span class="min-w-0 flex-1 truncate text-ink-700">' + esc(it.n) + '</span>' +
           '</div>' +
 
           // Hero
