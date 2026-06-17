@@ -182,7 +182,7 @@
         </aside>
 
         <!-- ============== Main column ============== -->
-        <main id="term-root" class="px-16 lg:col-span-8 lg:px-0 xl:col-span-9">
+        <main id="term-root" class="min-w-0 px-16 lg:col-span-8 lg:px-0 xl:col-span-9">
           <!-- JSで描画 -->
         </main>
       </div>
@@ -255,10 +255,10 @@
 
       function workCard(i) {
         return (
-          '<div class="overflow-hidden rounded-lg bg-white shadow-card">' +
+          '<a href="work.html" class="block overflow-hidden rounded-lg bg-white shadow-card ring-1 ring-ink-50 transition hover:shadow-cardLg">' +
             '<div class="placeholder aspect-square"></div>' +
             '<div class="p-8"><div class="h-8 w-3/4 rounded bg-ink-50"></div><div class="mt-4 h-6 w-1/2 rounded bg-ink-25"></div></div>' +
-          '</div>'
+          '</a>'
         );
       }
 
@@ -319,7 +319,7 @@
 
         root.innerHTML =
           // Breadcrumb
-          '<div class="mb-12 flex min-w-0 items-center gap-8 whitespace-nowrap text-[13px] text-ink-500">' +
+          '<div class="mb-12 flex min-w-0 items-center gap-8 whitespace-nowrap pt-12 text-[13px] text-ink-500">' +
             '<a href="database.html" class="shrink-0 hover:underline">データベース</a>' +
             '<svg width="12" height="12" viewBox="0 0 24 24" class="shrink-0"><path d="m9 6 6 6-6 6" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" /></svg>' +
             '<a href="database.html" class="shrink-0 hover:underline">用語集</a>' +

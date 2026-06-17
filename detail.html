@@ -183,7 +183,7 @@
         </aside>
 
         <!-- ============== Main column ============== -->
-        <main id="detail-root" class="px-16 lg:col-span-8 lg:px-0 xl:col-span-9">
+        <main id="detail-root" class="min-w-0 px-16 lg:col-span-8 lg:px-0 xl:col-span-9">
           <!-- JSで描画 -->
         </main>
       </div>
@@ -230,6 +230,22 @@
       function heroImg(it, big) {
         if (it.img) return '<img src="db-images/' + it.img + '" alt="" class="aspect-square w-full rounded-md bg-white object-contain" />';
         return '<div class="placeholder ph-dark aspect-square ' + (big ? 'rounded-md' : 'rounded-sm') + '"></div>';
+      }
+
+      // ＜＞で切り替えるギャラリー（複数画像のモック。実画像があれば1枚目に表示）
+      function gallery(it) {
+        const slides = [];
+        if (it.img) slides.push('<img src="db-images/' + it.img + '" alt="" class="h-full w-full bg-white object-contain" />');
+        while (slides.length < 4) slides.push('<div class="placeholder ph-dark h-full w-full"></div>');
+        const arrow = (dir) => '<svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="' + (dir === 'prev' ? 'm15 6-6 6 6 6' : 'm9 6 6 6-6 6') + '" stroke="#1A1A1A" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+        return (
+          '<div data-gallery class="relative aspect-square overflow-hidden rounded-md bg-ink-25 ring-1 ring-ink-100">' +
+            slides.map((s, i) => '<div class="gslide absolute inset-0' + (i ? ' hidden' : '') + '">' + s + '</div>').join('') +
+            '<button data-prev aria-label="前の画像" class="absolute left-8 top-1/2 grid h-32 w-32 -translate-y-1/2 place-items-center rounded-full bg-white/85 text-ink-900 shadow-card hover:bg-white">' + arrow('prev') + '</button>' +
+            '<button data-next aria-label="次の画像" class="absolute right-8 top-1/2 grid h-32 w-32 -translate-y-1/2 place-items-center rounded-full bg-white/85 text-ink-900 shadow-card hover:bg-white">' + arrow('next') + '</button>' +
+            '<div data-counter class="absolute bottom-8 right-8 rounded-full bg-ink-900/70 px-8 py-2 text-[11px] font-semibold text-white backdrop-blur">1 / ' + slides.length + '</div>' +
+          '</div>'
+        );
       }
 
       function specRows(it) {
@@ -286,7 +302,7 @@
 
         root.innerHTML =
           // Breadcrumb
-          '<div class="mb-12 flex min-w-0 items-center gap-8 whitespace-nowrap text-[13px] text-ink-500">' +
+          '<div class="mb-12 flex min-w-0 items-center gap-8 whitespace-nowrap pt-12 text-[13px] text-ink-500">' +
             '<a href="database.html" class="shrink-0 hover:underline">データベース</a>' +
             '<svg width="12" height="12" viewBox="0 0 24 24" class="shrink-0"><path d="m9 6 6 6-6 6" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" /></svg>' +
             '<a href="database.html" class="shrink-0 hover:underline">アイテム</a>' +
@@ -297,11 +313,7 @@
           // Hero
           '<article class="overflow-hidden bg-white shadow-card lg:rounded-lg">' +
             '<div class="grid gap-20 p-16 lg:grid-cols-[300px_1fr] lg:p-24">' +
-              '<div>' + heroImg(it, true) +
-                '<div class="mt-8 grid grid-cols-4 gap-4">' +
-                  '<div class="aspect-square rounded-sm bg-ink-25 ring-1 ring-ink-100"></div>'.repeat(4) +
-                '</div>' +
-              '</div>' +
+              '<div>' + gallery(it) + '</div>' +
               '<div class="min-w-0">' +
                 '<div class="flex items-center gap-8">' + brandBadge(it.b) +
                   '<span class="text-[11px] font-bold tracking-widest text-brand-600">' + (KIND_LABEL[it.k] || '') + '</span>' +
@@ -334,7 +346,7 @@
               '<span class="rounded-full bg-brand-50 px-10 py-4 text-[11px] font-semibold text-brand-700">準備中</span>' +
             '</header>' +
             '<div class="grid grid-cols-3 gap-8 p-16 lg:p-20">' +
-              '<div class="placeholder aspect-square rounded-md"></div>'.repeat(3) +
+              '<a href="work.html" class="placeholder block aspect-square rounded-md transition hover:opacity-90"></a>'.repeat(3) +
             '</div>' +
           '</section>' +
 
@@ -350,6 +362,21 @@
             : '') +
 
           '<div class="h-32"></div>';
+
+        // ギャラリーの＜＞切り替え
+        const gal = document.querySelector('[data-gallery]');
+        if (gal) {
+          const slides = [...gal.querySelectorAll('.gslide')];
+          const counter = gal.querySelector('[data-counter]');
+          let idx = 0;
+          const show = (i) => {
+            idx = (i + slides.length) % slides.length;
+            slides.forEach((s, j) => s.classList.toggle('hidden', j !== idx));
+            counter.textContent = (idx + 1) + ' / ' + slides.length;
+          };
+          gal.querySelector('[data-prev]').addEventListener('click', () => show(idx - 1));
+          gal.querySelector('[data-next]').addEventListener('click', () => show(idx + 1));
+        }
       }
 
       render();
