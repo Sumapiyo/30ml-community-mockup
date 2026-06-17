@@ -254,10 +254,11 @@
       }
 
       function workCard(i) {
+        // 用語カード(termCard)と同じ大きさ
         return (
-          '<a href="work.html" class="block overflow-hidden rounded-lg bg-white shadow-card ring-1 ring-ink-50 transition hover:shadow-cardLg">' +
-            '<div class="placeholder aspect-square"></div>' +
-            '<div class="p-8"><div class="h-8 w-3/4 rounded bg-ink-50"></div><div class="mt-4 h-6 w-1/2 rounded bg-ink-25"></div></div>' +
+          '<a href="work.html" class="group block w-[150px] shrink-0 snap-start overflow-hidden rounded-lg bg-white shadow-card ring-1 ring-ink-50 transition hover:shadow-cardLg lg:w-[180px]">' +
+            '<div class="placeholder aspect-[4/3]"></div>' +
+            '<div class="p-10"><div class="h-8 w-3/4 rounded bg-ink-50"></div><div class="mt-6 h-6 w-1/2 rounded bg-ink-25"></div></div>' +
           '</a>'
         );
       }
@@ -343,11 +344,11 @@
 
           // 関連する用語
           (relTerms.length
-            ? sectionWrap('関連する用語', '同じシリーズの設定（横にスクロール）', '<div class="-mx-16 flex snap-x snap-mandatory gap-12 overflow-x-auto scrollbar-hide px-16 pb-4 lg:-mx-20 lg:px-20">' + relTerms.map(termCard).join('') + '</div>')
+            ? sectionWrap('関連する用語', '同じシリーズの設定（横にスクロール）', '<div class="flex snap-x snap-mandatory gap-12 overflow-x-auto scrollbar-hide pb-4">' + relTerms.map(termCard).join('') + '</div>')
             : '') +
 
           // 関連する作例
-          sectionWrap('関連する作例', 'この設定にまつわるコミュニティ投稿', '<div class="grid grid-cols-3 gap-12">' + [0, 1, 2].map(workCard).join('') + '</div>', '準備中') +
+          sectionWrap('関連する作例', 'この設定にまつわるコミュニティ投稿（横にスクロール）', '<div class="flex snap-x snap-mandatory gap-12 overflow-x-auto scrollbar-hide pb-4">' + [0, 1, 2].map(workCard).join('') + '</div>', '準備中') +
 
           // 関連する商品
           (relProducts.length
