@@ -310,7 +310,6 @@
         ];
         if (it.b === '30MF' && it.mfcat) rows.push(['30MFカテゴリ', esc(it.mfcat)]);
         if (it.faction) rows.push(['勢力', esc(it.faction)]);
-        rows.push(['価格', '<span class="text-[15px] font-bold">' + yen(it.p) + '</span> <span class="text-[11px] font-normal text-ink-500">(税込)</span>']);
         rows.push(['発売', esc(it.d)]);
         rows.push(['メーカー', 'BANDAI SPIRITS']);
         return rows.map(([k, v]) => '<dt class="text-ink-500">' + k + '</dt><dd>' + v + '</dd>').join('');
@@ -373,6 +372,7 @@
                   '<span class="text-[11px] font-bold tracking-widest text-brand-600">' + (KIND_LABEL[it.k] || '') + '</span>' +
                 '</div>' +
                 '<h1 class="mt-8 text-[20px] font-bold leading-snug lg:text-[24px]">' + esc(it.n) + '</h1>' +
+                '<div class="mt-10 flex items-baseline gap-6"><span class="text-[22px] font-bold">' + yen(it.p) + '</span><span class="text-[12px] text-ink-500">(税込)</span></div>' +
                 '<div class="mt-16 space-y-10">' +
                   '<button class="flex w-full items-center justify-center gap-8 rounded-full bg-brand-600 px-16 py-12 text-[14px] font-bold text-white hover:bg-brand-700">' +
                     '<svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M5 7h14l-1.5 10a2 2 0 0 1-2 1.7H8.5a2 2 0 0 1-2-1.7L5 7Z" stroke="white" stroke-width="1.6" /><circle cx="9" cy="20" r="1.4" fill="white" /><circle cx="16" cy="20" r="1.4" fill="white" /></svg>' +
@@ -387,7 +387,16 @@
                     '</button>' +
                   '</div>' +
                 '</div>' +
-                '<dl class="mt-20 grid grid-cols-[100px_1fr] gap-y-8 text-[13px]">' + specRows(it) + '</dl>' +
+                '<div class="mt-20" data-spec>' +
+                  '<div data-spec-body class="relative overflow-hidden" style="max-height:76px">' +
+                    '<dl class="grid grid-cols-[100px_1fr] gap-y-8 text-[13px]">' + specRows(it) + '</dl>' +
+                    '<div data-spec-fade class="pointer-events-none absolute inset-x-0 bottom-0 h-28 bg-gradient-to-t from-white to-transparent"></div>' +
+                  '</div>' +
+                  '<button data-spec-toggle class="mt-10 inline-flex items-center gap-4 text-[13px] font-bold text-brand-600 hover:text-brand-700">' +
+                    '<span data-spec-label>詳細を見る</span>' +
+                    '<svg data-spec-chev width="14" height="14" viewBox="0 0 24 24" fill="none" class="transition-transform"><path d="m6 9 6 6 6-6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>' +
+                  '</button>' +
+                '</div>' +
               '</div>' +
             '</div>' +
           '</article>' +
@@ -433,6 +442,23 @@
           };
           gal.querySelector('[data-prev]').addEventListener('click', () => show(idx - 1));
           gal.querySelector('[data-next]').addEventListener('click', () => show(idx + 1));
+        }
+
+        // スペックの「詳細を見る」展開
+        const spec = document.querySelector('[data-spec]');
+        if (spec) {
+          const body = spec.querySelector('[data-spec-body]');
+          const fade = spec.querySelector('[data-spec-fade]');
+          const label = spec.querySelector('[data-spec-label]');
+          const chev = spec.querySelector('[data-spec-chev]');
+          let open = false;
+          spec.querySelector('[data-spec-toggle]').addEventListener('click', () => {
+            open = !open;
+            body.style.maxHeight = open ? body.scrollHeight + 'px' : '76px';
+            fade.classList.toggle('hidden', open);
+            label.textContent = open ? '閉じる' : '詳細を見る';
+            chev.style.transform = open ? 'rotate(180deg)' : '';
+          });
         }
       }
 
