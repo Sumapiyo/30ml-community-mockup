@@ -253,12 +253,20 @@
         );
       }
 
-      function workCard(i) {
-        // 用語カード(termCard)と同じ大きさ
+      // 用語カード(termCard)と同じ大きさ・タイトル/ユーザー名つき
+      const SAMPLE_WORKS = [
+        { title: '闇翼の槍使い', user: 'nagi', tone: 'dark' },
+        { title: 'ブルーライダー型カスタム', user: 'aoi', tone: 'light' },
+        { title: 'ネオン・スナイパー', user: 'kuro', tone: 'dark' },
+      ];
+      function workCard(w) {
         return (
           '<a href="work.html" class="group block w-[150px] shrink-0 snap-start overflow-hidden rounded-lg bg-white shadow-card ring-1 ring-ink-50 transition hover:shadow-cardLg lg:w-[180px]">' +
-            '<div class="placeholder aspect-[4/3]"></div>' +
-            '<div class="p-10"><div class="h-8 w-3/4 rounded bg-ink-50"></div><div class="mt-6 h-6 w-1/2 rounded bg-ink-25"></div></div>' +
+            '<div class="placeholder ' + (w.tone === 'dark' ? 'ph-dark' : '') + ' aspect-[4/3]"></div>' +
+            '<div class="p-10">' +
+              '<div class="line-clamp-1 text-[12px] font-bold">' + esc(w.title) + '</div>' +
+              '<div class="mt-4 flex items-center gap-4 text-[11px] text-ink-500"><span class="h-14 w-14 rounded-full bg-gradient-to-br from-brand-300 to-brand-100"></span>' + esc(w.user) + '</div>' +
+            '</div>' +
           '</a>'
         );
       }
@@ -348,7 +356,7 @@
             : '') +
 
           // 関連する作例
-          sectionWrap('関連する作例', 'この設定にまつわるコミュニティ投稿（横にスクロール）', '<div class="flex snap-x snap-mandatory gap-12 overflow-x-auto scrollbar-hide pb-4">' + [0, 1, 2].map(workCard).join('') + '</div>', '準備中') +
+          sectionWrap('関連する作例', 'この設定にまつわるコミュニティ投稿（横にスクロール）', '<div class="flex snap-x snap-mandatory gap-12 overflow-x-auto scrollbar-hide pb-4">' + SAMPLE_WORKS.map(workCard).join('') + '</div>', '準備中') +
 
           // 関連する商品
           (relProducts.length

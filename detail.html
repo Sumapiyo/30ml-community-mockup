@@ -65,6 +65,8 @@
           radial-gradient(circle at 25% 30%, rgba(198, 163, 90, 0.18), transparent 45%),
           radial-gradient(circle at 75% 75%, rgba(169, 61, 224, 0.22), transparent 50%);
       }
+      .scrollbar-hide::-webkit-scrollbar { display: none; }
+      .scrollbar-hide { scrollbar-width: none; }
     </style>
   </head>
   <body class="min-h-screen">
@@ -232,6 +234,24 @@
         return '<div class="placeholder ph-dark aspect-square ' + (big ? 'rounded-md' : 'rounded-sm') + '"></div>';
       }
 
+      // 作例カード（用語詳細と同じ大きさ・タイトル/ユーザー名つき）
+      const SAMPLE_WORKS = [
+        { title: '闇翼の槍使い', user: 'nagi', tone: 'dark' },
+        { title: 'ブルーライダー型カスタム', user: 'aoi', tone: 'light' },
+        { title: 'ネオン・スナイパー', user: 'kuro', tone: 'dark' },
+      ];
+      function workCard(w) {
+        return (
+          '<a href="work.html" class="group block w-[150px] shrink-0 snap-start overflow-hidden rounded-lg bg-white shadow-card ring-1 ring-ink-50 transition hover:shadow-cardLg lg:w-[180px]">' +
+            '<div class="placeholder ' + (w.tone === 'dark' ? 'ph-dark' : '') + ' aspect-[4/3]"></div>' +
+            '<div class="p-10">' +
+              '<div class="line-clamp-1 text-[12px] font-bold">' + esc(w.title) + '</div>' +
+              '<div class="mt-4 flex items-center gap-4 text-[11px] text-ink-500"><span class="h-14 w-14 rounded-full bg-gradient-to-br from-brand-300 to-brand-100"></span>' + esc(w.user) + '</div>' +
+            '</div>' +
+          '</a>'
+        );
+      }
+
       // ＜＞で切り替えるギャラリー（複数画像のモック。実画像があれば1枚目に表示）
       function gallery(it) {
         const slides = [];
@@ -319,8 +339,7 @@
                   '<span class="text-[11px] font-bold tracking-widest text-brand-600">' + (KIND_LABEL[it.k] || '') + '</span>' +
                 '</div>' +
                 '<h1 class="mt-8 text-[20px] font-bold leading-snug lg:text-[24px]">' + esc(it.n) + '</h1>' +
-                '<dl class="mt-16 grid grid-cols-[100px_1fr] gap-y-8 text-[13px]">' + specRows(it) + '</dl>' +
-                '<div class="mt-20 space-y-10">' +
+                '<div class="mt-16 space-y-10">' +
                   '<button class="flex w-full items-center justify-center gap-8 rounded-full bg-brand-600 px-16 py-12 text-[14px] font-bold text-white hover:bg-brand-700">' +
                     '<svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M5 7h14l-1.5 10a2 2 0 0 1-2 1.7H8.5a2 2 0 0 1-2-1.7L5 7Z" stroke="white" stroke-width="1.6" /><circle cx="9" cy="20" r="1.4" fill="white" /><circle cx="16" cy="20" r="1.4" fill="white" /></svg>' +
                     '30ML ストアで購入する' +
@@ -334,6 +353,7 @@
                     '</button>' +
                   '</div>' +
                 '</div>' +
+                '<dl class="mt-20 grid grid-cols-[100px_1fr] gap-y-8 text-[13px]">' + specRows(it) + '</dl>' +
               '</div>' +
             '</div>' +
           '</article>' +
@@ -345,8 +365,8 @@
               '<div class="mt-2 text-[11px] text-ink-500">コミュニティの投稿から集計</div></div>' +
               '<span class="rounded-full bg-brand-50 px-10 py-4 text-[11px] font-semibold text-brand-700">準備中</span>' +
             '</header>' +
-            '<div class="grid grid-cols-3 gap-8 p-16 lg:p-20">' +
-              '<a href="work.html" class="placeholder block aspect-square rounded-md transition hover:opacity-90"></a>'.repeat(3) +
+            '<div class="flex snap-x snap-mandatory gap-12 overflow-x-auto scrollbar-hide p-16 lg:p-20">' +
+              SAMPLE_WORKS.map(workCard).join('') +
             '</div>' +
           '</section>' +
 
