@@ -657,7 +657,7 @@
     <script>
       // ホームの二次創作セクション
       var hp = document.getElementById('home-posts');
-      if (hp && window.POSTS) hp.innerHTML = window.POSTS.map(postCard).join('');
+      if (hp && window.POSTS) hp.innerHTML = window.POSTS.filter(function (p) { return p.type !== '作例'; }).map(postCard).join('');
     </script>
   </body>
 </html>
