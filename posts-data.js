@@ -2,7 +2,7 @@
 window.POSTS = [
   { type: '作例',   title: '闇翼の槍使い',     user: 'nagi',     href: 'work.html',   tone: 'dark'  },
   { type: 'SS',     title: 'ドラゴン退治①',   user: '漱石枕流', href: 'ss.html',     tone: 'light' },
-  { type: 'イラスト', title: '🍺🍺',            user: '圣音玥玥', href: 'illust.html', tone: 'dark', img: 'post-images/illust-143443364.jpg' },
+  { type: 'イラスト', title: '🍺🍺',            user: '圣音玥玥', href: 'illust.html', tone: 'dark'  },
 ];
 
 function postTypeBadge(t) {
@@ -14,7 +14,6 @@ function postCard(p) {
   return (
     '<a href="' + p.href + '" class="group block w-[150px] shrink-0 snap-start overflow-hidden rounded-lg bg-white shadow-card ring-1 ring-ink-50 transition hover:shadow-cardLg lg:w-[180px]">' +
       '<div class="placeholder ' + (p.tone === 'dark' ? 'ph-dark' : '') + ' relative aspect-[4/3]">' +
-        (p.img ? '<img src="' + p.img + '" alt="" loading="lazy" class="absolute inset-0 h-full w-full object-cover" />' : '') +
         '<div class="absolute left-8 top-8">' + postTypeBadge(p.type) + '</div>' +
       '</div>' +
       '<div class="p-10">' +
