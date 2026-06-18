@@ -215,6 +215,7 @@
 
     <script src="items-data.js"></script>
     <script src="glossary-data.js"></script>
+    <script src="posts-data.js"></script>
     <script>
       const yen = (n) => '¥' + n.toLocaleString('ja-JP');
       const esc = (s) => (s || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
@@ -355,8 +356,8 @@
             ? sectionWrap('関連する用語', '同じシリーズの設定（横にスクロール）', '<div class="flex snap-x snap-mandatory gap-12 overflow-x-auto scrollbar-hide pb-4">' + relTerms.map(termCard).join('') + '</div>')
             : '') +
 
-          // 関連する作例
-          sectionWrap('関連する作例', 'この設定にまつわるコミュニティ投稿（横にスクロール）', '<div class="flex snap-x snap-mandatory gap-12 overflow-x-auto scrollbar-hide pb-4">' + SAMPLE_WORKS.map(workCard).join('') + '</div>', '準備中') +
+          // 関連する投稿（作例・SS・イラスト）
+          sectionWrap('関連する投稿', 'この設定にまつわるコミュニティ投稿（横にスクロール）', '<div class="flex snap-x snap-mandatory gap-12 overflow-x-auto scrollbar-hide pb-4">' + (window.POSTS || []).map(postCard).join('') + '</div>') +
 
           // 関連する商品
           (relProducts.length

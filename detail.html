@@ -217,6 +217,7 @@
     </nav>
 
     <script src="items-data.js"></script>
+    <script src="posts-data.js"></script>
     <script>
       const BRAND_FULL = { '30MM': '30 MINUTES MISSIONS', '30MS': '30 MINUTES SISTERS', '30MF': '30 MINUTES FANTASY' };
       const KIND_LABEL = { base: 'ベースキット', option: 'オプションパーツ' };
@@ -411,6 +412,19 @@
             '<div class="p-16 lg:p-20">' +
               '<div class="flex snap-x snap-mandatory gap-12 overflow-x-auto scrollbar-hide">' +
                 SAMPLE_WORKS.map(workCard).join('') +
+              '</div>' +
+            '</div>' +
+          '</section>' +
+
+          // このアイテムの二次創作（SS・イラスト）
+          '<section class="mt-16 overflow-hidden rounded-lg bg-white shadow-card">' +
+            '<header class="flex items-center justify-between border-b border-ink-50 px-16 py-12 lg:px-20">' +
+              '<div><div class="text-[15px] font-bold">このアイテムの二次創作</div>' +
+              '<div class="mt-2 text-[11px] text-ink-500">SS・イラストなどコミュニティの二次創作</div></div>' +
+            '</header>' +
+            '<div class="p-16 lg:p-20">' +
+              '<div class="flex snap-x snap-mandatory gap-12 overflow-x-auto scrollbar-hide">' +
+                (window.POSTS || []).filter((p) => p.type !== '作例').map(postCard).join('') +
               '</div>' +
             '</div>' +
           '</section>' +
