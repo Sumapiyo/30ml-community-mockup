@@ -55,59 +55,9 @@
     flex-direction: column;
     align-items: center;
     justify-content: flex-start;
-    padding: 24px 16px 40px;
+    padding: 40px 16px 40px;
   }
 
-  /* ===== Top toolbar (sim controls) ===== */
-  .toolbar {
-    width: 100%;
-    max-width: 420px;
-    margin-bottom: 16px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 12px;
-    color: #B3B3B3;
-    font-size: 12px;
-  }
-  .toolbar .title { font-weight: 700; color: #FFFFFF; }
-  .toolbar .pill {
-    padding: 4px 10px;
-    border: 1px solid #474747;
-    border-radius: var(--r-full);
-    background: transparent;
-    color: #B3B3B3;
-    font-size: 11px;
-    cursor: pointer;
-    transition: 0.15s;
-  }
-  .toolbar .pill:hover { color: #FFFFFF; border-color: #707070; }
-  .toolbar .pill.active { background: #4294FF; color: #141414; border-color: #4294FF; }
-  .sim {
-    width: 100%;
-    max-width: 420px;
-    margin-bottom: 12px;
-    padding: 10px 12px;
-    background: #1B1B1B;
-    border: 1px solid #474747;
-    border-radius: var(--r-md);
-    font-size: 11px;
-    color: #B3B3B3;
-    display: none;
-  }
-  .sim.open { display: block; }
-  .sim .label {
-    font-weight: 700;
-    color: #FFFFFF;
-    margin-bottom: 6px;
-    font-size: 11px;
-  }
-  .sim-row {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 6px;
-  }
-  .sim-row .pill { font-size: 10px; padding: 3px 8px; }
 
   /* ===== Mobile frame ===== */
   .frame {
@@ -420,16 +370,6 @@
   .qr-hero .greet { font-size: 22px; font-weight: 700; margin-bottom: 6px; }
   .qr-hero .desc { font-size: 13px; color: var(--text-secondary); line-height: 20px; }
 
-  /* ===== Hint footer ===== */
-  .hint {
-    margin-top: 16px;
-    width: 100%; max-width: 420px;
-    font-size: 11px;
-    color: #8a8a8a;
-    text-align: center;
-    line-height: 1.6;
-  }
-
   /* SVG icons */
   svg.ico-sm { width: 16px; height: 16px; }
   svg.ico-md { width: 20px; height: 20px; }
@@ -438,10 +378,6 @@
 </head>
 <body>
 
-<div class="toolbar">
-  <a href="events.html" class="pill" style="text-decoration:none;">← 一覧に戻る</a>
-  <span class="title" id="toolbar-title">イベントチェックイン</span>
-</div>
 
 
 <div class="frame">
@@ -480,7 +416,7 @@
   <!-- ============================================================ -->
   <div class="screen active" data-screen="s1">
     <div class="appbar">
-      <button class="ico" data-go="s0"><svg class="ico-md" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg></button>
+      <a href="events.html" class="ico"><svg class="ico-md" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg></a>
       <div class="title">チェックイン</div>
       <button class="ico"><svg class="ico-md" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M9.5 9a2.5 2.5 0 1 1 3.5 2.3c-.9.5-1 1-1 1.7"/><circle cx="12" cy="17" r="0.8" fill="currentColor"/></svg></button>
     </div>
@@ -700,7 +636,6 @@
   const ev = EVENTS[params.get('event')] || EVENTS['tokyo2026'];
 
   // Populate all dynamic text fields
-  document.getElementById('toolbar-title').textContent = ev.name;
   document.getElementById('ev-name').textContent = ev.name;
   document.getElementById('ev-venue').textContent = ev.venue;
   document.getElementById('s1-loc-text').textContent = '会場内（' + ev.venue.split(' ')[0] + '）';
