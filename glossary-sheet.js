@@ -109,7 +109,9 @@
           if (bestIdx < 0) break;
           var a = document.createElement('a');
           a.href = 'glossary.html?id=' + encodeURIComponent(map[bestKey]);
-          a.className = 'font-bold text-blue-600 underline decoration-dotted underline-offset-2 hover:text-blue-700';
+          a.style.cssText = 'font-weight:700;color:#2563eb;text-decoration:underline;text-decoration-style:dotted;text-underline-offset:2px;';
+          a.onmouseenter = function(){ this.style.color='#1d4ed8'; };
+          a.onmouseleave = function(){ this.style.color='#2563eb'; };
           a.textContent = bestKey;
           var after = document.createTextNode(text.slice(bestIdx + bestKey.length));
           node.nodeValue = text.slice(0, bestIdx);
