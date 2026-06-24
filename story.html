@@ -44,7 +44,7 @@
       };
     </script>
     <style>
-      body { font-family: 'Open Sans', 'Noto Sans JP', system-ui, sans-serif; background: #1a1a1a; color: #1a1a1a; }
+      body { font-family: 'Open Sans', 'Noto Sans JP', system-ui, sans-serif; background: #f3f4f6; color: #1a1a1a; }
       /* 30MF: 羊皮紙 */
       .bg-parchment {
         background:
@@ -101,6 +101,34 @@
       })();
     </script>
 
+    <!-- ===================== Desktop Header ===================== -->
+    <header class="fixed inset-x-0 top-0 z-30 hidden h-[60px] border-b border-ink-50 bg-white lg:flex">
+      <div class="mx-auto flex w-full max-w-screen-xl items-center gap-24 px-24">
+        <a href="index.html" class="flex items-center gap-8 rounded-md p-2 hover:bg-ink-25">
+          <span class="flex h-32 w-32 items-center justify-center rounded-md bg-gradient-to-br from-brand-600 to-brand-300 font-bold text-white">30</span>
+          <div class="leading-tight text-left">
+            <div class="text-[15px] font-bold tracking-wide">30ML COMMUNITY</div>
+            <div class="text-[10px] tracking-widest text-ink-500">POWERED BY BUILDERS NOTE</div>
+          </div>
+        </a>
+        <div class="flex-1">
+          <label class="flex h-36 items-center gap-8 rounded-full bg-ink-25 px-16 text-ink-500 ring-1 ring-inset ring-ink-50 focus-within:ring-brand-500">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+              <circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="1.6" />
+              <path d="m20 20-3.5-3.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" />
+            </svg>
+            <input type="text" placeholder="キット・パーツ・作例で検索" class="flex-1 bg-transparent text-sm text-ink-900 placeholder:text-ink-400 focus:outline-none" />
+          </label>
+        </div>
+        <div class="flex items-center gap-8">
+          <div class="ml-4 flex items-center gap-8 rounded-full bg-ink-25 py-4 pl-4 pr-12">
+            <span class="grid h-28 w-28 place-items-center rounded-full bg-gradient-to-br from-brand-500 to-brand-300 text-[11px] font-bold text-white">R</span>
+            <span class="text-[13px] font-semibold">リオ</span>
+          </div>
+        </div>
+      </div>
+    </header>
+
     <!-- ===================== Mobile App bar ===================== -->
     <header class="fixed inset-x-0 top-0 z-30 flex h-48 items-center justify-between border-b border-ink-100 bg-white px-12 lg:hidden">
       <a href="index.html" class="grid h-36 w-36 place-items-center rounded-full hover:bg-ink-25">
@@ -119,8 +147,8 @@
     <div id="world-menu-backdrop" class="fixed inset-0 z-20 hidden"></div>
 
     <!-- ===================== Worlds ===================== -->
-    <div class="pt-48 lg:pt-24">
-      <div class="mx-auto w-full max-w-screen-xl lg:grid lg:grid-cols-12 lg:gap-16 lg:px-24 lg:pb-24">
+    <div class="pt-48 lg:pt-[60px]">
+      <div class="mx-auto w-full max-w-screen-xl lg:grid lg:grid-cols-12 lg:gap-16 lg:p-24">
         <!-- ============== SideMenu (Desktop) ============== -->
         <aside class="hidden lg:col-span-3 lg:block">
           <nav class="sticky top-[84px] flex flex-col gap-4 rounded-lg bg-white p-12 shadow-card">
@@ -342,7 +370,7 @@
 
         <!-- ============== 右サブコンテンツ: ワールド選択(常時表示) ============== -->
         <aside class="hidden lg:col-span-3 lg:block">
-          <div class="sticky top-24 overflow-hidden rounded-lg bg-white shadow-card">
+          <div class="sticky top-[84px] overflow-hidden rounded-lg bg-white shadow-card">
             <div class="border-b border-ink-50 px-16 py-12 text-[11px] font-bold tracking-widest text-ink-500">WORLD 切り替え</div>
             <div id="world-rail" class="flex flex-col gap-2 p-8"></div>
           </div>
