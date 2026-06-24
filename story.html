@@ -101,34 +101,6 @@
       })();
     </script>
 
-    <!-- ===================== Desktop Header ===================== -->
-    <header class="fixed inset-x-0 top-0 z-30 hidden h-[60px] border-b border-ink-50 bg-white lg:flex">
-      <div class="mx-auto flex w-full max-w-screen-xl items-center gap-24 px-24">
-        <a href="index.html" class="flex items-center gap-8 rounded-md p-2 hover:bg-ink-25">
-          <span class="flex h-32 w-32 items-center justify-center rounded-md bg-gradient-to-br from-brand-600 to-brand-300 font-bold text-white">30</span>
-          <div class="leading-tight text-left">
-            <div class="text-[15px] font-bold tracking-wide">30ML COMMUNITY</div>
-            <div class="text-[10px] tracking-widest text-ink-500">POWERED BY BUILDERS NOTE</div>
-          </div>
-        </a>
-        <!-- 中央: ワールド選択 -->
-        <div class="relative flex-1">
-          <button data-world-toggle class="mx-auto flex h-40 w-full max-w-[420px] items-center gap-8 rounded-full bg-ink-25 px-16 text-[14px] font-bold text-ink-900 ring-1 ring-inset ring-ink-50 hover:bg-ink-50">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="m15 6-6 6 6 6" stroke="#1A1A1A" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
-            <span data-world-label>30MF</span>
-            <svg data-world-chev width="16" height="16" viewBox="0 0 24 24" fill="none" class="ml-auto transition-transform"><path d="m6 9 6 6 6-6" stroke="#1A1A1A" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
-          </button>
-          <div data-world-menu class="absolute right-0 top-full z-40 mt-6 hidden w-[260px] overflow-hidden rounded-lg bg-white py-4 shadow-cardLg ring-1 ring-ink-100"></div>
-        </div>
-        <div class="flex items-center gap-8">
-          <div class="ml-4 flex items-center gap-8 rounded-full bg-ink-25 py-4 pl-4 pr-12">
-            <span class="grid h-28 w-28 place-items-center rounded-full bg-gradient-to-br from-brand-500 to-brand-300 text-[11px] font-bold text-white">R</span>
-            <span class="text-[13px] font-semibold">リオ</span>
-          </div>
-        </div>
-      </div>
-    </header>
-
     <!-- ===================== Mobile App bar ===================== -->
     <header class="fixed inset-x-0 top-0 z-30 flex h-48 items-center justify-between border-b border-ink-100 bg-white px-12 lg:hidden">
       <a href="index.html" class="grid h-36 w-36 place-items-center rounded-full hover:bg-ink-25">
@@ -147,10 +119,10 @@
     <div id="world-menu-backdrop" class="fixed inset-0 z-20 hidden"></div>
 
     <!-- ===================== Worlds ===================== -->
-    <div class="pt-48 lg:pt-[60px]">
-      <div class="mx-auto w-full max-w-screen-xl lg:grid lg:grid-cols-12 lg:gap-16 lg:p-24">
+    <div class="pt-48 lg:pt-24">
+      <div class="mx-auto w-full max-w-screen-xl lg:grid lg:grid-cols-12 lg:gap-16 lg:px-24 lg:pb-24">
         <!-- ============== SideMenu (Desktop) ============== -->
-        <aside class="hidden lg:col-span-4 lg:block xl:col-span-3">
+        <aside class="hidden lg:col-span-3 lg:block">
           <nav class="sticky top-[84px] flex flex-col gap-4 rounded-lg bg-white p-12 shadow-card">
             <a href="index.html" class="flex items-center gap-12 rounded-md px-12 py-10 text-[14px] font-semibold text-ink-900 hover:bg-ink-25">
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M3 11.5 12 4l9 7.5V20a1 1 0 0 1-1 1h-5v-6h-6v6H4a1 1 0 0 1-1-1v-8.5Z" stroke="#1A1A1A" stroke-width="1.5" stroke-linejoin="round" /></svg>
@@ -194,7 +166,14 @@
           </nav>
         </aside>
 
-        <main class="mx-auto min-h-screen max-w-[480px] lg:col-span-8 lg:mx-0 lg:min-h-0 lg:max-w-none xl:col-span-9">
+        <main class="mx-auto min-h-screen max-w-[480px] lg:col-span-6 lg:mx-0 lg:min-h-0 lg:max-w-none">
+          <!-- ページ内ヘッダー(デスクトップ) -->
+          <div class="mb-16 hidden items-center gap-12 lg:flex">
+            <a href="index.html" class="grid h-36 w-36 place-items-center rounded-full bg-white shadow-card hover:bg-ink-25">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="m15 6-6 6 6 6" stroke="#1A1A1A" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" /></svg>
+            </a>
+            <h1 class="text-[20px] font-bold tracking-wide">30ML World</h1>
+          </div>
       <!-- ===== 30MF: FANTASY ===== -->
       <section data-world="mf" class="bg-parchment min-h-[calc(100vh-96px)] lg:min-h-0 lg:rounded-lg px-16 pb-32 pt-8 text-[#3a2c14]">
         <div class="text-center">
@@ -360,6 +339,14 @@
         </div>
       </section>
         </main>
+
+        <!-- ============== 右サブコンテンツ: ワールド選択(常時表示) ============== -->
+        <aside class="hidden lg:col-span-3 lg:block">
+          <div class="sticky top-24 overflow-hidden rounded-lg bg-white shadow-card">
+            <div class="border-b border-ink-50 px-16 py-12 text-[11px] font-bold tracking-widest text-ink-500">WORLD 切り替え</div>
+            <div id="world-rail" class="flex flex-col gap-2 p-8"></div>
+          </div>
+        </aside>
       </div>
     </div>
 
@@ -410,12 +397,30 @@
       });
       menuBd.addEventListener('click', closeMenu);
 
+      // 右サブコンテンツ: 常時表示のワールドメニュー
+      var rail = document.getElementById('world-rail');
+      function buildRail() {
+        if (!rail) return;
+        rail.innerHTML = WORLDS.map(function (w, i) {
+          var active = i === idx;
+          return '<button data-i="' + i + '" class="flex w-full items-center gap-10 rounded-md px-10 py-10 text-left text-[13px] ' + (active ? 'font-bold ring-1' : 'hover:bg-ink-25') + '" style="' + (active ? 'background:' + w.color + '1a;color:#1A1A1A;box-shadow:inset 0 0 0 1.5px ' + w.color : '') + '">' +
+            '<span class="grid h-28 w-28 shrink-0 place-items-center rounded-md text-[10px] font-black text-white" style="background:' + w.color + '">' + w.short.replace('30', '') + '</span>' +
+            '<span class="flex-1 leading-tight">' + w.name + '</span>' +
+            (active ? '<svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="m5 12 5 5 9-11" stroke="' + w.color + '" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>' : '') +
+            '</button>';
+        }).join('');
+        [].forEach.call(rail.querySelectorAll('button'), function (b) {
+          b.addEventListener('click', function () { idx = +b.dataset.i; render(); });
+        });
+      }
+
       function render() {
         var w = WORLDS[idx];
         document.querySelectorAll('[data-world]').forEach(function (el) {
           el.classList.toggle('hidden', el.dataset.world !== w.key);
         });
         document.querySelectorAll('[data-world-label]').forEach(function (el) { el.textContent = w.short; });
+        buildRail();
         window.scrollTo(0, 0);
       }
 
