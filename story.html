@@ -107,22 +107,20 @@
         <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="m15 6-6 6 6 6" stroke="#1A1A1A" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" /></svg>
       </a>
       <div class="text-[15px] font-bold tracking-wide">30ML World</div>
-      <span class="grid h-32 w-32 place-items-center rounded-full bg-gradient-to-br from-brand-500 to-brand-300 text-[11px] font-bold text-white">R</span>
-    </header>
-
-    <!-- ===================== Switcher + worlds ===================== -->
-    <main class="mx-auto min-h-screen max-w-[480px] pt-48">
-      <!-- ブランド切替バー -->
-      <div id="switcher" class="sticky top-48 z-20 flex items-center justify-between gap-12 px-12 py-12">
-        <button data-prev class="grid h-36 w-36 shrink-0 place-items-center rounded-full bg-black/30 text-white backdrop-blur hover:bg-black/45">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="m15 6-6 6 6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <!-- ワールド選択プルダウン -->
+      <div class="relative">
+        <button id="world-btn" class="flex h-36 items-center gap-6 rounded-md bg-ink-900 px-12 text-[13px] font-bold text-white">
+          <span id="world-btn-label">30MF</span>
+          <svg id="world-chev" width="14" height="14" viewBox="0 0 24 24" fill="none" class="transition-transform"><path d="m6 9 6 6 6-6" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
         </button>
-        <div id="brand-label" class="flex flex-1 items-center justify-center gap-10 text-center"></div>
-        <button data-next class="grid h-36 w-36 shrink-0 place-items-center rounded-full bg-black/30 text-white backdrop-blur hover:bg-black/45">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="m9 6 6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-        </button>
+        <div id="world-menu" class="absolute right-0 top-full z-40 mt-6 hidden w-[200px] overflow-hidden rounded-lg bg-white py-4 shadow-cardLg ring-1 ring-ink-100"></div>
       </div>
+    </header>
+    <!-- メニュー背景(クリックで閉じる) -->
+    <div id="world-menu-backdrop" class="fixed inset-0 z-30 hidden"></div>
 
+    <!-- ===================== Worlds ===================== -->
+    <main class="mx-auto min-h-screen max-w-[480px] pt-48">
       <!-- ===== 30MF: FANTASY ===== -->
       <section data-world="mf" class="bg-parchment min-h-[calc(100vh-96px)] px-16 pb-32 pt-8 text-[#3a2c14]">
         <div class="text-center">
@@ -287,11 +285,10 @@
           <a href="glossary.html?id=30MS____30MS" class="rounded-full bg-ms px-12 py-5 text-[12px] font-bold text-white">用語集で詳しく →</a>
         </div>
       </section>
-
-      <!-- ドット インジケータ -->
-      <div id="dots" class="flex items-center justify-center gap-8 bg-ink-900 py-16"></div>
     </main>
 
+    <script src="glossary-data.js"></script>
+    <script src="glossary-sheet.js"></script>
     <script>
       var WORLDS = [
         { key: 'mf', name: '30 MINUTES FANTASY', short: '30MF', color: '#B8985A' },
@@ -299,32 +296,40 @@
         { key: 'ms', name: '30 MINUTES SISTERS', short: '30MS', color: '#F5A623' },
       ];
       var idx = 0;
-      var sw = document.getElementById('switcher');
-      var label = document.getElementById('brand-label');
-      var dots = document.getElementById('dots');
+      var btn = document.getElementById('world-btn');
+      var btnLabel = document.getElementById('world-btn-label');
+      var chev = document.getElementById('world-chev');
+      var menu = document.getElementById('world-menu');
+      var menuBd = document.getElementById('world-menu-backdrop');
+
+      function buildMenu() {
+        menu.innerHTML = WORLDS.map(function (w, i) {
+          var active = i === idx;
+          return '<button data-i="' + i + '" class="flex w-full items-center gap-10 px-12 py-10 text-left text-[13px] ' + (active ? 'bg-ink-25 font-bold' : 'hover:bg-ink-25') + '">' +
+            '<span class="grid h-26 w-26 shrink-0 place-items-center rounded-md text-[10px] font-black text-white" style="background:' + w.color + '">' + w.short.replace('30', '') + '</span>' +
+            '<span class="flex-1">' + w.name + '</span>' +
+            (active ? '<svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="m5 12 5 5 9-11" stroke="#8C21C2" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>' : '') +
+            '</button>';
+        }).join('');
+        [].forEach.call(menu.querySelectorAll('button'), function (b) {
+          b.addEventListener('click', function () { idx = +b.dataset.i; closeMenu(); render(); });
+        });
+      }
+      function openMenu() { buildMenu(); menu.classList.remove('hidden'); menuBd.classList.remove('hidden'); chev.style.transform = 'rotate(180deg)'; }
+      function closeMenu() { menu.classList.add('hidden'); menuBd.classList.add('hidden'); chev.style.transform = ''; }
+      btn.addEventListener('click', function () { menu.classList.contains('hidden') ? openMenu() : closeMenu(); });
+      menuBd.addEventListener('click', closeMenu);
 
       function render() {
         var w = WORLDS[idx];
         document.querySelectorAll('[data-world]').forEach(function (el) {
           el.classList.toggle('hidden', el.dataset.world !== w.key);
         });
-        // 切替バーの見た目をワールドに合わせる
-        var dark = w.key === 'mm';
-        sw.style.background = w.key === 'mf' ? '#e3d3ad' : w.key === 'mm' ? '#0b0f24' : '#fff3e0';
-        sw.style.borderBottom = '1px solid ' + (dark ? 'rgba(255,255,255,.12)' : 'rgba(0,0,0,.08)');
-        label.innerHTML =
-          '<span class="grid h-28 w-28 place-items-center rounded-md text-[11px] font-black text-white" style="background:' + w.color + '">' + w.short.replace('30', '') + '</span>' +
-          '<span class="text-[15px] font-extrabold tracking-wide" style="color:' + (dark ? '#fff' : '#1A1A1A') + '">' + w.name + '</span>';
-        // dots
-        dots.innerHTML = WORLDS.map(function (x, i) {
-          return '<span class="h-8 rounded-full transition-all" style="width:' + (i === idx ? '24px' : '8px') + ';background:' + (i === idx ? x.color : '#5C5C5C') + '"></span>';
-        }).join('');
-        window.scrollTo({ top: 0, behavior: 'instant' in window ? 'auto' : 'auto' });
+        // ヘッダーのプルダウン ボタン
+        btnLabel.textContent = w.short;
+        btn.style.background = w.color;
+        window.scrollTo(0, 0);
       }
-      function go(d) { idx = (idx + d + WORLDS.length) % WORLDS.length; render(); }
-      sw.querySelector('[data-prev]').addEventListener('click', function () { go(-1); });
-      sw.querySelector('[data-next]').addEventListener('click', function () { go(1); });
-      dots.addEventListener('click', function () {});
 
       // ?w=mf|mm|ms で初期表示を指定可能
       var q = new URLSearchParams(location.search).get('w');
