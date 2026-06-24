@@ -109,7 +109,7 @@
           if (bestIdx < 0) break;
           var a = document.createElement('a');
           a.href = 'glossary.html?id=' + encodeURIComponent(map[bestKey]);
-          a.className = 'font-bold text-brand-700 underline decoration-dotted underline-offset-2 hover:text-brand-600';
+          a.className = 'font-bold text-blue-600 underline decoration-dotted underline-offset-2 hover:text-blue-700';
           a.textContent = bestKey;
           var after = document.createTextNode(text.slice(bestIdx + bestKey.length));
           node.nodeValue = text.slice(0, bestIdx);
