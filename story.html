@@ -1,0 +1,310 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>30ML World｜ストーリー｜30ML COMMUNITY</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;500;600;700&family=Noto+Sans+JP:wght@400;500;600;700&family=Cinzel:wght@600;700&display=swap"
+      rel="stylesheet"
+    />
+    <script>
+      tailwind.config = {
+        theme: {
+          spacing: {
+            0: '0px', 1: '1px', 2: '2px', 4: '4px', 6: '6px', 8: '8px',
+            10: '10px', 12: '12px', 14: '14px', 16: '16px', 18: '18px',
+            20: '20px', 24: '24px', 28: '28px', 32: '32px', 36: '36px',
+            40: '40px', 44: '44px', 48: '48px', 52: '52px', 56: '56px',
+            60: '60px', 64: '64px', 72: '72px', 80: '80px', 88: '88px',
+            96: '96px', 112: '112px', 128: '128px',
+            px: '1px', 0.5: '2px',
+          },
+          borderRadius: { none: '0px', xs: '2px', DEFAULT: '4px', sm: '4px', md: '8px', lg: '16px', full: '9999px' },
+          extend: {
+            fontFamily: { sans: ['Open Sans', 'Noto Sans JP', 'system-ui', 'sans-serif'], serif: ['Cinzel', 'serif'] },
+            colors: {
+              ink: { 900: '#1A1A1A', 700: '#474747', 600: '#5C5C5C', 500: '#737373', 400: '#949494', 300: '#B3B3B3', 200: '#D1D1D1', 100: '#E8E8E8', 50: '#F5F5F5', 25: '#FAFAFA' },
+              brand: { 25: '#FCF7FF', 50: '#F9EDFF', 100: '#F0D7FC', 300: '#D79DF5', 500: '#A93DE0', 600: '#8C21C2', 700: '#6E05A3' },
+              gold: '#C6A35A',
+              like: '#E5097B',
+              mf: '#B8985A',
+              mm: '#2B6FE0',
+              ms: '#F5A623',
+            },
+            boxShadow: {
+              card: '0px 0px 4px rgba(0,0,0,0.08), 0px 0px 8px rgba(0,0,0,0.06)',
+              cardLg: '0px 0px 8px rgba(0,0,0,0.08), 0px 0px 16px rgba(0,0,0,0.06)',
+            },
+          },
+        },
+      };
+    </script>
+    <style>
+      body { font-family: 'Open Sans', 'Noto Sans JP', system-ui, sans-serif; background: #1a1a1a; color: #1a1a1a; }
+      /* 30MF: 羊皮紙 */
+      .bg-parchment {
+        background:
+          radial-gradient(circle at 30% 20%, rgba(120,90,50,.18), transparent 55%),
+          radial-gradient(circle at 75% 70%, rgba(150,70,90,.16), transparent 55%),
+          linear-gradient(135deg, #e9dcc0 0%, #ddc9a3 50%, #d2bb91 100%);
+      }
+      .land { position:absolute; border-radius:48% 52% 56% 44% / 50% 46% 54% 50%; filter: blur(1px); }
+      .compass { width:64px; height:64px; border-radius:9999px; border:2px solid #7a5a32; display:grid; place-items:center; color:#7a5a32; background:rgba(255,255,255,.25); }
+      /* 30MM: ダーク */
+      .bg-mm {
+        background:
+          radial-gradient(circle at 25% 30%, rgba(43,111,224,.35), transparent 55%),
+          radial-gradient(circle at 80% 65%, rgba(169,61,224,.3), transparent 55%),
+          linear-gradient(160deg, #0c1024 0%, #0e1430 55%, #1a1030 100%);
+      }
+      /* 30MS: ホワイト/オレンジ */
+      .bg-ms { background: linear-gradient(120deg, #ffffff 0%, #fff6e9 60%, #ffe9cc 100%); }
+      .scrollbar-hide::-webkit-scrollbar { display: none; }
+      .scrollbar-hide { scrollbar-width: none; }
+    </style>
+  </head>
+  <body class="min-h-screen">
+    <!-- ===================== Password Gate ===================== -->
+    <div id="gate" class="fixed inset-0 z-50 flex items-center justify-center bg-ink-900 px-24">
+      <div class="w-full max-w-[360px] rounded-lg bg-white p-24 shadow-cardLg">
+        <div class="mb-16 flex items-center gap-10">
+          <span class="flex h-36 w-36 items-center justify-center rounded-md bg-gradient-to-br from-brand-600 to-brand-300 font-bold text-white">30</span>
+          <div class="leading-tight">
+            <div class="text-[15px] font-bold tracking-wide">30ML COMMUNITY</div>
+            <div class="text-[10px] tracking-widest text-ink-500">POWERED BY BUILDERS NOTE</div>
+          </div>
+        </div>
+        <div class="text-[14px] font-bold">このページは限定公開です</div>
+        <p class="mt-2 text-[12px] text-ink-500">合言葉を入力してください。</p>
+        <form id="gate-form" class="mt-14">
+          <input id="gate-input" type="password" autocomplete="off" placeholder="合言葉" class="h-40 w-full rounded-md border border-ink-100 bg-ink-25 px-12 text-[14px] text-ink-900 focus:border-brand-500 focus:outline-none" />
+          <p id="gate-error" class="mt-6 hidden text-[12px] font-semibold text-like">合言葉が違います。</p>
+          <button type="submit" class="mt-12 h-40 w-full rounded-full bg-brand-600 text-[14px] font-bold text-white hover:bg-brand-700">入る</button>
+        </form>
+      </div>
+    </div>
+    <script>
+      (function () {
+        var KEY = 'db_gate_ok'; var PASS = 'gaudiy00';
+        var gate = document.getElementById('gate');
+        function unlock() { gate.style.display = 'none'; document.body.style.overflow = ''; }
+        if (sessionStorage.getItem(KEY) === '1') { unlock(); } else { document.body.style.overflow = 'hidden'; }
+        document.getElementById('gate-form').addEventListener('submit', function (e) {
+          e.preventDefault();
+          if (document.getElementById('gate-input').value.trim() === PASS) { sessionStorage.setItem(KEY, '1'); unlock(); }
+          else { document.getElementById('gate-error').classList.remove('hidden'); }
+        });
+      })();
+    </script>
+
+    <!-- ===================== App bar ===================== -->
+    <header class="fixed inset-x-0 top-0 z-30 flex h-48 items-center justify-between border-b border-ink-100 bg-white px-12">
+      <a href="index.html" class="grid h-36 w-36 place-items-center rounded-full hover:bg-ink-25">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="m15 6-6 6 6 6" stroke="#1A1A1A" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" /></svg>
+      </a>
+      <div class="text-[15px] font-bold tracking-wide">30ML World</div>
+      <span class="grid h-32 w-32 place-items-center rounded-full bg-gradient-to-br from-brand-500 to-brand-300 text-[11px] font-bold text-white">R</span>
+    </header>
+
+    <!-- ===================== Switcher + worlds ===================== -->
+    <main class="mx-auto min-h-screen max-w-[480px] pt-48">
+      <!-- ブランド切替バー -->
+      <div id="switcher" class="sticky top-48 z-20 flex items-center justify-between gap-12 px-12 py-12">
+        <button data-prev class="grid h-36 w-36 shrink-0 place-items-center rounded-full bg-black/30 text-white backdrop-blur hover:bg-black/45">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="m15 6-6 6 6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+        <div id="brand-label" class="flex flex-1 items-center justify-center gap-10 text-center"></div>
+        <button data-next class="grid h-36 w-36 shrink-0 place-items-center rounded-full bg-black/30 text-white backdrop-blur hover:bg-black/45">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="m9 6 6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+      </div>
+
+      <!-- ===== 30MF: FANTASY ===== -->
+      <section data-world="mf" class="bg-parchment min-h-[calc(100vh-96px)] px-16 pb-32 pt-8 text-[#3a2c14]">
+        <div class="text-center">
+          <div class="font-serif text-[11px] tracking-[0.3em] text-[#7a5a32]">THE WORLD OF</div>
+          <div class="font-serif text-[20px] font-bold tracking-wide text-[#5a4220]">30 MINUTES FANTASY</div>
+        </div>
+        <!-- 世界地図 -->
+        <div class="relative mt-14 aspect-[3/4] overflow-hidden rounded-md ring-2 ring-[#a9854f]/50">
+          <div class="absolute inset-0 bg-[#efe6cd]"></div>
+          <div class="land" style="left:8%;top:30%;width:42%;height:34%;background:#8a6f8a;"></div>
+          <div class="land" style="left:46%;top:18%;width:34%;height:26%;background:#9c6f4a;"></div>
+          <div class="land" style="left:52%;top:48%;width:40%;height:34%;background:#a07a4a;"></div>
+          <div class="land" style="left:14%;top:64%;width:20%;height:14%;background:#8f7042;"></div>
+          <span class="absolute left-[14%] top-[40%] text-[11px] font-bold tracking-widest text-[#3a2c14]">WEST QUEENS</span>
+          <span class="absolute left-[55%] top-[28%] text-[11px] font-bold tracking-widest text-[#3a2c14]">EAST QUEENS</span>
+          <span class="absolute left-[60%] top-[58%] text-[11px] font-bold tracking-widest text-[#3a2c14]">NORTH AUSTLAND</span>
+          <span class="absolute left-[16%] top-[78%] text-[11px] font-bold tracking-widest text-[#3a2c14]">SOUTH AUSTLAND</span>
+          <!-- 大断崖 -->
+          <div class="absolute left-[45%] top-[12%] h-[72%] w-[3px] -rotate-6 bg-[#5a4220]/60"></div>
+          <span class="absolute left-[40%] top-[6%] rotate-90 origin-left text-[9px] font-bold tracking-widest text-[#5a4220]">GREAT WALL</span>
+          <div class="compass absolute bottom-12 left-12">
+            <svg width="30" height="30" viewBox="0 0 24 24" fill="none"><path d="M12 3l2.5 6.5L21 12l-6.5 2.5L12 21l-2.5-6.5L3 12l6.5-2.5z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/></svg>
+          </div>
+        </div>
+        <p class="mt-16 text-[13px] leading-loose">
+          剣と魔法のファンタジー世界。大陸は巨大な大断崖「<b>グレートウォール</b>」によって東西に隔てられている。
+          西の <b>リーベル共和国</b> と東の <b>ローザン帝国</b>、二つの勢力が対峙し、同じジョブでも異なる意匠の装甲をまとう。
+        </p>
+        <div class="mt-16 grid grid-cols-2 gap-10">
+          <a href="glossary.html?id=30MF__リーベル共和国__リーベル共和国" class="rounded-md bg-white/55 p-12 ring-1 ring-[#a9854f]/40 hover:bg-white/75">
+            <div class="text-[10px] font-bold tracking-widest text-[#7a5a32]">WEST</div>
+            <div class="mt-2 text-[14px] font-bold">リーベル共和国</div>
+            <div class="mt-2 text-[11px] leading-snug text-[#5a4220]">騎士道を重んじる共和国。洗練された装甲。</div>
+          </a>
+          <a href="glossary.html?id=30MF__ローザン帝国__ローザン帝国" class="rounded-md bg-white/55 p-12 ring-1 ring-[#a9854f]/40 hover:bg-white/75">
+            <div class="text-[10px] font-bold tracking-widest text-[#7a5a32]">EAST</div>
+            <div class="mt-2 text-[14px] font-bold">ローザン帝国</div>
+            <div class="mt-2 text-[11px] leading-snug text-[#5a4220]">高濃度元素が漂う大国。重厚な装甲。</div>
+          </a>
+        </div>
+        <div class="mt-14 flex flex-wrap gap-6">
+          <a href="glossary.html?id=30MF____30MF" class="rounded-full bg-[#5a4220] px-12 py-5 text-[12px] font-bold text-[#efe6cd]">用語集で詳しく →</a>
+        </div>
+      </section>
+
+      <!-- ===== 30MM: MISSIONS ===== -->
+      <section data-world="mm" class="bg-mm hidden min-h-[calc(100vh-96px)] px-16 pb-32 pt-8 text-white">
+        <div class="text-center">
+          <div class="text-[11px] font-bold tracking-[0.3em] text-mm">SCIENCE FICTION</div>
+          <div class="text-[20px] font-bold tracking-wide">30 MINUTES MISSIONS</div>
+        </div>
+        <!-- キービジュアル -->
+        <div class="relative mt-14 flex aspect-[4/5] items-end overflow-hidden rounded-md ring-1 ring-white/15">
+          <div class="absolute inset-0" style="background:radial-gradient(circle at 30% 35%,rgba(43,111,224,.5),transparent 55%),radial-gradient(circle at 75% 60%,rgba(169,61,224,.45),transparent 55%),linear-gradient(160deg,#10173a,#0b0f24);"></div>
+          <div class="absolute inset-0 grid grid-cols-6 gap-px opacity-10">
+            <div class="border-r border-white"></div><div class="border-r border-white"></div><div class="border-r border-white"></div><div class="border-r border-white"></div><div class="border-r border-white"></div><div></div>
+          </div>
+          <div class="relative z-10 p-16">
+            <div class="text-[34px] font-black leading-none text-mm">6th</div>
+            <div class="text-[14px] font-bold">Thank you for the Anniversary !!</div>
+            <div class="mt-2 text-[10px] text-white/60">©BANDAI SPIRITS 2019</div>
+          </div>
+        </div>
+        <p class="mt-16 text-[13px] leading-loose text-white/85">
+          汎用人型機動兵器「<b class="text-white">エグザマクス（EXM）</b>」が活躍する近未来。
+          <b class="text-white">地球連合軍</b> と <b class="text-white">バイロン軍</b> が対立し、東洋風の第3勢力「スピナティオ」も存在する。
+          豊富なオプションで自分だけの機体を組み上げよう。
+        </p>
+        <div class="mt-16 grid grid-cols-2 gap-10">
+          <a href="glossary.html?id=30MM____地球連合軍" class="rounded-md bg-white/8 p-12 ring-1 ring-white/15 hover:bg-white/15">
+            <div class="text-[10px] font-bold tracking-widest text-mm">FACTION 01</div>
+            <div class="mt-2 text-[14px] font-bold">地球連合軍</div>
+            <div class="mt-2 text-[11px] leading-snug text-white/70">アルト／ラビオットを運用。</div>
+          </a>
+          <a href="glossary.html?id=30MM____バイロン軍" class="rounded-md bg-white/8 p-12 ring-1 ring-white/15 hover:bg-white/15">
+            <div class="text-[10px] font-bold tracking-widest text-mm">FACTION 02</div>
+            <div class="mt-2 text-[14px] font-bold">バイロン軍</div>
+            <div class="mt-2 text-[11px] leading-snug text-white/70">ポルタノヴァを運用する対立勢力。</div>
+          </a>
+        </div>
+        <div class="mt-14 flex flex-wrap gap-6">
+          <a href="glossary.html?id=30MM____30MM" class="rounded-full bg-mm px-12 py-5 text-[12px] font-bold text-white">用語集で詳しく →</a>
+        </div>
+      </section>
+
+      <!-- ===== 30MS: SISTERS ===== -->
+      <section data-world="ms" class="bg-ms hidden min-h-[calc(100vh-96px)] pb-32 pt-8">
+        <div class="px-16 text-center">
+          <div class="text-[11px] font-bold tracking-[0.3em] text-ms">CHARACTER</div>
+          <div class="text-[20px] font-bold tracking-wide text-ink-900">30 MINUTES SISTERS</div>
+        </div>
+        <!-- キャラクター ショーケース -->
+        <div class="relative mt-14">
+          <div class="relative grid grid-cols-[1.1fr_1fr] overflow-hidden">
+            <!-- キャラアート(プレースホルダー) -->
+            <div class="relative aspect-[3/4]" style="background:linear-gradient(135deg,#fbe3bf,#f6c98a 60%,#efb066);">
+              <div class="absolute inset-0" style="background:radial-gradient(circle at 50% 35%,rgba(255,255,255,.5),transparent 55%);"></div>
+              <span class="absolute bottom-10 left-10 text-[10px] font-bold tracking-widest text-white/80">ILLUSTRATION</span>
+            </div>
+            <!-- プロフィール -->
+            <div class="bg-ms p-14">
+              <div class="inline-block rounded bg-ink-900 px-10 py-4 text-[13px] font-bold text-white">SIS-G00 リシェッタ</div>
+              <div class="mt-6 inline-block rounded bg-white px-10 py-3 text-[12px] font-bold text-ink-900 ring-1 ring-ink-200">CV：天海由梨奈</div>
+              <p class="mt-10 text-[11.5px] leading-relaxed text-ink-700">
+                天真爛漫で明るく無邪気なシスター。戦闘では持ち前のスピードと鋭いクローで瞬時に敵勢力を制圧する。
+                速さのあまり、ブレインを置き去りにしてしまうことも——？
+              </p>
+              <a href="database.html" class="mt-12 inline-flex items-center gap-4 rounded-full bg-like px-12 py-6 text-[11px] font-bold text-white">商品詳細はコチラ！</a>
+            </div>
+          </div>
+          <div class="bg-ms px-16">
+            <div class="mt-2 font-black tracking-widest text-ms text-[26px] leading-none">SIS-G00</div>
+            <div class="font-black tracking-[0.12em] text-ink-900 text-[34px] leading-none">RISHETTA</div>
+          </div>
+        </div>
+        <!-- キャラ一覧 -->
+        <div class="mt-16 -mx-0 flex snap-x snap-mandatory gap-10 overflow-x-auto scrollbar-hide px-16 pb-4">
+          <button data-char class="w-[84px] shrink-0 snap-start text-center">
+            <div class="aspect-[3/4] rounded-md ring-2 ring-ms" style="background:linear-gradient(135deg,#fbe3bf,#efb066);"></div>
+            <div class="mt-3 text-[10px] font-bold tracking-widest text-ink-900">RISHETTA</div>
+          </button>
+          <button data-char class="w-[84px] shrink-0 snap-start text-center">
+            <div class="aspect-[3/4] rounded-md ring-1 ring-ink-100" style="background:linear-gradient(135deg,#dfe3ee,#aeb6c9);"></div>
+            <div class="mt-3 text-[10px] font-bold tracking-widest text-ink-500">TIASHA</div>
+          </button>
+          <button data-char class="w-[84px] shrink-0 snap-start text-center">
+            <div class="aspect-[3/4] rounded-md ring-1 ring-ink-100" style="background:linear-gradient(135deg,#ffe1ec,#f3a9c6);"></div>
+            <div class="mt-3 text-[10px] font-bold tracking-widest text-ink-500">LULUCE</div>
+          </button>
+          <button data-char class="w-[84px] shrink-0 snap-start text-center">
+            <div class="aspect-[3/4] rounded-md ring-1 ring-ink-100" style="background:linear-gradient(135deg,#e7e2d6,#bcae8f);"></div>
+            <div class="mt-3 text-[10px] font-bold tracking-widest text-ink-500">ALKA-CARTI</div>
+          </button>
+        </div>
+        <div class="mt-8 flex flex-wrap gap-6 px-16">
+          <a href="glossary.html?id=30MS____30MS" class="rounded-full bg-ms px-12 py-5 text-[12px] font-bold text-white">用語集で詳しく →</a>
+        </div>
+      </section>
+
+      <!-- ドット インジケータ -->
+      <div id="dots" class="flex items-center justify-center gap-8 bg-ink-900 py-16"></div>
+    </main>
+
+    <script>
+      var WORLDS = [
+        { key: 'mf', name: '30 MINUTES FANTASY', short: '30MF', color: '#B8985A' },
+        { key: 'mm', name: '30 MINUTES MISSIONS', short: '30MM', color: '#2B6FE0' },
+        { key: 'ms', name: '30 MINUTES SISTERS', short: '30MS', color: '#F5A623' },
+      ];
+      var idx = 0;
+      var sw = document.getElementById('switcher');
+      var label = document.getElementById('brand-label');
+      var dots = document.getElementById('dots');
+
+      function render() {
+        var w = WORLDS[idx];
+        document.querySelectorAll('[data-world]').forEach(function (el) {
+          el.classList.toggle('hidden', el.dataset.world !== w.key);
+        });
+        // 切替バーの見た目をワールドに合わせる
+        var dark = w.key === 'mm';
+        sw.style.background = w.key === 'mf' ? '#e3d3ad' : w.key === 'mm' ? '#0b0f24' : '#fff3e0';
+        sw.style.borderBottom = '1px solid ' + (dark ? 'rgba(255,255,255,.12)' : 'rgba(0,0,0,.08)');
+        label.innerHTML =
+          '<span class="grid h-28 w-28 place-items-center rounded-md text-[11px] font-black text-white" style="background:' + w.color + '">' + w.short.replace('30', '') + '</span>' +
+          '<span class="text-[15px] font-extrabold tracking-wide" style="color:' + (dark ? '#fff' : '#1A1A1A') + '">' + w.name + '</span>';
+        // dots
+        dots.innerHTML = WORLDS.map(function (x, i) {
+          return '<span class="h-8 rounded-full transition-all" style="width:' + (i === idx ? '24px' : '8px') + ';background:' + (i === idx ? x.color : '#5C5C5C') + '"></span>';
+        }).join('');
+        window.scrollTo({ top: 0, behavior: 'instant' in window ? 'auto' : 'auto' });
+      }
+      function go(d) { idx = (idx + d + WORLDS.length) % WORLDS.length; render(); }
+      sw.querySelector('[data-prev]').addEventListener('click', function () { go(-1); });
+      sw.querySelector('[data-next]').addEventListener('click', function () { go(1); });
+      dots.addEventListener('click', function () {});
+
+      // ?w=mf|mm|ms で初期表示を指定可能
+      var q = new URLSearchParams(location.search).get('w');
+      var qi = WORLDS.findIndex(function (x) { return x.key === q; });
+      if (qi >= 0) idx = qi;
+      render();
+    </script>
+  </body>
+</html>
