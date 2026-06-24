@@ -71,4 +71,55 @@
     var id = decodeURIComponent((a.getAttribute('href').split('id=')[1] || ''));
     open(id);
   });
+
+  // ===== 本文オートリンク: [data-autolink] 内に出現する用語をリンク化 =====
+  function buildKeywordMap() {
+    var map = {}, ambiguous = {};
+    (window.GLOSSARY || []).forEach(function (g) {
+      var ns = [g.name];
+      var m = g.name.match(/^(.*?)（(.+?)）$/); // 例: 大断崖（グレートウォール）
+      if (m) { ns.push(m[1]); ns.push(m[2]); }
+      ns.forEach(function (n) {
+        if (!n || n.length < 3) return;          // 短すぎる語は対象外
+        if (map[n] && map[n] !== g.id) ambiguous[n] = 1; // 複数用語に該当する語は曖昧として除外
+        if (!map[n]) map[n] = g.id;
+      });
+    });
+    Object.keys(ambiguous).forEach(function (k) { delete map[k]; });
+    return map;
+  }
+  function autolink() {
+    var containers = document.querySelectorAll('[data-autolink]');
+    if (!containers.length) return;
+    var map = buildKeywordMap();
+    var keys = Object.keys(map).sort(function (a, b) { return b.length - a.length; }); // 長い語優先
+    if (!keys.length) return;
+    containers.forEach(function (c) {
+      var walker = document.createTreeWalker(c, NodeFilter.SHOW_TEXT, null);
+      var nodes = [], n;
+      while ((n = walker.nextNode())) { if (!n.parentElement.closest('a')) nodes.push(n); }
+      nodes.forEach(function (tn) {
+        var node = tn;
+        while (node) {
+          var text = node.nodeValue, bestIdx = -1, bestKey = null;
+          for (var i = 0; i < keys.length; i++) {
+            var p = text.indexOf(keys[i]);
+            if (p >= 0 && (bestIdx < 0 || p < bestIdx)) { bestIdx = p; bestKey = keys[i]; }
+          }
+          if (bestIdx < 0) break;
+          var a = document.createElement('a');
+          a.href = 'glossary.html?id=' + encodeURIComponent(map[bestKey]);
+          a.className = 'font-bold text-brand-700 underline decoration-dotted underline-offset-2 hover:text-brand-600';
+          a.textContent = bestKey;
+          var after = document.createTextNode(text.slice(bestIdx + bestKey.length));
+          node.nodeValue = text.slice(0, bestIdx);
+          node.parentNode.insertBefore(a, node.nextSibling);
+          node.parentNode.insertBefore(after, a.nextSibling);
+          node = after;
+        }
+      });
+    });
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', autolink);
+  else autolink();
 })();
