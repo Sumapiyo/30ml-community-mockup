@@ -1,0 +1,377 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>フィルター設計デモ｜30ML COMMUNITY</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;500;600;700&family=Noto+Sans+JP:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <script>
+      tailwind.config = {
+        theme: {
+          spacing: {
+            0:'0px',1:'1px',2:'2px',4:'4px',6:'6px',8:'8px',
+            10:'10px',12:'12px',14:'14px',16:'16px',18:'18px',
+            20:'20px',24:'24px',28:'28px',32:'32px',36:'36px',
+            40:'40px',44:'44px',48:'48px',52:'52px',56:'56px',
+            60:'60px',64:'64px',72:'72px',80:'80px',88:'88px',
+            96:'96px',112:'112px',128:'128px',px:'1px','0.5':'2px',
+          },
+          borderRadius: { none:'0px',xs:'2px',DEFAULT:'4px',sm:'4px',md:'8px',lg:'16px',full:'9999px' },
+          extend: {
+            fontFamily: { sans: ['Open Sans','Noto Sans JP','system-ui','sans-serif'] },
+            colors: {
+              ink: { 900:'#1A1A1A',700:'#474747',600:'#5C5C5C',500:'#737373',400:'#949494',300:'#B3B3B3',200:'#D1D1D1',100:'#E8E8E8',50:'#F5F5F5',25:'#FAFAFA' },
+              brand: { 25:'#FCF7FF',50:'#F9EDFF',100:'#F0D7FC',300:'#D79DF5',500:'#A93DE0',600:'#8C21C2',700:'#6E05A3' },
+              gold:'#C6A35A', like:'#E5097B',
+            },
+            boxShadow: {
+              card:'0px 0px 4px rgba(0,0,0,0.08), 0px 0px 8px rgba(0,0,0,0.06)',
+              cardLg:'0px 0px 8px rgba(0,0,0,0.08), 0px 0px 16px rgba(0,0,0,0.06)',
+            },
+          },
+        },
+      };
+    </script>
+    <style>
+      body { font-family:'Open Sans','Noto Sans JP',system-ui,sans-serif; background:#fafafa; color:#1a1a1a; }
+      .scrollbar-hide::-webkit-scrollbar { display:none; }
+      .scrollbar-hide { scrollbar-width:none; }
+      .acc-panel { display:none; }
+      .acc-panel.open { display:block; }
+      @keyframes sheet-up { from { transform:translateY(24px); opacity:0; } to { transform:translateY(0); opacity:1; } }
+      .sheet-anim { animation:sheet-up 0.22s ease; }
+    </style>
+  </head>
+  <body class="min-h-screen">
+
+    <!-- ===================== Header ===================== -->
+    <header class="fixed inset-x-0 top-0 z-20 flex h-48 items-center justify-between border-b border-ink-50 bg-white px-16">
+      <button class="grid h-32 w-32 place-items-center">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M3 6h18M3 12h18M3 18h18" stroke="#1A1A1A" stroke-width="1.6" stroke-linecap="round"/></svg>
+      </button>
+      <span class="text-[14px] font-bold tracking-wide">30ML COMMUNITY</span>
+      <button class="grid h-32 w-32 place-items-center">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M6 8a6 6 0 1 1 12 0v4l1.5 3h-15L6 12V8Z" stroke="#1A1A1A" stroke-width="1.5" stroke-linejoin="round"/><path d="M10 18a2 2 0 0 0 4 0" stroke="#1A1A1A" stroke-width="1.5"/></svg>
+      </button>
+    </header>
+
+    <!-- ===================== Main ===================== -->
+    <div class="pt-48">
+      <main class="mx-auto max-w-screen-md px-16 pb-40 pt-16">
+
+        <!-- Search row -->
+        <div class="mb-14 flex items-center gap-10">
+          <label class="flex h-44 flex-1 items-center gap-10 rounded-full bg-ink-50 px-16 text-ink-500">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="1.6"/><path d="m20 20-3.5-3.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+            <input id="q" type="text" placeholder="キット名で検索" class="w-full flex-1 bg-transparent text-[14px] text-ink-900 placeholder:text-ink-400 focus:outline-none"/>
+          </label>
+          <button id="filter-btn" class="relative grid h-44 w-44 shrink-0 place-items-center rounded-full bg-ink-50 hover:bg-ink-100">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M4 7h10M18 7h2M4 17h2M10 17h10" stroke="#1A1A1A" stroke-width="1.6" stroke-linecap="round"/><circle cx="16" cy="7" r="2.2" stroke="#1A1A1A" stroke-width="1.6"/><circle cx="8" cy="17" r="2.2" stroke="#1A1A1A" stroke-width="1.6"/></svg>
+            <span id="filter-badge" class="absolute -right-2 -top-2 hidden h-[18px] min-w-[18px] place-items-center rounded-full bg-brand-600 px-4 text-[10px] font-bold text-white"></span>
+          </button>
+        </div>
+
+        <!-- Toolbar row -->
+        <div class="mb-14 flex items-center justify-between">
+          <span class="text-[14px] font-semibold" id="count-label">—件</span>
+          <div class="flex items-center gap-8">
+            <button id="sort-btn" class="flex h-32 items-center gap-6 rounded-md bg-white px-12 text-[12px] font-semibold shadow-card hover:bg-ink-25">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M8 5v14M8 5 5 8m3-3 3 3M16 19V5m0 14 3-3m-3 3-3-3" stroke="#1A1A1A" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              <span id="sort-label">新着順</span>
+            </button>
+            <button id="view-btn" class="flex h-32 items-center gap-6 rounded-md bg-white px-12 text-[12px] font-semibold shadow-card hover:bg-ink-25">
+              <svg id="view-icon-grid" width="14" height="14" viewBox="0 0 24 24" fill="none"><rect x="4" y="4" width="7" height="7" rx="1" stroke="#1A1A1A" stroke-width="1.6"/><rect x="13" y="4" width="7" height="7" rx="1" stroke="#1A1A1A" stroke-width="1.6"/><rect x="4" y="13" width="7" height="7" rx="1" stroke="#1A1A1A" stroke-width="1.6"/><rect x="13" y="13" width="7" height="7" rx="1" stroke="#1A1A1A" stroke-width="1.6"/></svg>
+              <svg id="view-icon-list" width="14" height="14" viewBox="0 0 24 24" fill="none" class="hidden"><path d="M9 6h11M9 12h11M9 18h11" stroke="#1A1A1A" stroke-width="1.6" stroke-linecap="round"/><circle cx="5" cy="6" r="1.4" fill="#1A1A1A"/><circle cx="5" cy="12" r="1.4" fill="#1A1A1A"/><circle cx="5" cy="18" r="1.4" fill="#1A1A1A"/></svg>
+              <span id="view-label">画像で表示中</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Results -->
+        <div id="results"></div>
+        <div id="empty" class="hidden rounded-lg bg-white p-32 text-center shadow-card">
+          <div class="text-[14px] font-bold">条件に合うキットがありません</div>
+          <p class="mt-6 text-[12px] text-ink-500">絞り込み条件を減らしてみてください</p>
+          <button id="empty-clear" class="mt-16 rounded-full border-[1.5px] border-brand-500 px-20 py-8 text-[13px] font-bold text-brand-600 hover:bg-brand-50">条件をすべてクリア</button>
+        </div>
+      </main>
+    </div>
+
+    <!-- ===================== Filter Sheet ===================== -->
+    <div id="sheet" class="fixed inset-0 z-40 hidden">
+      <div id="sheet-backdrop" class="absolute inset-0 bg-ink-900/50"></div>
+      <div class="sheet-anim absolute inset-x-0 bottom-0 flex max-h-[85vh] flex-col rounded-t-lg bg-white md:inset-auto md:left-1/2 md:top-1/2 md:w-[480px] md:max-h-[80vh] md:-translate-x-1/2 md:-translate-y-1/2 md:rounded-lg md:shadow-cardLg">
+        <div class="flex items-center justify-between border-b border-ink-50 px-16 py-12">
+          <span class="text-[15px] font-bold">絞り込み</span>
+          <button id="sheet-close" class="grid h-32 w-32 place-items-center rounded-full text-ink-500 hover:bg-ink-25">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M18 6 6 18M6 6l12 12" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+          </button>
+        </div>
+
+        <div id="acc-root" class="flex-1 overflow-y-auto"></div>
+
+        <div class="flex items-center gap-12 border-t border-ink-50 px-16 py-12">
+          <button id="sheet-clear" class="text-[13px] font-semibold text-ink-500 hover:text-ink-900">すべてクリア</button>
+          <button id="sheet-apply" class="h-44 flex-1 rounded-full bg-brand-600 px-16 text-[14px] font-bold text-white hover:bg-brand-700">—件を表示</button>
+        </div>
+      </div>
+    </div>
+
+    <script src="items-data.js?v=1"></script>
+    <script>
+    (function () {
+      // ══════════════ 分類の自動導出（データは書き換えない） ══════════════
+      function classify(it) {
+        const n = it.n;
+        const out = { mmcat:null, mscat:null, mffaction:null, mfcat:null };
+        if (it.b === '30MM') {
+          if (n.includes('デカール')) out.mmcat = 'デカール';
+          else if (n.includes('エグザビークル')) out.mmcat = 'エグザビークル';
+          else if (n.includes('ウェポン')) out.mmcat = 'ウェポン';
+          else if (it.k === 'base') out.mmcat = '機体（ベース）';
+          else out.mmcat = 'オプションパーツ';
+        }
+        if (it.b === '30MS') {
+          if (n.includes('デカール')) out.mscat = 'デカール';
+          else if (it.k === 'base') out.mscat = 'キャラクター（素体）';
+          else if (n.includes('オプションボディ') || n.includes('ボディパーツ')) out.mscat = 'ボディパーツ';
+          else if (n.includes('ヘアスタイル') || n.includes('ヘア')) out.mscat = 'ヘアパーツ';
+          else out.mscat = 'オプションパーツ';
+        }
+        if (it.b === '30MF') {
+          if (n.includes('リーベル') || n.includes('アズレア')) out.mffaction = 'リーベル共和国';
+          else if (n.includes('ローザン') || n.includes('ヴァーミリオン')) out.mffaction = 'ローザン帝国';
+          else if (n.includes('鉄禍')) out.mffaction = '鉄禍';
+          else if (n.includes('ドラゴニア') || n.includes('ドゥロー') || n.includes('ネクロス')) out.mffaction = 'ドラゴニア';
+          else if (n.includes('鎧真伝')) out.mffaction = '鎧真伝';
+          else out.mffaction = 'その他';
+          if (n.includes('クラスアップアーマー')) out.mfcat = 'クラスアップアーマー';
+          else if (n.includes('アイテムショップ')) out.mfcat = 'アイテムショップ';
+          else if (n.includes('ストラクチャー')) out.mfcat = 'ストラクチャー';
+          else if (it.k === 'base') out.mfcat = 'キャラクター（ベース）';
+          else out.mfcat = 'その他オプション';
+        }
+        return out;
+      }
+      const ITEMS = window.ITEMS.map((it) => Object.assign({}, it, classify(it)));
+
+      // ══════════════ フィルター軸の定義 ══════════════
+      // dependsOn: ブランドがドラフトに含まれる時のみ行を表示
+      const FACETS = [
+        { key:'brand',    label:'ブランド',      field:'b',        dependsOn:null },
+        { key:'kind',     label:'種別',          field:'k',        dependsOn:null,
+          labels:{ base:'ベースキット', option:'オプション' } },
+        { key:'mmcat',    label:'30MMカテゴリ',  field:'mmcat',    dependsOn:'30MM' },
+        { key:'mscat',    label:'30MSカテゴリ',  field:'mscat',    dependsOn:'30MS' },
+        { key:'mfcat',    label:'30MFカテゴリ',  field:'mfcat',    dependsOn:'30MF' },
+        { key:'mffaction',label:'勢力',          field:'mffaction',dependsOn:'30MF' },
+      ];
+      const FACET_ORDER = { brand:['30MM','30MS','30MF'] };
+
+      // ══════════════ 状態 ══════════════
+      const state = {};  // 適用済み
+      const draft = {};  // シート内編集中
+      FACETS.forEach((f) => { state[f.key] = new Set(); draft[f.key] = new Set(); });
+      let q = '', sort = 'new', view = 'grid';
+      const openRows = new Set(['brand']);
+
+      const $ = (id) => document.getElementById(id);
+
+      // ══════════════ 絞り込みロジック（AND across facets, OR within） ══════════════
+      function passes(it, sel, skipKey) {
+        if (q && !it.n.toLowerCase().includes(q.toLowerCase())) return false;
+        for (const f of FACETS) {
+          if (f.key === skipKey) continue;
+          const set = sel[f.key];
+          if (!set.size) continue;
+          if (!set.has(it[f.field])) return false;
+        }
+        return true;
+      }
+      function facetValues(f) {
+        const vals = new Set();
+        ITEMS.forEach((it) => { const v = it[f.field]; if (v) vals.add(v); });
+        let arr = [...vals];
+        if (FACET_ORDER[f.key]) arr = FACET_ORDER[f.key].filter((v) => vals.has(v));
+        else arr.sort((a, b) => a.localeCompare(b, 'ja'));
+        return arr;
+      }
+      // 予測件数: 自分の軸以外のドラフト条件を適用した上で value を選んだ場合の件数
+      function predictCount(f, value) {
+        return ITEMS.filter((it) => it[f.field] === value && passes(it, draft, f.key)).length;
+      }
+      function draftResultCount() {
+        return ITEMS.filter((it) => passes(it, draft)).length;
+      }
+
+      // ══════════════ アコーディオン描画 ══════════════
+      function rowVisible(f) {
+        if (!f.dependsOn) return true;
+        return draft.brand.has(f.dependsOn);
+      }
+      function renderSheet() {
+        // 依存が外れた軸の選択をクリア
+        FACETS.forEach((f) => { if (!rowVisible(f)) draft[f.key].clear(); });
+
+        const root = $('acc-root');
+        root.innerHTML = '';
+        FACETS.forEach((f) => {
+          if (!rowVisible(f)) return;
+          const isOpen = openRows.has(f.key);
+          const selected = [...draft[f.key]];
+
+          const row = document.createElement('button');
+          row.className = 'flex w-full items-center justify-between border-b border-ink-50 px-16 py-14 text-left hover:bg-ink-25';
+          row.innerHTML =
+            '<span class="flex items-center gap-8 text-[14px] font-semibold">' + f.label +
+            (f.dependsOn ? '<span class="rounded-full bg-brand-50 px-8 py-1 text-[10px] font-bold text-brand-700">' + f.dependsOn + '</span>' : '') +
+            '</span>' +
+            '<span class="flex min-w-0 items-center gap-6 pl-12">' +
+            '<span class="max-w-[150px] truncate text-[12px] ' + (selected.length ? 'font-semibold text-brand-700' : 'text-ink-400') + '">' +
+            (selected.length ? selected.map((v) => (f.labels && f.labels[v]) || v).join('、') : 'すべて') +
+            '</span>' +
+            '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" class="shrink-0 text-ink-400 transition-transform ' + (isOpen ? 'rotate-180' : '') + '"><path d="m6 9 6 6 6-6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>' +
+            '</span>';
+          row.addEventListener('click', () => {
+            isOpen ? openRows.delete(f.key) : openRows.add(f.key);
+            renderSheet();
+          });
+          root.appendChild(row);
+
+          const panel = document.createElement('div');
+          panel.className = 'acc-panel border-b border-ink-50 bg-ink-25/60 px-16 py-12' + (isOpen ? ' open' : '');
+          const wrap = document.createElement('div');
+          wrap.className = 'flex flex-wrap gap-6';
+          facetValues(f).forEach((v) => {
+            const cnt = predictCount(f, v);
+            const on = draft[f.key].has(v);
+            const chip = document.createElement('button');
+            chip.className = 'inline-flex items-center gap-4 rounded-full border-[1.5px] px-12 py-6 text-[12px] font-semibold transition-colors ' +
+              (on ? 'border-brand-500 bg-brand-50 text-brand-700'
+                  : cnt === 0 ? 'border-ink-100 bg-white text-ink-300'
+                  : 'border-ink-100 bg-white text-ink-700 hover:border-ink-300');
+            chip.innerHTML = ((f.labels && f.labels[v]) || v) +
+              '<span class="text-[10px] ' + (on ? 'text-brand-500' : 'text-ink-400') + '">' + cnt + '</span>';
+            chip.addEventListener('click', () => {
+              on ? draft[f.key].delete(v) : draft[f.key].add(v);
+              renderSheet();
+            });
+            wrap.appendChild(chip);
+          });
+          panel.appendChild(wrap);
+          root.appendChild(panel);
+        });
+
+        $('sheet-apply').textContent = draftResultCount() + '件を表示';
+      }
+
+      // ══════════════ 一覧描画 ══════════════
+      function activeCount() {
+        return FACETS.reduce((n, f) => n + state[f.key].size, 0);
+      }
+      function currentList() {
+        let list = ITEMS.filter((it) => passes(it, state));
+        if (sort === 'new') list.sort((a, b) => b.sk - a.sk);
+        else if (sort === 'cheap') list.sort((a, b) => a.p - b.p);
+        else list.sort((a, b) => b.p - a.p);
+        return list;
+      }
+      function brandChipCls(b) {
+        return b === '30MF' ? 'bg-gold' : b === '30MS' ? 'bg-brand-500' : 'bg-ink-700';
+      }
+      function thumbHTML(it, sizeCls) {
+        return '<div class="' + sizeCls + ' grid shrink-0 place-items-center rounded-md bg-ink-50 text-[10px] font-bold text-ink-300">' + it.b.replace('30','') + '</div>';
+      }
+      function render() {
+        const list = currentList();
+        $('count-label').textContent = list.length + '件';
+
+        const badge = $('filter-badge');
+        const n = activeCount();
+        if (n > 0) { badge.textContent = n; badge.classList.remove('hidden'); badge.classList.add('grid'); }
+        else { badge.classList.add('hidden'); badge.classList.remove('grid'); }
+
+        const res = $('results');
+        $('empty').classList.toggle('hidden', list.length > 0);
+        res.classList.toggle('hidden', list.length === 0);
+
+        if (view === 'grid') {
+          res.className = 'grid grid-cols-2 gap-12 md:grid-cols-3';
+          res.innerHTML = list.map((it) =>
+            '<div class="overflow-hidden rounded-lg bg-white shadow-card">' +
+              '<div class="grid aspect-square place-items-center bg-ink-25 text-[13px] font-bold text-ink-200">' + it.b + '</div>' +
+              '<div class="p-10">' +
+                '<div class="mb-4 flex items-center gap-6"><span class="h-8 w-8 rounded-full ' + brandChipCls(it.b) + '"></span><span class="text-[10px] font-semibold text-ink-500">' + it.b + '</span></div>' +
+                '<div class="line-clamp-2 text-[12px] font-semibold leading-snug">' + it.n + '</div>' +
+                '<div class="mt-4 text-[12px] font-bold text-ink-700">¥' + it.p.toLocaleString() + '</div>' +
+              '</div>' +
+            '</div>'
+          ).join('');
+        } else {
+          res.className = 'flex flex-col gap-8';
+          res.innerHTML = list.map((it) =>
+            '<div class="flex items-center gap-12 rounded-lg bg-white p-10 shadow-card">' +
+              thumbHTML(it, 'h-48 w-48') +
+              '<div class="min-w-0 flex-1">' +
+                '<div class="truncate text-[13px] font-semibold">' + it.n + '</div>' +
+                '<div class="mt-2 flex items-center gap-8 text-[11px] text-ink-500"><span class="flex items-center gap-4"><span class="h-6 w-6 rounded-full ' + brandChipCls(it.b) + '"></span>' + it.b + '</span><span>¥' + it.p.toLocaleString() + '</span></div>' +
+              '</div>' +
+              '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" class="shrink-0 text-ink-300"><path d="m12 4 2.4 5 5.6.7-4.1 3.9 1 5.4-4.9-2.6L7.1 19l1-5.4L4 9.7 9.6 9 12 4Z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg>' +
+            '</div>'
+          ).join('');
+        }
+      }
+
+      // ══════════════ イベント ══════════════
+      function openSheet() {
+        FACETS.forEach((f) => { draft[f.key] = new Set(state[f.key]); });
+        renderSheet();
+        $('sheet').classList.remove('hidden');
+        document.body.style.overflow = 'hidden';
+      }
+      function closeSheet() {
+        $('sheet').classList.add('hidden');
+        document.body.style.overflow = '';
+      }
+      $('filter-btn').addEventListener('click', openSheet);
+      $('sheet-backdrop').addEventListener('click', closeSheet);
+      $('sheet-close').addEventListener('click', closeSheet);
+      $('sheet-clear').addEventListener('click', () => {
+        FACETS.forEach((f) => draft[f.key].clear());
+        renderSheet();
+      });
+      $('sheet-apply').addEventListener('click', () => {
+        FACETS.forEach((f) => { state[f.key] = new Set(draft[f.key]); });
+        closeSheet();
+        render();
+      });
+      $('empty-clear').addEventListener('click', () => {
+        FACETS.forEach((f) => state[f.key].clear());
+        render();
+      });
+      $('q').addEventListener('input', (e) => { q = e.target.value.trim(); render(); });
+
+      const SORTS = [['new','新着順'],['cheap','価格が安い順'],['exp','価格が高い順']];
+      $('sort-btn').addEventListener('click', () => {
+        const i = SORTS.findIndex(function(s){ return s[0] === sort; });
+        sort = SORTS[(i + 1) % SORTS.length][0];
+        $('sort-label').textContent = SORTS.find(function(s){ return s[0] === sort; })[1];
+        render();
+      });
+      $('view-btn').addEventListener('click', () => {
+        view = view === 'grid' ? 'list' : 'grid';
+        $('view-label').textContent = view === 'grid' ? '画像で表示中' : 'リストで表示中';
+        $('view-icon-grid').classList.toggle('hidden', view !== 'grid');
+        $('view-icon-list').classList.toggle('hidden', view !== 'list');
+        render();
+      });
+      document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeSheet(); });
+
+      render();
+    })();
+    </script>
+  </body>
+</html>
