@@ -176,7 +176,7 @@
       const draft = {};  // シート内編集中
       FACETS.forEach((f) => { state[f.key] = new Set(); draft[f.key] = new Set(); });
       let q = '', sort = 'new', view = 'grid';
-      const openRows = new Set(['brand']);
+      const openRows = new Set(FACETS.map((f) => f.key));
 
       const $ = (id) => document.getElementById(id);
 
