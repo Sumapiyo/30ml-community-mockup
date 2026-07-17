@@ -248,13 +248,15 @@
           facetValues(f).forEach((v) => {
             const cnt = predictCount(f, v);
             const on = draft[f.key].has(v);
+            const disabled = !on && cnt === 0;
             const chip = document.createElement('button');
             chip.className = 'inline-flex items-center gap-4 rounded-full border-[1.5px] px-12 py-6 text-[12px] font-semibold transition-colors ' +
               (on ? 'border-brand-500 bg-brand-50 text-brand-700'
-                  : cnt === 0 ? 'border-ink-100 bg-white text-ink-300'
+                  : disabled ? 'cursor-not-allowed border-ink-50 bg-ink-25 text-ink-200'
                   : 'border-ink-100 bg-white text-ink-700 hover:border-ink-300');
+            chip.disabled = disabled;
             chip.innerHTML = ((f.labels && f.labels[v]) || v) +
-              '<span class="text-[10px] ' + (on ? 'text-brand-500' : 'text-ink-400') + '">' + cnt + '</span>';
+              '<span class="text-[10px] ' + (on ? 'text-brand-500' : disabled ? 'text-ink-200' : 'text-ink-400') + '">' + cnt + '</span>';
             chip.addEventListener('click', () => {
               on ? draft[f.key].delete(v) : draft[f.key].add(v);
               renderSheet();
