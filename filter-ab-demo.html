@@ -195,6 +195,7 @@
       const state = {}, draft = {};
       KEYS.forEach((k) => { state[k] = new Set(); draft[k] = new Set(); });
       let q = '', sort = 'new', view = 'grid';
+      const openSections = new Set();
 
       const $ = (id) => document.getElementById(id);
 
@@ -313,29 +314,51 @@
           const cnt = ITEMS.filter((it) => it.k === v && passesB(it, draft, 'kind')).length;
           kindChips.appendChild(makeChip(KIND_LABEL[v], cnt, draft.kind.has(v), () => toggleVal('kind', v)));
         });
-        // ブランド区画
+        // ブランド区画（開閉式）
         BRANDS.filter((b) => draft.brand.has(b)).forEach((b) => {
-          const grp = document.createElement('div');
-          grp.className = 'mx-12 mt-16 rounded-md bg-ink-25 pb-14';
+          const isOpen = openSections.has(b);
           const contrib = contribution(b);
-          const touched = (SUB_KEYS[b] || []).some((k) => draft[k].size);
-          grp.innerHTML = '<div class="flex items-center justify-between px-14 pt-12">' +
-            '<span class="text-[13px] font-bold">' + b + ' の絞り込み</span>' +
-            '<span class="text-[12px] font-bold ' + (touched ? 'text-brand-700' : 'text-ink-400') + '">' + contrib + '件</span></div>';
-          SECTIONS[b].forEach((sub) => {
-            const label = document.createElement('div');
-            label.className = 'mb-8 mt-12 px-14 text-[12px] font-semibold text-ink-500';
-            label.textContent = sub.label;
-            grp.appendChild(label);
-            const chips = document.createElement('div');
-            chips.className = 'flex flex-wrap gap-6 px-14';
-            facetValues(sub.field).forEach((v) => {
-              const cnt = ITEMS.filter((it) => it.b === b && it[sub.field] === v && qPass(it) &&
-                (!draft.kind.size || draft.kind.has(it.k)) && sectionPass(it, draft, sub.key)).length;
-              chips.appendChild(makeChip(v, cnt, draft[sub.key].has(v), () => toggleVal(sub.key, v)));
-            });
-            grp.appendChild(chips);
+          const selectedVals = (SUB_KEYS[b] || []).flatMap((k) => [...draft[k]]);
+          const touched = selectedVals.length > 0;
+
+          const grp = document.createElement('div');
+          grp.className = 'mx-12 mt-12 rounded-md bg-ink-25' + (isOpen ? ' pb-14' : ' pb-2');
+
+          const head = document.createElement('button');
+          head.className = 'flex w-full items-center justify-between px-14 py-12 text-left';
+          head.innerHTML =
+            '<span class="min-w-0">' +
+              '<span class="block text-[13px] font-bold">' + b + ' の絞り込み</span>' +
+              (!isOpen && touched
+                ? '<span class="mt-2 block truncate text-[11px] font-semibold text-brand-700">' + selectedVals.join('、') + '</span>'
+                : '') +
+            '</span>' +
+            '<span class="flex shrink-0 items-center gap-8 pl-12">' +
+              '<span class="text-[12px] font-bold ' + (touched ? 'text-brand-700' : 'text-ink-400') + '">' + contrib + '件</span>' +
+              '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" class="text-ink-400 transition-transform ' + (isOpen ? 'rotate-180' : '') + '"><path d="m6 9 6 6 6-6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>' +
+            '</span>';
+          head.addEventListener('click', () => {
+            isOpen ? openSections.delete(b) : openSections.add(b);
+            renderSheet();
           });
+          grp.appendChild(head);
+
+          if (isOpen) {
+            SECTIONS[b].forEach((sub) => {
+              const label = document.createElement('div');
+              label.className = 'mb-8 mt-4 px-14 text-[12px] font-semibold text-ink-500';
+              label.textContent = sub.label;
+              grp.appendChild(label);
+              const chips = document.createElement('div');
+              chips.className = 'flex flex-wrap gap-6 px-14';
+              facetValues(sub.field).forEach((v) => {
+                const cnt = ITEMS.filter((it) => it.b === b && it[sub.field] === v && qPass(it) &&
+                  (!draft.kind.size || draft.kind.has(it.k)) && sectionPass(it, draft, sub.key)).length;
+                chips.appendChild(makeChip(v, cnt, draft[sub.key].has(v), () => toggleVal(sub.key, v)));
+              });
+              grp.appendChild(chips);
+            });
+          }
           root.appendChild(grp);
         });
       }
