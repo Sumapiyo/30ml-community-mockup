@@ -256,66 +256,33 @@
               <p class="mt-2 text-[13px] text-ink-500">バンダイホビーサイトから収集した 30MM / 30MS / 30MF の全商品。</p>
             </div>
 
-            <!-- 検索 -->
-            <div class="px-4">
-              <label class="flex h-40 items-center gap-8 rounded-full bg-white px-16 text-ink-500 shadow-card focus-within:ring-2 focus-within:ring-brand-300">
+            <!-- 検索 + 絞り込みアイコン -->
+            <div class="flex items-center gap-10 px-4">
+              <label class="flex h-40 flex-1 items-center gap-8 rounded-full bg-white px-16 text-ink-500 shadow-card focus-within:ring-2 focus-within:ring-brand-300">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="1.6" /><path d="m20 20-3.5-3.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" /></svg>
                 <input id="item-search" type="text" placeholder="商品名・品番で検索" class="flex-1 bg-transparent text-[14px] text-ink-900 placeholder:text-ink-400 focus:outline-none" />
               </label>
+              <button data-filter-toggle="item" class="relative grid h-40 w-40 shrink-0 place-items-center rounded-full bg-white shadow-card hover:bg-ink-25">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M4 7h10M18 7h2M4 17h2M10 17h10" stroke="#1A1A1A" stroke-width="1.6" stroke-linecap="round"/><circle cx="16" cy="7" r="2.2" stroke="#1A1A1A" stroke-width="1.6"/><circle cx="8" cy="17" r="2.2" stroke="#1A1A1A" stroke-width="1.6"/></svg>
+                <span id="item-filter-badge" class="absolute -right-2 -top-2 hidden h-[18px] min-w-[18px] place-items-center rounded-full bg-brand-600 px-4 text-[10px] font-bold text-white"></span>
+              </button>
             </div>
 
-            <!-- フィルタバー（折りたたみ型） -->
-            <div class="mt-12 px-4">
-              <div class="flex flex-wrap items-center gap-8">
-                <button data-filter-toggle="item" class="inline-flex h-32 shrink-0 items-center gap-6 rounded-full bg-ink-900 px-14 text-[13px] font-semibold text-white hover:bg-ink-700">
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M3 5h18M6 12h12M10 19h4" stroke="white" stroke-width="1.8" stroke-linecap="round" /></svg>
-                  絞り込む
-                </button>
-                <!-- 選択中チップ -->
-                <div id="item-chips" class="flex flex-1 flex-wrap items-center gap-6"></div>
-              </div>
-
-              <!-- 展開パネル -->
-              <!-- フィルタモーダル（モバイル=ボトムシート / PC=中央ダイアログ） -->
-              <div data-filter-panel="item" class="fixed inset-0 z-40 hidden">
-                <div data-filter-backdrop class="absolute inset-0 bg-ink-900/50"></div>
-                <div class="absolute inset-x-0 bottom-0 flex max-h-[85vh] flex-col rounded-t-lg bg-white shadow-cardLg lg:inset-x-auto lg:bottom-auto lg:left-1/2 lg:top-1/2 lg:max-h-[80vh] lg:w-[480px] lg:-translate-x-1/2 lg:-translate-y-1/2 lg:rounded-lg">
-                  <div class="mx-auto mt-8 h-4 w-36 rounded-full bg-ink-200 lg:hidden"></div>
-                  <div class="flex items-center justify-between px-16 py-12">
-                    <div class="text-[15px] font-bold">絞り込み</div>
-                    <button data-filter-close class="grid h-32 w-32 place-items-center rounded-full text-ink-500 hover:bg-ink-25">
-                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="m6 6 12 12M18 6 6 18" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" /></svg>
-                    </button>
-                  </div>
-                  <div class="grid gap-14 overflow-y-auto border-t border-ink-50 px-16 py-16">
-                    <div data-facet-row>
-                      <div class="mb-6 text-[11px] font-bold tracking-wide text-ink-500">ブランド</div>
-                      <div id="f-brand" class="flex flex-wrap gap-6" data-facet="brand"></div>
-                    </div>
-                    <div data-facet-row>
-                      <div class="mb-6 text-[11px] font-bold tracking-wide text-ink-500">種類</div>
-                      <div id="f-kind" class="flex flex-wrap gap-6" data-facet="kind"></div>
-                    </div>
-                    <!-- 30MF選択時のみ表示（階層依存） -->
-                    <div data-facet-row data-only-mf class="hidden">
-                      <div class="mb-6 flex items-center gap-6 text-[11px] font-bold tracking-wide text-ink-500">
-                        30MFカテゴリ
-                        <span class="rounded-full bg-gold/15 px-6 py-1 text-[10px] font-semibold text-gold">30MF選択時</span>
-                      </div>
-                      <div id="f-mfcat" class="flex flex-wrap gap-6" data-facet="mfcat"></div>
-                    </div>
-                    <div data-facet-row data-only-mf class="hidden">
-                      <div class="mb-6 flex items-center gap-6 text-[11px] font-bold tracking-wide text-ink-500">
-                        勢力
-                        <span class="rounded-full bg-gold/15 px-6 py-1 text-[10px] font-semibold text-gold">30MF選択時</span>
-                      </div>
-                      <div id="f-faction" class="flex flex-wrap gap-6" data-facet="faction"></div>
-                    </div>
-                  </div>
-                  <div class="flex items-center justify-between gap-12 border-t border-ink-50 px-16 py-12 pb-[max(12px,env(safe-area-inset-bottom))]">
-                    <button data-filter-clear="item" class="text-[13px] font-semibold text-ink-500 hover:text-ink-900">すべてクリア</button>
-                    <button data-filter-apply="item" class="h-40 flex-1 rounded-full bg-brand-600 px-16 text-[14px] font-bold text-white hover:bg-brand-700 lg:flex-none">絞り込む</button>
-                  </div>
+            <!-- フィルタモーダル（モバイル=ボトムシート / PC=中央ダイアログ） -->
+            <div data-filter-panel="item" class="fixed inset-0 z-40 hidden">
+              <div data-filter-backdrop class="absolute inset-0 bg-ink-900/50"></div>
+              <div class="absolute inset-x-0 bottom-0 flex max-h-[calc(100dvh-56px)] flex-col rounded-t-lg bg-white shadow-cardLg lg:inset-x-auto lg:bottom-auto lg:left-1/2 lg:top-1/2 lg:max-h-[80vh] lg:w-[480px] lg:-translate-x-1/2 lg:-translate-y-1/2 lg:rounded-lg">
+                <div class="mx-auto mt-8 h-4 w-36 rounded-full bg-ink-200 lg:hidden"></div>
+                <div class="flex items-center justify-between px-16 py-12">
+                  <div class="text-[15px] font-bold">絞り込み</div>
+                  <button data-filter-close class="grid h-32 w-32 place-items-center rounded-full text-ink-500 hover:bg-ink-25">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="m6 6 12 12M18 6 6 18" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" /></svg>
+                  </button>
+                </div>
+                <div id="item-sheet-body" class="flex-1 overflow-y-auto pb-16"></div>
+                <div class="flex items-center justify-between gap-12 border-t border-ink-50 px-16 py-12 pb-[max(12px,env(safe-area-inset-bottom))]">
+                  <button data-filter-clear="item" class="text-[13px] font-semibold text-ink-500 hover:text-ink-900">すべてクリア</button>
+                  <button data-filter-apply="item" class="h-40 flex-1 rounded-full bg-brand-600 px-16 text-[14px] font-bold text-white hover:bg-brand-700 lg:flex-none">絞り込む</button>
                 </div>
               </div>
             </div>
@@ -446,7 +413,43 @@
     <script src="glossary-sheet.js?v=3"></script>
     <script>
       /* ====== データ ====== */
-      const ITEMS = window.ITEMS;
+      // ブランド専用の分類（カテゴリ・勢力）は商品名から読込時に導出する
+      function classifyItem(it) {
+        const n = it.n;
+        const out = { mmcat: null, mmfaction: null, mscat: null, mfcat: null, mffaction: null };
+        if (it.b === '30MM') {
+          if (n.includes('デカール')) out.mmcat = 'デカール';
+          else if (n.includes('エグザビークル')) out.mmcat = 'エグザビークル';
+          else if (n.includes('ウェポン')) out.mmcat = 'ウェポン';
+          else if (it.k === 'base') out.mmcat = '機体（ベース）';
+          else out.mmcat = 'オプションパーツ';
+          if (n.includes('アルト') || n.includes('ラビオット')) out.mmfaction = '地球連合軍';
+          else if (n.includes('ポルタノヴァ') || n.includes('シエルノヴァ') || n.includes('ヴェルデノヴァ') || n.includes('ノヴァ')) out.mmfaction = 'バイロン軍';
+          else if (n.includes('スピナティオ') || n.includes('スピナティア') || n.includes('プロヴェデル')) out.mmfaction = 'マクシオン軍';
+        }
+        if (it.b === '30MS') {
+          if (n.includes('デカール')) out.mscat = 'デカール';
+          else if (it.k === 'base') out.mscat = 'キャラクター（素体）';
+          else if (n.includes('オプションボディ') || n.includes('ボディパーツ')) out.mscat = 'ボディパーツ';
+          else if (n.includes('ヘアスタイル') || n.includes('ヘア')) out.mscat = 'ヘアパーツ';
+          else out.mscat = 'オプションパーツ';
+        }
+        if (it.b === '30MF') {
+          if (n.includes('クラスアップアーマー')) out.mfcat = 'クラスアップアーマー';
+          else if (n.includes('アイテムショップ')) out.mfcat = 'アイテムショップ';
+          else if (n.includes('ストラクチャー')) out.mfcat = 'ストラクチャー';
+          else if (it.k === 'base') out.mfcat = 'キャラクター（ベース）';
+          else out.mfcat = 'その他オプション';
+          if (n.includes('リーベル') || n.includes('アズレア')) out.mffaction = 'リーベル共和国';
+          else if (n.includes('ローザン') || n.includes('ヴァーミリオン')) out.mffaction = 'ローザン帝国';
+          else if (n.includes('鉄禍')) out.mffaction = '鉄禍';
+          else if (n.includes('ドラゴニア') || n.includes('ドゥロー') || n.includes('ネクロス')) out.mffaction = 'ドラゴニア';
+          else if (n.includes('鎧真伝')) out.mffaction = '鎧真伝';
+          else out.mffaction = 'その他';
+        }
+        return out;
+      }
+      const ITEMS = window.ITEMS.map((it) => Object.assign({}, it, classifyItem(it)));
 
       const GLOSSARY = window.GLOSSARY;
 
@@ -454,27 +457,39 @@
       const KIND_LABEL = { base: 'ベースキット', option: 'オプション' };
       const BRANDS = ['30MM', '30MS', '30MF'];
       const KINDS = ['base', 'option'];
-      const MFCATS = ['キャラクター', 'クラスアップアーマー', 'アイテムショップ', 'カスタマイズストラクチャー', 'ウェポン'];
       const MF_FACTIONS = ['ローザン帝国', 'リーベル共和国'];
       const GCATS = ['レーベル', '勢力', '陣営', 'ジョブ', 'メカ', 'キャラクター', '用語'];
       const GBRANDS = ['30MM', '30MS', '30MF'];
 
+      // 案2: ブランド区画の中のサブ軸
+      const ITEM_SECTIONS = {
+        '30MM': [ { key: 'mmcat', label: 'カテゴリ', field: 'mmcat' }, { key: 'mmfaction', label: '勢力', field: 'mmfaction' } ],
+        '30MS': [ { key: 'mscat', label: 'カテゴリ', field: 'mscat' } ],
+        '30MF': [ { key: 'mfcat', label: 'カテゴリ', field: 'mfcat' }, { key: 'mffaction', label: '勢力', field: 'mffaction' } ],
+      };
+      const ITEM_SUB_KEYS = { '30MM': ['mmcat', 'mmfaction'], '30MS': ['mscat'], '30MF': ['mfcat', 'mffaction'] };
+      const ITEM_KEYS = ['brand', 'kind', 'mmcat', 'mmfaction', 'mscat', 'mfcat', 'mffaction'];
+      const ITEM_FIELD = { brand: 'b', kind: 'k', mmcat: 'mmcat', mmfaction: 'mmfaction', mscat: 'mscat', mfcat: 'mfcat', mffaction: 'mffaction' };
+
       const yen = (n) => '¥' + n.toLocaleString('ja-JP');
 
       /* ====== 状態 ====== */
-      const itemState = { q: '', brand: new Set(), kind: new Set(), mfcat: new Set(), faction: new Set(), sort: 'new', shown: 24 };
+      const itemState = { q: '', sort: 'new', shown: 24 };
+      ITEM_KEYS.forEach((k) => { itemState[k] = new Set(); });
       const gloState = { q: '', gbrand: new Set(), gcat: new Set(), gfaction: new Set() };
       // モーダル内の作業用ドラフト（「絞り込む」押下時に itemState/gloState へ反映）
-      const itemDraft = { brand: new Set(), kind: new Set(), mfcat: new Set(), faction: new Set() };
+      const itemDraft = {};
+      ITEM_KEYS.forEach((k) => { itemDraft[k] = new Set(); });
       const gloDraft = { gbrand: new Set(), gcat: new Set(), gfaction: new Set() };
+      const itemOpenSections = new Set();
       function snapItemDraft() {
-        ['brand', 'kind', 'mfcat', 'faction'].forEach((k) => { itemDraft[k] = new Set(itemState[k]); });
+        ITEM_KEYS.forEach((k) => { itemDraft[k] = new Set(itemState[k]); });
       }
       function snapGloDraft() {
         ['gbrand', 'gcat', 'gfaction'].forEach((k) => { gloDraft[k] = new Set(gloState[k]); });
       }
       function commitItemDraft() {
-        ['brand', 'kind', 'mfcat', 'faction'].forEach((k) => { itemState[k] = new Set(itemDraft[k]); });
+        ITEM_KEYS.forEach((k) => { itemState[k] = new Set(itemDraft[k]); });
         itemState.shown = 24;
       }
       function commitGloDraft() {
@@ -482,9 +497,6 @@
       }
 
       /* ====== ファセットチップ生成 ====== */
-      function countItems(predicate) {
-        return ITEMS.filter(predicate).length;
-      }
       function makeChip(label, count, active) {
         const b = document.createElement('button');
         b.type = 'button';
@@ -496,111 +508,168 @@
         b.innerHTML = label + (count != null ? ' <span class="ml-2 opacity-70">' + count + '</span>' : '');
         return b;
       }
-
-      function renderItemFacets() {
-        // ブランド
-        const fb = document.getElementById('f-brand');
-        fb.innerHTML = '';
-        BRANDS.forEach((b) => {
-          const c = countItems((it) => it.b === b);
-          const chip = makeChip(b, c, itemDraft.brand.has(b));
-          chip.onclick = () => { toggleSet(itemDraft.brand, b); syncMfRows(); renderItemFacets(); };
-          fb.appendChild(chip);
-        });
-        // 種類
-        const fk = document.getElementById('f-kind');
-        fk.innerHTML = '';
-        KINDS.forEach((k) => {
-          const c = countItems((it) => it.k === k);
-          const chip = makeChip(KIND_LABEL[k], c, itemDraft.kind.has(k));
-          chip.onclick = () => { toggleSet(itemDraft.kind, k); renderItemFacets(); };
-          fk.appendChild(chip);
-        });
-        // 30MFカテゴリ
-        const fm = document.getElementById('f-mfcat');
-        fm.innerHTML = '';
-        MFCATS.forEach((m) => {
-          const c = countItems((it) => it.b === '30MF' && it.mfcat === m);
-          const chip = makeChip(m, c, itemDraft.mfcat.has(m));
-          chip.onclick = () => { toggleSet(itemDraft.mfcat, m); renderItemFacets(); };
-          fm.appendChild(chip);
-        });
-        // 勢力
-        const ff = document.getElementById('f-faction');
-        ff.innerHTML = '';
-        MF_FACTIONS.forEach((f) => {
-          const c = countItems((it) => it.faction === f);
-          const chip = makeChip(f, c, itemDraft.faction.has(f));
-          chip.onclick = () => { toggleSet(itemDraft.faction, f); renderItemFacets(); };
-          ff.appendChild(chip);
-        });
-      }
-
-      // 30MFカテゴリ/勢力の行はドラフトで30MFが選ばれている時のみ表示
-      function syncMfRows() {
-        const show = itemDraft.brand.has('30MF');
-        document.querySelectorAll('[data-only-mf]').forEach((el) => el.classList.toggle('hidden', !show));
-        if (!show) { itemDraft.mfcat.clear(); itemDraft.faction.clear(); }
+      // アイテム用 outlined chip（0件はdisabled、選択済みは解除可能なので押せる）
+      function makeOutlineChip(label, cnt, on, onClick) {
+        const disabled = !on && cnt === 0;
+        const chip = document.createElement('button');
+        chip.type = 'button';
+        chip.className = 'inline-flex items-center gap-4 rounded-full border-[1.5px] px-12 py-6 text-[12px] font-semibold transition-colors ' +
+          (on ? 'border-brand-500 bg-brand-50 text-brand-700'
+              : disabled ? 'cursor-not-allowed border-ink-50 bg-white text-ink-200'
+              : 'border-ink-200 bg-white text-ink-700 hover:border-ink-400');
+        chip.disabled = disabled;
+        chip.innerHTML = label + '<span class="text-[10px] ' + (on ? 'text-brand-500' : disabled ? 'text-ink-200' : 'text-ink-400') + '">' + cnt + '</span>';
+        chip.addEventListener('click', onClick);
+        return chip;
       }
 
       function toggleSet(set, v) { set.has(v) ? set.delete(v) : set.add(v); }
 
-      function renderItemChips() {
-        const wrap = document.getElementById('item-chips');
-        wrap.innerHTML = '';
-        const all = [];
-        itemState.brand.forEach((v) => all.push(['brand', v, v]));
-        itemState.kind.forEach((v) => all.push(['kind', v, KIND_LABEL[v]]));
-        itemState.mfcat.forEach((v) => all.push(['mfcat', v, v]));
-        itemState.faction.forEach((v) => all.push(['faction', v, v]));
-        if (all.length === 0) {
-          wrap.innerHTML = '<span class="text-[12px] text-ink-400">すべて表示中</span>';
-          return;
+      /* ====== 判定ロジック（案2: 共通AND × ブランド区画OR合算） ====== */
+      function itemQPass(it) {
+        if (!itemState.q) return true;
+        const q = itemState.q.toLowerCase();
+        return it.n.toLowerCase().includes(q) || it.c.toLowerCase().includes(q);
+      }
+      // ブランド区画内の条件（そのアイテムの所属ブランドの軸だけを適用）
+      function itemSectionPass(it, sel, skipKey) {
+        const subs = ITEM_SUB_KEYS[it.b] || [];
+        for (const k of subs) {
+          if (k === skipKey) continue;
+          const set = sel[k];
+          if (!set.size) continue;
+          if (!set.has(it[ITEM_FIELD[k]])) return false;
         }
-        all.forEach(([facet, v, label]) => {
-          const chip = document.createElement('button');
-          chip.className = 'inline-flex items-center gap-4 rounded-full bg-brand-50 px-10 py-4 text-[12px] font-semibold text-brand-700 ring-1 ring-brand-100';
-          chip.innerHTML = label + ' <span class="text-[14px] leading-none">×</span>';
-          chip.onclick = () => {
-            itemState[facet].delete(v);
-            if (facet === 'brand' && v === '30MF') { itemState.mfcat.clear(); itemState.faction.clear(); }
-            itemState.shown = 24;
-            renderItemChips(); applyItem();
-          };
-          wrap.appendChild(chip);
-        });
-        const clr = document.createElement('button');
-        clr.className = 'text-[12px] font-semibold text-ink-500 underline hover:text-ink-900';
-        clr.textContent = 'クリア';
-        clr.onclick = clearItem;
-        wrap.appendChild(clr);
+        return true;
+      }
+      // 結果 = 検索 AND 種別 AND (ブランド未選択 or (所属ブランド選択済み AND 区画条件))
+      function itemPasses(it, sel, skipKey) {
+        if (!itemQPass(it)) return false;
+        if (skipKey !== 'kind' && sel.kind.size && !sel.kind.has(it.k)) return false;
+        if (!sel.brand.size) return true;
+        if (!sel.brand.has(it.b)) return false;
+        return itemSectionPass(it, sel, skipKey);
+      }
+      // 区画見出しに出す貢献件数（ブランド選択の有無に依らずそのブランドで計算）
+      function itemContribution(brand) {
+        return ITEMS.filter((it) => it.b === brand && itemQPass(it) &&
+          (!itemDraft.kind.size || itemDraft.kind.has(it.k)) && itemSectionPass(it, itemDraft)).length;
+      }
+      function itemFacetValues(field) {
+        const vals = new Set();
+        ITEMS.forEach((it) => { const v = it[field]; if (v) vals.add(v); });
+        return [...vals].sort((a, b) => a.localeCompare(b, 'ja'));
       }
 
-      // 適用済みフィルタをすべて解除（チップバーの「クリア」）
-      function clearItem() {
-        itemState.brand.clear(); itemState.kind.clear(); itemState.mfcat.clear(); itemState.faction.clear();
-        itemState.shown = 24;
-        renderItemChips(); applyItem();
+      /* ====== シート描画（案2: 共通軸 + 開閉式ブランド区画） ====== */
+      function itemAxisBlock(parent, heading) {
+        const wrap = document.createElement('div');
+        wrap.className = 'px-16 pt-16';
+        wrap.innerHTML = '<div class="mb-10 text-[14px] font-semibold">' + heading + '</div>';
+        const chips = document.createElement('div');
+        chips.className = 'flex flex-wrap gap-6';
+        wrap.appendChild(chips);
+        parent.appendChild(wrap);
+        return chips;
       }
+      function itemToggle(key, v) {
+        toggleSet(itemDraft[key], v);
+        if (key === 'brand') {
+          BRANDS.forEach((b) => {
+            if (!itemDraft.brand.has(b)) (ITEM_SUB_KEYS[b] || []).forEach((k) => itemDraft[k].clear());
+          });
+        }
+        renderItemFacets();
+      }
+      function renderItemFacets() {
+        const root = document.getElementById('item-sheet-body');
+        root.innerHTML = '';
+
+        // 共通軸: ブランド（件数 = そのブランドの現在の貢献分）
+        const brandChips = itemAxisBlock(root, 'ブランド');
+        BRANDS.forEach((v) => {
+          const cnt = ITEMS.filter((it) => it.b === v && itemQPass(it) &&
+            (!itemDraft.kind.size || itemDraft.kind.has(it.k)) && itemSectionPass(it, itemDraft)).length;
+          brandChips.appendChild(makeOutlineChip(v, cnt, itemDraft.brand.has(v), () => itemToggle('brand', v)));
+        });
+        // 共通軸: 種別
+        const kindChips = itemAxisBlock(root, '種別');
+        KINDS.forEach((v) => {
+          const cnt = ITEMS.filter((it) => it.k === v && itemPasses(it, itemDraft, 'kind')).length;
+          kindChips.appendChild(makeOutlineChip(KIND_LABEL[v], cnt, itemDraft.kind.has(v), () => itemToggle('kind', v)));
+        });
+
+        // ブランド区画（開閉式・デフォルト折りたたみ）
+        BRANDS.filter((b) => itemDraft.brand.has(b)).forEach((b) => {
+          const isOpen = itemOpenSections.has(b);
+          const contrib = itemContribution(b);
+          const selectedVals = (ITEM_SUB_KEYS[b] || []).flatMap((k) => [...itemDraft[k]]);
+          const touched = selectedVals.length > 0;
+
+          const grp = document.createElement('div');
+          grp.className = 'mx-12 mt-12 rounded-md bg-ink-25' + (isOpen ? ' pb-14' : ' pb-2');
+
+          const head = document.createElement('button');
+          head.type = 'button';
+          head.className = 'flex w-full items-center justify-between px-14 py-12 text-left';
+          head.innerHTML =
+            '<span class="min-w-0">' +
+              '<span class="block text-[13px] font-bold">' + b + ' の絞り込み</span>' +
+              (!isOpen && touched
+                ? '<span class="mt-2 block truncate text-[11px] font-semibold text-brand-700">' + selectedVals.join('、') + '</span>'
+                : '') +
+            '</span>' +
+            '<span class="flex shrink-0 items-center gap-8 pl-12">' +
+              '<span class="text-[12px] font-bold ' + (touched ? 'text-brand-700' : 'text-ink-400') + '">' + contrib + '件</span>' +
+              '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" class="text-ink-400 transition-transform ' + (isOpen ? 'rotate-180' : '') + '"><path d="m6 9 6 6 6-6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>' +
+            '</span>';
+          head.addEventListener('click', () => {
+            isOpen ? itemOpenSections.delete(b) : itemOpenSections.add(b);
+            renderItemFacets();
+          });
+          grp.appendChild(head);
+
+          if (isOpen) {
+            ITEM_SECTIONS[b].forEach((sub) => {
+              const label = document.createElement('div');
+              label.className = 'mb-8 mt-4 px-14 text-[12px] font-semibold text-ink-500';
+              label.textContent = sub.label;
+              grp.appendChild(label);
+              const chips = document.createElement('div');
+              chips.className = 'flex flex-wrap gap-6 px-14';
+              itemFacetValues(sub.field).forEach((v) => {
+                const cnt = ITEMS.filter((it) => it.b === b && it[sub.field] === v && itemQPass(it) &&
+                  (!itemDraft.kind.size || itemDraft.kind.has(it.k)) && itemSectionPass(it, itemDraft, sub.key)).length;
+                chips.appendChild(makeOutlineChip(v, cnt, itemDraft[sub.key].has(v), () => itemToggle(sub.key, v)));
+              });
+              grp.appendChild(chips);
+            });
+          }
+          root.appendChild(grp);
+        });
+
+        // 適用ボタンに結果件数を先出し
+        const applyBtn = document.querySelector('[data-filter-apply="item"]');
+        applyBtn.textContent = ITEMS.filter((it) => itemPasses(it, itemDraft)).length + '件を表示';
+      }
+
+      // フィルターアイコンのカウントバッジ（適用済みの選択値数）
+      function renderItemBadge() {
+        const badge = document.getElementById('item-filter-badge');
+        const n = ITEM_KEYS.reduce((sum, k) => sum + itemState[k].size, 0);
+        if (n > 0) { badge.textContent = n; badge.classList.remove('hidden'); badge.classList.add('grid'); }
+        else { badge.classList.add('hidden'); badge.classList.remove('grid'); }
+      }
+
       // モーダル内ドラフトをすべて解除（モーダルの「すべてクリア」）
       function clearItemDraft() {
-        itemDraft.brand.clear(); itemDraft.kind.clear(); itemDraft.mfcat.clear(); itemDraft.faction.clear();
-        syncMfRows(); renderItemFacets();
+        ITEM_KEYS.forEach((k) => itemDraft[k].clear());
+        renderItemFacets();
       }
 
       /* ====== フィルタ＆描画（アイテム） ====== */
       function filteredItems() {
-        let list = ITEMS.filter((it) => {
-          if (itemState.brand.size && !itemState.brand.has(it.b)) return false;
-          if (itemState.kind.size && !itemState.kind.has(it.k)) return false;
-          if (itemState.mfcat.size && !itemState.mfcat.has(it.mfcat)) return false;
-          if (itemState.faction.size && !itemState.faction.has(it.faction)) return false;
-          if (itemState.q) {
-            const q = itemState.q.toLowerCase();
-            if (!(it.n.toLowerCase().includes(q) || it.c.toLowerCase().includes(q))) return false;
-          }
-          return true;
-        });
+        let list = ITEMS.filter((it) => itemPasses(it, itemState));
         const s = itemState.sort;
         list.sort((a, b) => {
           if (s === 'new') return b.sk - a.sk;
@@ -777,7 +846,7 @@
 
       function openFilter(key) {
         // 開くたびに適用済み状態をドラフトへ複製してからモーダルを描画
-        if (key === 'item') { snapItemDraft(); syncMfRows(); renderItemFacets(); }
+        if (key === 'item') { snapItemDraft(); renderItemFacets(); }
         else { snapGloDraft(); syncGloMfRow(); renderGloFacets(); }
         document.querySelector('[data-filter-panel="' + key + '"]').classList.remove('hidden');
         document.body.style.overflow = 'hidden';
@@ -789,7 +858,7 @@
       }
       function applyFilter(key) {
         // 「絞り込む」押下時にドラフトを反映
-        if (key === 'item') { commitItemDraft(); renderItemChips(); applyItem(); }
+        if (key === 'item') { commitItemDraft(); renderItemBadge(); applyItem(); }
         else { commitGloDraft(); renderGloChips(); applyGlo(); }
         closeFilter(key);
       }
@@ -818,9 +887,7 @@
       /* ====== 初期化 ====== */
       setTab('item');
       snapItemDraft();
-      syncMfRows();
-      renderItemFacets();
-      renderItemChips();
+      renderItemBadge();
       applyItem();
       snapGloDraft();
       syncGloMfRow();
