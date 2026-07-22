@@ -104,7 +104,7 @@
     <div id="sheet" class="fixed inset-0 z-40 hidden">
       <div id="sheet-backdrop" class="absolute inset-0 bg-ink-900/50"></div>
       <div class="sheet-anim absolute inset-x-0 bottom-0 flex max-h-[85vh] flex-col rounded-t-lg bg-white md:inset-auto md:left-1/2 md:top-1/2 md:w-[480px] md:max-h-[80vh] md:-translate-x-1/2 md:-translate-y-1/2 md:rounded-lg md:shadow-cardLg">
-        <div class="flex items-center justify-between border-b border-ink-50 px-16 py-12">
+        <div class="flex items-center justify-between px-16 py-12">
           <span class="text-[15px] font-bold">絞り込み</span>
           <button id="sheet-close" class="grid h-32 w-32 place-items-center rounded-full text-ink-500 hover:bg-ink-25">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M18 6 6 18M6 6l12 12" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
@@ -224,7 +224,7 @@
           const selected = [...draft[f.key]];
 
           const row = document.createElement('button');
-          row.className = 'flex w-full items-center justify-between border-b border-ink-50 px-16 py-14 text-left hover:bg-ink-25';
+          row.className = 'flex w-full items-center justify-between px-16 pb-10 pt-16 text-left';
           row.innerHTML =
             '<span class="flex items-center gap-8 text-[14px] font-semibold">' + f.label +
             (f.dependsOn ? '<span class="rounded-full bg-brand-50 px-8 py-1 text-[10px] font-bold text-brand-700">' + f.dependsOn + '</span>' : '') +
@@ -242,7 +242,7 @@
           root.appendChild(row);
 
           const panel = document.createElement('div');
-          panel.className = 'acc-panel border-b border-ink-50 bg-ink-25/60 px-16 py-12' + (isOpen ? ' open' : '');
+          panel.className = 'acc-panel px-16 pb-8' + (isOpen ? ' open' : '');
           const wrap = document.createElement('div');
           wrap.className = 'flex flex-wrap gap-6';
           facetValues(f).forEach((v) => {
@@ -252,8 +252,8 @@
             const chip = document.createElement('button');
             chip.className = 'inline-flex items-center gap-4 rounded-full border-[1.5px] px-12 py-6 text-[12px] font-semibold transition-colors ' +
               (on ? 'border-brand-500 bg-brand-50 text-brand-700'
-                  : disabled ? 'cursor-not-allowed border-ink-50 bg-ink-25 text-ink-200'
-                  : 'border-ink-100 bg-white text-ink-700 hover:border-ink-300');
+                  : disabled ? 'cursor-not-allowed border-ink-50 bg-white text-ink-200'
+                  : 'border-ink-200 bg-white text-ink-700 hover:border-ink-400');
             chip.disabled = disabled;
             chip.innerHTML = ((f.labels && f.labels[v]) || v) +
               '<span class="text-[10px] ' + (on ? 'text-brand-500' : disabled ? 'text-ink-200' : 'text-ink-400') + '">' + cnt + '</span>';
