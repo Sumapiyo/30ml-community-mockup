@@ -1,0 +1,457 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>絞り込み比較デモ（案1 AND / 案2 OR合算）｜30ML COMMUNITY</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;500;600;700&family=Noto+Sans+JP:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <script>
+      tailwind.config = {
+        theme: {
+          spacing: {
+            0:'0px',1:'1px',2:'2px',4:'4px',6:'6px',8:'8px',
+            10:'10px',12:'12px',14:'14px',16:'16px',18:'18px',
+            20:'20px',24:'24px',28:'28px',32:'32px',36:'36px',
+            40:'40px',44:'44px',48:'48px',52:'52px',56:'56px',
+            60:'60px',64:'64px',72:'72px',80:'80px',88:'88px',
+            96:'96px',112:'112px',128:'128px',px:'1px','0.5':'2px',
+          },
+          borderRadius: { none:'0px',xs:'2px',DEFAULT:'4px',sm:'4px',md:'8px',lg:'16px',full:'9999px' },
+          extend: {
+            fontFamily: { sans: ['Open Sans','Noto Sans JP','system-ui','sans-serif'] },
+            colors: {
+              ink: { 900:'#1A1A1A',700:'#474747',600:'#5C5C5C',500:'#737373',400:'#949494',300:'#B3B3B3',200:'#D1D1D1',100:'#E8E8E8',50:'#F5F5F5',25:'#FAFAFA' },
+              brand: { 25:'#FCF7FF',50:'#F9EDFF',100:'#F0D7FC',300:'#D79DF5',500:'#A93DE0',600:'#8C21C2',700:'#6E05A3' },
+              gold:'#C6A35A', like:'#E5097B',
+            },
+            boxShadow: {
+              card:'0px 0px 4px rgba(0,0,0,0.08), 0px 0px 8px rgba(0,0,0,0.06)',
+              cardLg:'0px 0px 8px rgba(0,0,0,0.08), 0px 0px 16px rgba(0,0,0,0.06)',
+            },
+          },
+        },
+      };
+    </script>
+    <style>
+      body { font-family:'Open Sans','Noto Sans JP',system-ui,sans-serif; background:#fafafa; color:#1a1a1a; }
+      .scrollbar-hide::-webkit-scrollbar { display:none; }
+      .scrollbar-hide { scrollbar-width:none; }
+      @keyframes sheet-up { from { transform:translateY(24px); opacity:0; } to { transform:translateY(0); opacity:1; } }
+      .sheet-anim { animation:sheet-up 0.22s ease; }
+    </style>
+  </head>
+  <body class="min-h-screen">
+
+    <!-- ===================== Header ===================== -->
+    <header class="fixed inset-x-0 top-0 z-20 flex h-48 items-center justify-between border-b border-ink-50 bg-white px-16">
+      <button class="grid h-32 w-32 place-items-center">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M3 6h18M3 12h18M3 18h18" stroke="#1A1A1A" stroke-width="1.6" stroke-linecap="round"/></svg>
+      </button>
+      <span class="text-[14px] font-bold tracking-wide">30ML COMMUNITY</span>
+      <button class="grid h-32 w-32 place-items-center">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M6 8a6 6 0 1 1 12 0v4l1.5 3h-15L6 12V8Z" stroke="#1A1A1A" stroke-width="1.5" stroke-linejoin="round"/><path d="M10 18a2 2 0 0 0 4 0" stroke="#1A1A1A" stroke-width="1.5"/></svg>
+      </button>
+    </header>
+
+    <!-- ===================== Main ===================== -->
+    <div class="pt-48">
+      <main class="mx-auto max-w-screen-md px-16 pb-40 pt-16">
+
+        <!-- Mode toggle -->
+        <div class="mb-8 grid grid-cols-2 gap-4 rounded-full bg-ink-50 p-4">
+          <button id="mode-a" class="rounded-full py-8 text-[12px] font-bold transition-colors">案1 軸フラット（AND）</button>
+          <button id="mode-b" class="rounded-full py-8 text-[12px] font-bold transition-colors">案2 ブランド区画（OR合算）</button>
+        </div>
+        <p id="mode-desc" class="mb-14 text-[11px] leading-relaxed text-ink-400"></p>
+
+        <!-- Search row -->
+        <div class="mb-14 flex items-center gap-10">
+          <label class="flex h-44 flex-1 items-center gap-10 rounded-full bg-ink-50 px-16 text-ink-500">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="1.6"/><path d="m20 20-3.5-3.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+            <input id="q" type="text" placeholder="キット名で検索" class="w-full flex-1 bg-transparent text-[14px] text-ink-900 placeholder:text-ink-400 focus:outline-none"/>
+          </label>
+          <button id="filter-btn" class="relative grid h-44 w-44 shrink-0 place-items-center rounded-full bg-ink-50 hover:bg-ink-100">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M4 7h10M18 7h2M4 17h2M10 17h10" stroke="#1A1A1A" stroke-width="1.6" stroke-linecap="round"/><circle cx="16" cy="7" r="2.2" stroke="#1A1A1A" stroke-width="1.6"/><circle cx="8" cy="17" r="2.2" stroke="#1A1A1A" stroke-width="1.6"/></svg>
+            <span id="filter-badge" class="absolute -right-2 -top-2 hidden h-[18px] min-w-[18px] place-items-center rounded-full bg-brand-600 px-4 text-[10px] font-bold text-white"></span>
+          </button>
+        </div>
+
+        <!-- Toolbar row -->
+        <div class="mb-14 flex items-center justify-between">
+          <span class="text-[14px] font-semibold" id="count-label">—件</span>
+          <div class="flex items-center gap-8">
+            <button id="sort-btn" class="flex h-32 items-center gap-6 rounded-md bg-white px-12 text-[12px] font-semibold shadow-card hover:bg-ink-25">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M8 5v14M8 5 5 8m3-3 3 3M16 19V5m0 14 3-3m-3 3-3-3" stroke="#1A1A1A" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              <span id="sort-label">新着順</span>
+            </button>
+            <button id="view-btn" class="flex h-32 items-center gap-6 rounded-md bg-white px-12 text-[12px] font-semibold shadow-card hover:bg-ink-25">
+              <svg id="view-icon-grid" width="14" height="14" viewBox="0 0 24 24" fill="none"><rect x="4" y="4" width="7" height="7" rx="1" stroke="#1A1A1A" stroke-width="1.6"/><rect x="13" y="4" width="7" height="7" rx="1" stroke="#1A1A1A" stroke-width="1.6"/><rect x="4" y="13" width="7" height="7" rx="1" stroke="#1A1A1A" stroke-width="1.6"/><rect x="13" y="13" width="7" height="7" rx="1" stroke="#1A1A1A" stroke-width="1.6"/></svg>
+              <svg id="view-icon-list" width="14" height="14" viewBox="0 0 24 24" fill="none" class="hidden"><path d="M9 6h11M9 12h11M9 18h11" stroke="#1A1A1A" stroke-width="1.6" stroke-linecap="round"/><circle cx="5" cy="6" r="1.4" fill="#1A1A1A"/><circle cx="5" cy="12" r="1.4" fill="#1A1A1A"/><circle cx="5" cy="18" r="1.4" fill="#1A1A1A"/></svg>
+              <span id="view-label">画像で表示中</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Results -->
+        <div id="results"></div>
+        <div id="empty" class="hidden rounded-lg bg-white p-32 text-center shadow-card">
+          <div class="text-[14px] font-bold">条件に合うキットがありません</div>
+          <p class="mt-6 text-[12px] text-ink-500">絞り込み条件を減らしてみてください</p>
+          <button id="empty-clear" class="mt-16 rounded-full border-[1.5px] border-brand-500 px-20 py-8 text-[13px] font-bold text-brand-600 hover:bg-brand-50">条件をすべてクリア</button>
+        </div>
+      </main>
+    </div>
+
+    <!-- ===================== Filter Sheet ===================== -->
+    <div id="sheet" class="fixed inset-0 z-40 hidden">
+      <div id="sheet-backdrop" class="absolute inset-0 bg-ink-900/50"></div>
+      <div class="sheet-anim absolute inset-x-0 bottom-0 flex max-h-[calc(100dvh-56px)] flex-col rounded-t-lg bg-white md:inset-auto md:left-1/2 md:top-1/2 md:w-[480px] md:max-h-[80vh] md:-translate-x-1/2 md:-translate-y-1/2 md:rounded-lg md:shadow-cardLg">
+        <div class="flex items-center justify-between px-16 py-12">
+          <span class="text-[15px] font-bold">絞り込み</span>
+          <button id="sheet-close" class="grid h-32 w-32 place-items-center rounded-full text-ink-500 hover:bg-ink-25">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M18 6 6 18M6 6l12 12" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+          </button>
+        </div>
+
+        <div id="sheet-body" class="flex-1 overflow-y-auto pb-8"></div>
+
+        <div class="flex items-center gap-12 border-t border-ink-50 px-16 py-12">
+          <button id="sheet-clear" class="text-[13px] font-semibold text-ink-500 hover:text-ink-900">すべてクリア</button>
+          <button id="sheet-apply" class="h-44 flex-1 rounded-full bg-brand-600 px-16 text-[14px] font-bold text-white hover:bg-brand-700">—件を表示</button>
+        </div>
+      </div>
+    </div>
+
+    <script src="items-data.js?v=1"></script>
+    <script>
+    (function () {
+      // ══════════════ 分類の自動導出（データは書き換えない） ══════════════
+      function classify(it) {
+        const n = it.n;
+        const out = { mmcat:null, mmfaction:null, mscat:null, mfcat:null, mffaction:null };
+        if (it.b === '30MM') {
+          if (n.includes('デカール')) out.mmcat = 'デカール';
+          else if (n.includes('エグザビークル')) out.mmcat = 'エグザビークル';
+          else if (n.includes('ウェポン')) out.mmcat = 'ウェポン';
+          else if (it.k === 'base') out.mmcat = '機体（ベース）';
+          else out.mmcat = 'オプションパーツ';
+          if (n.includes('アルト') || n.includes('ラビオット')) out.mmfaction = '地球連合軍';
+          else if (n.includes('ポルタノヴァ') || n.includes('シエルノヴァ') || n.includes('ヴェルデノヴァ') || n.includes('ノヴァ')) out.mmfaction = 'バイロン軍';
+          else if (n.includes('スピナティオ') || n.includes('スピナティア') || n.includes('プロヴェデル')) out.mmfaction = 'マクシオン軍';
+        }
+        if (it.b === '30MS') {
+          if (n.includes('デカール')) out.mscat = 'デカール';
+          else if (it.k === 'base') out.mscat = 'キャラクター（素体）';
+          else if (n.includes('オプションボディ') || n.includes('ボディパーツ')) out.mscat = 'ボディパーツ';
+          else if (n.includes('ヘアスタイル') || n.includes('ヘア')) out.mscat = 'ヘアパーツ';
+          else out.mscat = 'オプションパーツ';
+        }
+        if (it.b === '30MF') {
+          if (n.includes('クラスアップアーマー')) out.mfcat = 'クラスアップアーマー';
+          else if (n.includes('アイテムショップ')) out.mfcat = 'アイテムショップ';
+          else if (n.includes('ストラクチャー')) out.mfcat = 'ストラクチャー';
+          else if (it.k === 'base') out.mfcat = 'キャラクター（ベース）';
+          else out.mfcat = 'その他オプション';
+          if (n.includes('リーベル') || n.includes('アズレア')) out.mffaction = 'リーベル共和国';
+          else if (n.includes('ローザン') || n.includes('ヴァーミリオン')) out.mffaction = 'ローザン帝国';
+          else if (n.includes('鉄禍')) out.mffaction = '鉄禍';
+          else if (n.includes('ドラゴニア') || n.includes('ドゥロー') || n.includes('ネクロス')) out.mffaction = 'ドラゴニア';
+          else if (n.includes('鎧真伝')) out.mffaction = '鎧真伝';
+          else out.mffaction = 'その他';
+        }
+        return out;
+      }
+      const ITEMS = window.ITEMS.map((it) => Object.assign({}, it, classify(it)));
+
+      // ══════════════ 定義 ══════════════
+      const BRANDS = ['30MM', '30MS', '30MF'];
+      const KIND_LABEL = { base:'ベースキット', option:'オプション' };
+      // 案1: フラットな軸リスト（dependsOn = 該当ブランド選択時のみ表示）
+      const FLAT_FACETS = [
+        { key:'brand',     label:'ブランド',     field:'b',         dependsOn:null },
+        { key:'kind',      label:'種別',         field:'k',         dependsOn:null, labels:KIND_LABEL },
+        { key:'mmcat',     label:'30MMカテゴリ', field:'mmcat',     dependsOn:'30MM' },
+        { key:'mmfaction', label:'30MM勢力',     field:'mmfaction', dependsOn:'30MM' },
+        { key:'mscat',     label:'30MSカテゴリ', field:'mscat',     dependsOn:'30MS' },
+        { key:'mfcat',     label:'30MFカテゴリ', field:'mfcat',     dependsOn:'30MF' },
+        { key:'mffaction', label:'30MF勢力',     field:'mffaction', dependsOn:'30MF' },
+      ];
+      // 案2: ブランド区画の中のサブ軸
+      const SECTIONS = {
+        '30MM': [ { key:'mmcat', label:'カテゴリ', field:'mmcat' }, { key:'mmfaction', label:'勢力', field:'mmfaction' } ],
+        '30MS': [ { key:'mscat', label:'カテゴリ', field:'mscat' } ],
+        '30MF': [ { key:'mfcat', label:'カテゴリ', field:'mfcat' }, { key:'mffaction', label:'勢力', field:'mffaction' } ],
+      };
+      const SUB_KEYS = { '30MM':['mmcat','mmfaction'], '30MS':['mscat'], '30MF':['mfcat','mffaction'] };
+      const FIELD = {};
+      FLAT_FACETS.forEach((f) => { FIELD[f.key] = f.field; });
+
+      // ══════════════ 状態（両モード共有 — 切替時に同じ条件で結果を比較できる） ══════════════
+      let mode = 'A';
+      const KEYS = FLAT_FACETS.map((f) => f.key);
+      const state = {}, draft = {};
+      KEYS.forEach((k) => { state[k] = new Set(); draft[k] = new Set(); });
+      let q = '', sort = 'new', view = 'grid';
+
+      const $ = (id) => document.getElementById(id);
+
+      // ══════════════ 判定ロジック ══════════════
+      function qPass(it) { return !q || it.n.toLowerCase().includes(q.toLowerCase()); }
+
+      // 案1: 全軸AND
+      function passesA(it, sel, skipKey) {
+        if (!qPass(it)) return false;
+        for (const f of FLAT_FACETS) {
+          if (f.key === skipKey) continue;
+          const set = sel[f.key];
+          if (!set.size) continue;
+          if (!set.has(it[f.field])) return false;
+        }
+        return true;
+      }
+
+      // 案2: 共通AND × ブランド区画OR
+      //   結果 = q AND 種別 AND (ブランド未選択 or (所属ブランドが選択済み AND その区画の条件を満たす))
+      function sectionPass(it, sel, skipKey) {
+        const subs = SUB_KEYS[it.b] || [];
+        for (const k of subs) {
+          if (k === skipKey) continue;
+          const set = sel[k];
+          if (!set.size) continue;
+          if (!set.has(it[FIELD[k]])) return false;
+        }
+        return true;
+      }
+      function passesB(it, sel, skipKey) {
+        if (!qPass(it)) return false;
+        if (skipKey !== 'kind' && sel.kind.size && !sel.kind.has(it.k)) return false;
+        if (!sel.brand.size) return true;
+        if (!sel.brand.has(it.b)) return false;
+        return sectionPass(it, sel, skipKey);
+      }
+
+      function passes(it, sel, skipKey) {
+        return mode === 'A' ? passesA(it, sel, skipKey) : passesB(it, sel, skipKey);
+      }
+
+      function facetValues(fieldName, orderHint) {
+        const vals = new Set();
+        ITEMS.forEach((it) => { const v = it[fieldName]; if (v) vals.add(v); });
+        let arr = [...vals];
+        if (orderHint) arr = orderHint.filter((v) => vals.has(v));
+        else arr.sort((a, b) => a.localeCompare(b, 'ja'));
+        return arr;
+      }
+      function draftResultCount() { return ITEMS.filter((it) => passes(it, draft)).length; }
+      function contribution(brand) {
+        return ITEMS.filter((it) => it.b === brand && qPass(it) &&
+          (!draft.kind.size || draft.kind.has(it.k)) && sectionPass(it, draft)).length;
+      }
+
+      // ══════════════ チップ生成 ══════════════
+      function makeChip(label, cnt, on, onClick) {
+        const disabled = !on && cnt === 0;
+        const chip = document.createElement('button');
+        chip.className = 'inline-flex items-center gap-4 rounded-full border-[1.5px] px-12 py-6 text-[12px] font-semibold transition-colors ' +
+          (on ? 'border-brand-500 bg-brand-50 text-brand-700'
+              : disabled ? 'cursor-not-allowed border-ink-50 bg-white text-ink-200'
+              : 'border-ink-200 bg-white text-ink-700 hover:border-ink-400');
+        chip.disabled = disabled;
+        chip.innerHTML = label + '<span class="text-[10px] ' + (on ? 'text-brand-500' : disabled ? 'text-ink-200' : 'text-ink-400') + '">' + cnt + '</span>';
+        chip.addEventListener('click', onClick);
+        return chip;
+      }
+      function axisBlock(parent, heading, badge) {
+        const wrap = document.createElement('div');
+        wrap.className = 'px-16 pt-16';
+        wrap.innerHTML = '<div class="mb-10 flex items-center gap-8 text-[14px] font-semibold">' + heading +
+          (badge ? '<span class="rounded-full bg-brand-50 px-8 py-1 text-[10px] font-bold text-brand-700">' + badge + '</span>' : '') + '</div>';
+        const chips = document.createElement('div');
+        chips.className = 'flex flex-wrap gap-6';
+        wrap.appendChild(chips);
+        parent.appendChild(wrap);
+        return chips;
+      }
+      function toggleVal(key, v) {
+        draft[key].has(v) ? draft[key].delete(v) : draft[key].add(v);
+        if (key === 'brand') {
+          BRANDS.forEach((b) => {
+            if (!draft.brand.has(b)) (SUB_KEYS[b] || []).forEach((k) => draft[k].clear());
+          });
+        }
+        renderSheet();
+      }
+
+      // ══════════════ シート描画: 案1 ══════════════
+      function renderSheetA(root) {
+        FLAT_FACETS.forEach((f) => {
+          if (f.dependsOn && !draft.brand.has(f.dependsOn)) { draft[f.key].clear(); return; }
+          const chips = axisBlock(root, f.label, f.dependsOn);
+          const order = f.key === 'brand' ? BRANDS : null;
+          facetValues(f.field, order).forEach((v) => {
+            const cnt = ITEMS.filter((it) => it[f.field] === v && passesA(it, draft, f.key)).length;
+            chips.appendChild(makeChip((f.labels && f.labels[v]) || v, cnt, draft[f.key].has(v), () => toggleVal(f.key, v)));
+          });
+        });
+      }
+
+      // ══════════════ シート描画: 案2 ══════════════
+      function renderSheetB(root) {
+        // 共通軸: ブランド
+        const brandChips = axisBlock(root, 'ブランド');
+        BRANDS.forEach((v) => {
+          const cnt = ITEMS.filter((it) => it.b === v && qPass(it) &&
+            (!draft.kind.size || draft.kind.has(it.k)) && sectionPass(it, draft)).length;
+          brandChips.appendChild(makeChip(v, cnt, draft.brand.has(v), () => toggleVal('brand', v)));
+        });
+        // 共通軸: 種別
+        const kindChips = axisBlock(root, '種別');
+        ['base','option'].forEach((v) => {
+          const cnt = ITEMS.filter((it) => it.k === v && passesB(it, draft, 'kind')).length;
+          kindChips.appendChild(makeChip(KIND_LABEL[v], cnt, draft.kind.has(v), () => toggleVal('kind', v)));
+        });
+        // ブランド区画
+        BRANDS.filter((b) => draft.brand.has(b)).forEach((b) => {
+          const grp = document.createElement('div');
+          grp.className = 'mx-12 mt-16 rounded-md bg-ink-25 pb-14';
+          const contrib = contribution(b);
+          const touched = (SUB_KEYS[b] || []).some((k) => draft[k].size);
+          grp.innerHTML = '<div class="flex items-center justify-between px-14 pt-12">' +
+            '<span class="text-[13px] font-bold">' + b + ' の絞り込み</span>' +
+            '<span class="text-[12px] font-bold ' + (touched ? 'text-brand-700' : 'text-ink-400') + '">' + contrib + '件</span></div>';
+          SECTIONS[b].forEach((sub) => {
+            const label = document.createElement('div');
+            label.className = 'mb-8 mt-12 px-14 text-[12px] font-semibold text-ink-500';
+            label.textContent = sub.label;
+            grp.appendChild(label);
+            const chips = document.createElement('div');
+            chips.className = 'flex flex-wrap gap-6 px-14';
+            facetValues(sub.field).forEach((v) => {
+              const cnt = ITEMS.filter((it) => it.b === b && it[sub.field] === v && qPass(it) &&
+                (!draft.kind.size || draft.kind.has(it.k)) && sectionPass(it, draft, sub.key)).length;
+              chips.appendChild(makeChip(v, cnt, draft[sub.key].has(v), () => toggleVal(sub.key, v)));
+            });
+            grp.appendChild(chips);
+          });
+          root.appendChild(grp);
+        });
+      }
+
+      function renderSheet() {
+        const root = $('sheet-body');
+        root.innerHTML = '';
+        mode === 'A' ? renderSheetA(root) : renderSheetB(root);
+        $('sheet-apply').textContent = draftResultCount() + '件を表示';
+      }
+
+      // ══════════════ 一覧描画 ══════════════
+      function activeCount() { return KEYS.reduce((n, k) => n + state[k].size, 0); }
+      function currentList() {
+        let list = ITEMS.filter((it) => passes(it, state));
+        if (sort === 'new') list.sort((a, b) => b.sk - a.sk);
+        else if (sort === 'cheap') list.sort((a, b) => a.p - b.p);
+        else list.sort((a, b) => b.p - a.p);
+        return list;
+      }
+      function brandChipCls(b) { return b === '30MF' ? 'bg-gold' : b === '30MS' ? 'bg-brand-500' : 'bg-ink-700'; }
+      function render() {
+        const list = currentList();
+        $('count-label').textContent = list.length + '件';
+        const badge = $('filter-badge');
+        const n = activeCount();
+        if (n > 0) { badge.textContent = n; badge.classList.remove('hidden'); badge.classList.add('grid'); }
+        else { badge.classList.add('hidden'); badge.classList.remove('grid'); }
+        const res = $('results');
+        $('empty').classList.toggle('hidden', list.length > 0);
+        res.classList.toggle('hidden', list.length === 0);
+        if (view === 'grid') {
+          res.className = 'grid grid-cols-2 gap-12 md:grid-cols-3';
+          res.innerHTML = list.map((it) =>
+            '<div class="overflow-hidden rounded-lg bg-white shadow-card">' +
+              '<div class="grid aspect-square place-items-center bg-ink-25 text-[13px] font-bold text-ink-200">' + it.b + '</div>' +
+              '<div class="p-10">' +
+                '<div class="mb-4 flex items-center gap-6"><span class="h-8 w-8 rounded-full ' + brandChipCls(it.b) + '"></span><span class="text-[10px] font-semibold text-ink-500">' + it.b + '</span></div>' +
+                '<div class="line-clamp-2 text-[12px] font-semibold leading-snug">' + it.n + '</div>' +
+                '<div class="mt-4 text-[12px] font-bold text-ink-700">¥' + it.p.toLocaleString() + '</div>' +
+              '</div>' +
+            '</div>'
+          ).join('');
+        } else {
+          res.className = 'flex flex-col gap-8';
+          res.innerHTML = list.map((it) =>
+            '<div class="flex items-center gap-12 rounded-lg bg-white p-10 shadow-card">' +
+              '<div class="grid h-48 w-48 shrink-0 place-items-center rounded-md bg-ink-50 text-[10px] font-bold text-ink-300">' + it.b.replace('30','') + '</div>' +
+              '<div class="min-w-0 flex-1">' +
+                '<div class="truncate text-[13px] font-semibold">' + it.n + '</div>' +
+                '<div class="mt-2 flex items-center gap-8 text-[11px] text-ink-500"><span class="flex items-center gap-4"><span class="h-6 w-6 rounded-full ' + brandChipCls(it.b) + '"></span>' + it.b + '</span><span>¥' + it.p.toLocaleString() + '</span></div>' +
+              '</div>' +
+            '</div>'
+          ).join('');
+        }
+      }
+
+      // ══════════════ モード切替 ══════════════
+      const DESC = {
+        A: '案1: すべての条件をANDで適用。ブランド専用軸（カテゴリ・勢力）は該当ブランド選択時に行として出現し、他ブランドの結果にも影響します。',
+        B: '案2: 種別・検索は全体にAND。ブランドごとの区画内で絞り、区画同士はOR合算。触っていない区画の件数は変わりません。',
+      };
+      function setMode(m) {
+        mode = m;
+        const on  = 'bg-white text-ink-900 shadow-card';
+        const off = 'text-ink-500 hover:text-ink-700';
+        $('mode-a').className = 'rounded-full py-8 text-[12px] font-bold transition-colors ' + (m === 'A' ? on : off);
+        $('mode-b').className = 'rounded-full py-8 text-[12px] font-bold transition-colors ' + (m === 'B' ? on : off);
+        $('mode-desc').textContent = DESC[m];
+        render();
+        if (!$('sheet').classList.contains('hidden')) renderSheet();
+      }
+      $('mode-a').addEventListener('click', () => setMode('A'));
+      $('mode-b').addEventListener('click', () => setMode('B'));
+
+      // ══════════════ イベント ══════════════
+      function openSheet() {
+        KEYS.forEach((k) => { draft[k] = new Set(state[k]); });
+        renderSheet();
+        $('sheet').classList.remove('hidden');
+        document.body.style.overflow = 'hidden';
+      }
+      function closeSheet() {
+        $('sheet').classList.add('hidden');
+        document.body.style.overflow = '';
+      }
+      $('filter-btn').addEventListener('click', openSheet);
+      $('sheet-backdrop').addEventListener('click', closeSheet);
+      $('sheet-close').addEventListener('click', closeSheet);
+      $('sheet-clear').addEventListener('click', () => { KEYS.forEach((k) => draft[k].clear()); renderSheet(); });
+      $('sheet-apply').addEventListener('click', () => {
+        KEYS.forEach((k) => { state[k] = new Set(draft[k]); });
+        closeSheet();
+        render();
+      });
+      $('empty-clear').addEventListener('click', () => { KEYS.forEach((k) => state[k].clear()); render(); });
+      $('q').addEventListener('input', (e) => { q = e.target.value.trim(); render(); });
+
+      const SORTS = [['new','新着順'],['cheap','価格が安い順'],['exp','価格が高い順']];
+      $('sort-btn').addEventListener('click', () => {
+        const i = SORTS.findIndex(function(s){ return s[0] === sort; });
+        sort = SORTS[(i + 1) % SORTS.length][0];
+        $('sort-label').textContent = SORTS.find(function(s){ return s[0] === sort; })[1];
+        render();
+      });
+      $('view-btn').addEventListener('click', () => {
+        view = view === 'grid' ? 'list' : 'grid';
+        $('view-label').textContent = view === 'grid' ? '画像で表示中' : 'リストで表示中';
+        $('view-icon-grid').classList.toggle('hidden', view !== 'grid');
+        $('view-icon-list').classList.toggle('hidden', view !== 'list');
+        render();
+      });
+      document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeSheet(); });
+
+      setMode('A');
+    })();
+    </script>
+  </body>
+</html>
