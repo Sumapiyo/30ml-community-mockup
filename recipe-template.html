@@ -1,0 +1,391 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>方向性3：本文テンプレート｜レシピ機能プロトタイプ｜30ML COMMUNITY</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;500;600;700&family=Noto+Sans+JP:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <script>
+      tailwind.config = {
+        theme: {
+          spacing: {
+            0: '0px', 1: '1px', 2: '2px', 4: '4px', 6: '6px', 8: '8px',
+            10: '10px', 12: '12px', 14: '14px', 16: '16px', 18: '18px',
+            20: '20px', 24: '24px', 28: '28px', 32: '32px', 36: '36px',
+            40: '40px', 44: '44px', 48: '48px', 52: '52px', 56: '56px',
+            60: '60px', 64: '64px', 72: '72px', 80: '80px', 88: '88px',
+            96: '96px', 112: '112px', 128: '128px',
+            px: '1px', 0.5: '2px',
+          },
+          borderRadius: { none: '0px', xs: '2px', DEFAULT: '4px', sm: '4px', md: '8px', lg: '16px', full: '9999px' },
+          extend: {
+            fontFamily: { sans: ['Open Sans', 'Noto Sans JP', 'system-ui', 'sans-serif'] },
+            colors: {
+              ink: {
+                900: '#1A1A1A', 700: '#474747', 600: '#5C5C5C', 500: '#737373',
+                400: '#949494', 300: '#B3B3B3', 200: '#D1D1D1', 100: '#E8E8E8',
+                50: '#F5F5F5', 25: '#FAFAFA',
+              },
+              brand: {
+                25: '#FCF7FF', 50: '#F9EDFF', 100: '#F0D7FC', 300: '#D79DF5',
+                500: '#A93DE0', 600: '#8C21C2', 700: '#6E05A3',
+              },
+              gold: '#C6A35A',
+              like: '#E5097B',
+              ok: '#15803D',
+              warn: '#B45309',
+            },
+            boxShadow: {
+              card: '0px 0px 4px rgba(0,0,0,0.08), 0px 0px 8px rgba(0,0,0,0.06)',
+              cardLg: '0px 0px 8px rgba(0,0,0,0.08), 0px 0px 16px rgba(0,0,0,0.06)',
+            },
+          },
+        },
+      };
+    </script>
+    <style>
+      body { font-family: 'Open Sans', 'Noto Sans JP', system-ui, sans-serif; background: #fafafa; color: #1a1a1a; }
+      .fade-in { animation: fadein 0.2s ease-out; }
+      @keyframes fadein { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+      #body-input { min-height: 320px; resize: vertical; line-height: 1.8; }
+      .flash { animation: flash 0.8s ease-out; }
+      @keyframes flash { 0% { background: #F9EDFF; } 100% { background: #FAFAFA; } }
+    </style>
+  </head>
+  <body class="min-h-screen">
+    <!-- ===================== Password Gate ===================== -->
+    <div id="gate" class="fixed inset-0 z-50 flex items-center justify-center bg-ink-900 px-24">
+      <div class="w-full max-w-[360px] rounded-lg bg-white p-24 shadow-cardLg">
+        <div class="mb-16 flex items-center gap-10">
+          <span class="flex h-36 w-36 items-center justify-center rounded-md bg-gradient-to-br from-brand-600 to-brand-300 font-bold text-white">30</span>
+          <div class="leading-tight">
+            <div class="text-[15px] font-bold tracking-wide">30ML COMMUNITY</div>
+            <div class="text-[10px] tracking-widest text-ink-500">POWERED BY BUILDERS NOTE</div>
+          </div>
+        </div>
+        <div class="text-[14px] font-bold">このページは限定公開です</div>
+        <p class="mt-2 text-[12px] text-ink-500">合言葉を入力してください。</p>
+        <form id="gate-form" class="mt-14">
+          <input id="gate-input" type="password" autocomplete="off" placeholder="合言葉"
+            class="h-40 w-full rounded-md border border-ink-100 bg-ink-25 px-12 text-[14px] text-ink-900 focus:border-brand-500 focus:outline-none" />
+          <p id="gate-error" class="mt-6 hidden text-[12px] font-semibold text-like">合言葉が違います。</p>
+          <button type="submit" class="mt-12 h-40 w-full rounded-full bg-brand-600 text-[14px] font-bold text-white hover:bg-brand-700">入る</button>
+        </form>
+      </div>
+    </div>
+    <script>
+      (function () {
+        var KEY = 'db_gate_ok'; var PASS = 'gaudiy00';
+        var gate = document.getElementById('gate');
+        function unlock() { gate.style.display = 'none'; document.body.style.overflow = ''; }
+        if (sessionStorage.getItem(KEY) === '1') { unlock(); } else { document.body.style.overflow = 'hidden'; }
+        document.getElementById('gate-form').addEventListener('submit', function (e) {
+          e.preventDefault();
+          if (document.getElementById('gate-input').value.trim() === PASS) { sessionStorage.setItem(KEY, '1'); unlock(); }
+          else { document.getElementById('gate-error').classList.remove('hidden'); }
+        });
+      })();
+    </script>
+
+    <!-- ===================== Header ===================== -->
+    <header class="fixed inset-x-0 top-0 z-20 flex h-48 items-center justify-between border-b border-ink-50 bg-white px-16">
+      <a href="recipe-demo.html" class="flex items-center gap-6 text-[13px] font-semibold text-ink-700 hover:text-ink-900">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="m15 6-6 6 6 6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" /></svg>
+        プロトタイプ一覧
+      </a>
+      <div class="flex items-center gap-8">
+        <span class="flex h-24 w-24 items-center justify-center rounded bg-gradient-to-br from-brand-600 to-brand-300 text-[11px] font-bold text-white">30</span>
+        <span class="text-[13px] font-bold tracking-wide">レシピ機能 PROTO</span>
+      </div>
+      <span class="rounded-full bg-brand-600 px-10 py-4 text-[11px] font-bold text-white">案3</span>
+    </header>
+
+    <div class="mx-auto max-w-[640px] px-0 pb-96 pt-48 lg:px-16">
+      <!-- 説明バナー -->
+      <div class="mx-16 mt-16 rounded-lg border border-brand-100 bg-brand-25 p-16 lg:mx-0">
+        <div class="text-[14px] font-bold text-brand-700">方向性3：本文にテンプレートを自動挿入する</div>
+        <p class="mt-6 text-[12px] leading-relaxed text-ink-600">
+          投稿画面を開くと、本文欄に<b>実テキストとしてテンプレートが入っている</b>状態から書き始めます（プレースホルダーではないので、そのまま編集・削除できます）。
+          登録済みキットからキット名を自動で流し込むパターンも用意しました。新規UIを作らないため実装が最も軽い案です。
+        </p>
+      </div>
+
+      <!-- モード切替 -->
+      <div class="mx-16 mt-16 grid grid-cols-2 gap-4 rounded-full bg-ink-50 p-4 lg:mx-0">
+        <button id="tab-post" class="rounded-full bg-white py-10 text-[13px] font-bold text-ink-900 shadow-card">投稿する側の体験</button>
+        <button id="tab-view" class="rounded-full py-10 text-[13px] font-bold text-ink-500">閲覧する側の体験</button>
+      </div>
+
+      <!-- ============================================================ -->
+      <!-- 投稿モード（この案は投稿体験が主役なので先に表示） -->
+      <!-- ============================================================ -->
+      <section id="mode-post" class="mt-16">
+        <article class="overflow-hidden bg-white shadow-card lg:rounded-lg">
+          <header class="flex items-center justify-between border-b border-ink-50 px-16 py-12">
+            <span class="text-[15px] font-bold">作品を投稿する</span>
+            <button class="rounded-full bg-brand-600 px-16 py-8 text-[12px] font-bold text-white">投稿する</button>
+          </header>
+
+          <div class="p-16">
+            <!-- 画像 -->
+            <div class="flex gap-8">
+              <img src="images/IMG_6320.jpeg" alt="" class="h-72 w-72 rounded-md object-cover ring-1 ring-ink-50" />
+              <button class="grid h-72 w-72 place-items-center rounded-md border-2 border-dashed border-ink-200 text-ink-400 hover:border-brand-300 hover:text-brand-500">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2" stroke-linecap="round" /></svg>
+              </button>
+            </div>
+
+            <!-- タイトル -->
+            <input type="text" value="ライダースーツ ルルチェ&ミコルル"
+              class="mt-14 h-44 w-full rounded-md border border-ink-100 bg-white px-12 text-[15px] font-bold focus:border-brand-500 focus:outline-none" placeholder="タイトル" />
+
+            <!-- テンプレ操作バー -->
+            <div class="mt-14 rounded-md border border-brand-100 bg-brand-25 p-10">
+              <div class="flex items-center justify-between">
+                <span class="text-[12px] font-bold text-brand-700">レシピテンプレート</span>
+                <label class="flex cursor-pointer items-center gap-6 text-[11px] font-semibold text-ink-600">
+                  <input id="auto-insert" type="checkbox" checked class="accent-[#8C21C2]" style="width:14px;height:14px;" />
+                  新規投稿時に自動挿入
+                </label>
+              </div>
+              <div class="mt-8 flex flex-wrap gap-6">
+                <button id="btn-insert-empty" class="inline-flex items-center gap-4 rounded-full border-[1.5px] border-brand-500 bg-white px-12 py-6 text-[11.5px] font-bold text-brand-600 hover:bg-brand-50">
+                  空のテンプレを挿入
+                </button>
+                <button id="btn-insert-filled" class="inline-flex items-center gap-4 rounded-full bg-brand-600 px-12 py-6 text-[11.5px] font-bold text-white hover:bg-brand-700">
+                  ✨ 登録キット名を流し込んで挿入
+                </button>
+                <button id="btn-clear" class="inline-flex items-center gap-4 rounded-full px-12 py-6 text-[11.5px] font-semibold text-ink-500 hover:text-like">
+                  本文をクリア
+                </button>
+              </div>
+              <p class="mt-6 text-[10.5px] leading-relaxed text-ink-500">
+                「登録キット名を流し込んで挿入」は、投稿に添付済みのキット6点の名前を自動でテンプレに埋めます。書くのは「└ 使った場所」の行だけ。
+              </p>
+            </div>
+
+            <!-- 本文 -->
+            <textarea id="body-input"
+              class="mt-10 w-full rounded-md border border-ink-100 bg-ink-25 p-12 text-[13.5px] text-ink-900 focus:border-brand-500 focus:bg-white focus:outline-none"
+              placeholder="本文を入力..."></textarea>
+            <div class="mt-4 flex items-center justify-between text-[11px] text-ink-400">
+              <span>テンプレは通常のテキストです。不要な行は消してOK。</span>
+              <span><span id="char-count">0</span>文字</span>
+            </div>
+
+            <!-- リアルタイムプレビュー -->
+            <div class="mt-16">
+              <div class="text-[11px] font-bold tracking-widest text-ink-500">プレビュー（閲覧者にはこう見える）</div>
+              <div id="preview" class="mt-8 rounded-md border border-ink-50 bg-white p-14 text-[13.5px] leading-relaxed text-ink-700"></div>
+            </div>
+          </div>
+        </article>
+
+        <!-- 検証メモ -->
+        <div class="mx-16 mt-16 rounded-lg border border-ink-100 bg-white p-14 lg:mx-0">
+          <div class="text-[12px] font-bold text-ink-700">検証ポイント</div>
+          <ul class="mt-6 list-disc pl-18 text-[12px] leading-relaxed text-ink-600">
+            <li>投稿UIの追加開発ほぼゼロ。既存の本文欄に初期値を入れるだけなので最速でリリース可能</li>
+            <li>「▼」「・」「└」で始まる行はプレビューで自動的に見出し・リスト風に整形（本文はプレーンテキストのまま）</li>
+            <li>弱点：構造化データにならないので、部位での検索・集計・カート連携には使えない</li>
+            <li>テンプレを消して自由に書く人も出る=記入率はピンやチップ方式より運用依存</li>
+          </ul>
+        </div>
+      </section>
+
+      <!-- ============================================================ -->
+      <!-- 閲覧モード -->
+      <!-- ============================================================ -->
+      <section id="mode-view" class="mt-16 hidden">
+        <article class="overflow-hidden bg-white shadow-card lg:rounded-lg">
+          <div class="flex items-center gap-12 px-16 pt-16">
+            <span class="grid h-40 w-40 shrink-0 place-items-center rounded-full bg-gradient-to-br from-brand-500 via-brand-300 to-gold text-[14px] font-bold text-white">3</span>
+            <div class="min-w-0">
+              <div class="text-[14px] font-bold">323号</div>
+              <div class="text-[11px] text-ink-500">@323go · 2026/03/29</div>
+            </div>
+            <button class="ml-auto h-32 rounded-full bg-ink-900 px-14 text-[12px] font-bold text-white">フォロー</button>
+          </div>
+          <h1 class="mt-12 px-16 text-[20px] font-bold leading-snug">ライダースーツ ルルチェ&ミコルル</h1>
+          <img src="images/IMG_6320.jpeg" alt="" class="mt-12 block w-full" loading="lazy" />
+
+          <!-- 本文（テンプレに沿って書かれた完成形） -->
+          <div id="view-body" class="px-16 py-16 text-[14px] leading-relaxed text-ink-700"></div>
+
+          <!-- 従来のキットカードは併存 -->
+          <section class="px-16 pb-20">
+            <div class="rounded-lg border border-brand-100 bg-brand-25 p-12">
+              <div class="text-[12px] font-bold text-brand-700">使用キット（6アイテム）</div>
+              <div class="mt-8 flex gap-8 overflow-x-auto pb-4 scrollbar-hide" id="view-kitstrip"></div>
+              <div class="mt-6 text-[10.5px] text-ink-500">※ 本文のテンプレとは別に、従来どおりキットカード（購入導線）は残ります</div>
+            </div>
+          </section>
+        </article>
+      </section>
+    </div>
+
+    <script>
+      // ============ データ ============
+      const KITS = [
+        { short: 'ターボコスチュームα [カラーB]', full: '30MS オプションパーツセット22(ターボコスチュームα)[カラーB]', img: 'https://m.media-amazon.com/images/I/61uY56WJ2iL._AC_SX522_.jpg' },
+        { short: 'ターボコスチュームβ [カラーA]', full: '30MS オプションパーツセット24(ターボコスチュームβ)[カラーA]', img: 'https://m.media-amazon.com/images/I/617bucW+q+L._AC_SX679_.jpg' },
+        { short: 'ターボコスチュームγ [カラーC]', full: '30MS オプションパーツセット25(ターボコスチュームγ)[カラーC]', img: 'https://m.media-amazon.com/images/I/61PxfxsqmtL._AC_SX679_.jpg' },
+        { short: 'クライムユニット [カラーC]', full: '30MS オプションパーツセット26(クライムユニット)[カラーC]', img: 'https://m.media-amazon.com/images/I/61ghPVPDQqL._AC_SX679_.jpg' },
+        { short: 'キャノンバイクVer.', full: '30MM 1/144 エグザビークル(キャノンバイクVer.)', img: 'https://m.media-amazon.com/images/I/61XHIRVKhtL._AC_SX679_.jpg' },
+        { short: 'ブーストワイルドバイクVer.', full: '30MM 1/144 エグザビークル(ブーストワイルドバイクVer.)', img: 'https://m.media-amazon.com/images/I/61PxECyrujL._AC_SX679_.jpg' },
+      ];
+
+      const TEMPLATE_EMPTY = [
+        '（作品の紹介文）',
+        '',
+        '▼ 使用キットと使った場所',
+        '・キット名',
+        '　└ 使った場所：',
+        '・キット名',
+        '　└ 使った場所：',
+        '',
+        '▼ 塗装・仕上げ',
+        '・',
+        '',
+        '▼ こだわりポイント',
+        '・',
+      ].join('\n');
+
+      function buildFilledTemplate() {
+        const lines = ['（作品の紹介文）', '', '▼ 使用キットと使った場所'];
+        KITS.forEach((k) => {
+          lines.push('・' + k.short);
+          lines.push('　└ 使った場所：');
+        });
+        lines.push('', '▼ 塗装・仕上げ', '・', '', '▼ こだわりポイント', '・');
+        return lines.join('\n');
+      }
+
+      // 閲覧モード用：記入済みの完成形サンプル
+      const FILLED_SAMPLE = [
+        '30MSの「ターボコスチューム」シリーズと「クライムユニット」を組み合わせて、姉妹キャラのルルチェ＆ミコルルをライダースーツ仕様で組みました。工具なしの素組み＋付属シールで仕上げています。',
+        '',
+        '▼ 使用キットと使った場所',
+        '・ターボコスチュームα [カラーB]',
+        '　└ 使った場所：ルルチェの胴体スーツ・脚部',
+        '・ターボコスチュームβ [カラーA]',
+        '　└ 使った場所：ミコルルの胴体スーツ・ブーツ',
+        '・ターボコスチュームγ [カラーC]',
+        '　└ 使った場所：両体の肩アーマー・腰アクセント',
+        '・クライムユニット [カラーC]',
+        '　└ 使った場所：ヘルメット2種（手持ち小物）',
+        '・キャノンバイクVer.',
+        '　└ 使った場所：ルルチェのバイク',
+        '・ブーストワイルドバイクVer.',
+        '　└ 使った場所：ミコルルのバイク',
+        '',
+        '▼ 塗装・仕上げ',
+        '・基本は素組み。ホワイト×ブラック×パープル×ゴールドの成型色を活かして部分塗装のみ',
+        '',
+        '▼ こだわりポイント',
+        '・同じテーマの姉妹で「黒×白」の質感差を出すこと。ヘルメットは手に持たせて表情を見せる構成にしました',
+      ].join('\n');
+
+      // ============ タブ切替 ============
+      const tabView = document.getElementById('tab-view');
+      const tabPost = document.getElementById('tab-post');
+      function setMode(isPost) {
+        document.getElementById('mode-post').classList.toggle('hidden', !isPost);
+        document.getElementById('mode-view').classList.toggle('hidden', isPost);
+        tabPost.className = isPost
+          ? 'rounded-full bg-white py-10 text-[13px] font-bold text-ink-900 shadow-card'
+          : 'rounded-full py-10 text-[13px] font-bold text-ink-500';
+        tabView.className = !isPost
+          ? 'rounded-full bg-white py-10 text-[13px] font-bold text-ink-900 shadow-card'
+          : 'rounded-full py-10 text-[13px] font-bold text-ink-500';
+      }
+      tabPost.addEventListener('click', () => setMode(true));
+      tabView.addEventListener('click', () => setMode(false));
+
+      // ============ 本文レンダリング（テンプレ行の軽い整形） ============
+      function escapeHtml(s) {
+        return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+      }
+      function renderBody(text) {
+        if (!text.trim()) return '<span class="text-ink-400">（本文はまだありません）</span>';
+        return text.split('\n').map((line) => {
+          const esc = escapeHtml(line);
+          if (line.startsWith('▼')) {
+            return `<div class="mt-14 flex items-center gap-6 text-[13px] font-bold text-brand-700"><span class="h-12 w-3 rounded-full bg-brand-500" style="width:3px;height:14px;"></span>${esc.replace(/^▼\s*/, '')}</div>`;
+          }
+          if (line.startsWith('・')) {
+            return `<div class="mt-4 pl-8 text-[13.5px] font-semibold text-ink-900">${esc}</div>`;
+          }
+          if (line.trim().startsWith('└')) {
+            return `<div class="pl-24 text-[12.5px] text-ink-600">${esc.trim()}</div>`;
+          }
+          if (line.trim() === '') return '<div style="height:8px"></div>';
+          return `<div>${esc}</div>`;
+        }).join('');
+      }
+
+      // ============ 投稿モード ============
+      const bodyInput = document.getElementById('body-input');
+      const preview = document.getElementById('preview');
+      const charCount = document.getElementById('char-count');
+
+      function refreshPreview() {
+        preview.innerHTML = renderBody(bodyInput.value);
+        charCount.textContent = bodyInput.value.length;
+      }
+      bodyInput.addEventListener('input', refreshPreview);
+
+      function insertAtCursor(text) {
+        const start = bodyInput.selectionStart ?? bodyInput.value.length;
+        const end = bodyInput.selectionEnd ?? bodyInput.value.length;
+        const before = bodyInput.value.slice(0, start);
+        const after = bodyInput.value.slice(end);
+        const glue = before && !before.endsWith('\n') ? '\n' : '';
+        bodyInput.value = before + glue + text + after;
+        bodyInput.classList.add('flash');
+        setTimeout(() => bodyInput.classList.remove('flash'), 800);
+        refreshPreview();
+        bodyInput.focus();
+      }
+
+      document.getElementById('btn-insert-empty').addEventListener('click', () => insertAtCursor(TEMPLATE_EMPTY));
+      document.getElementById('btn-insert-filled').addEventListener('click', () => insertAtCursor(buildFilledTemplate()));
+      document.getElementById('btn-clear').addEventListener('click', () => {
+        if (!bodyInput.value || confirm('本文をクリアしますか？')) {
+          bodyInput.value = '';
+          refreshPreview();
+        }
+      });
+
+      // 「新規投稿時に自動挿入」のデモ：チェックONなら初期状態でテンプレ入り
+      const autoInsert = document.getElementById('auto-insert');
+      function applyAutoInsert() {
+        bodyInput.value = autoInsert.checked ? buildFilledTemplate() : '';
+        refreshPreview();
+      }
+      autoInsert.addEventListener('change', applyAutoInsert);
+
+      // ============ 閲覧モード ============
+      document.getElementById('view-body').innerHTML = renderBody(FILLED_SAMPLE);
+      const strip = document.getElementById('view-kitstrip');
+      KITS.forEach((k) => {
+        const el = document.createElement('a');
+        el.href = 'kit.html';
+        el.className = 'w-[120px] shrink-0 rounded-md bg-white p-8 shadow-card hover:shadow-cardLg';
+        el.innerHTML = `
+          <img src="${k.img}" alt="" class="aspect-square w-full rounded bg-white object-contain" loading="lazy" />
+          <div class="mt-4 line-clamp-2 text-[10.5px] font-bold leading-tight">${k.short}</div>`;
+        strip.appendChild(el);
+      });
+
+      // 初期描画
+      applyAutoInsert();
+    </script>
+  </body>
+</html>

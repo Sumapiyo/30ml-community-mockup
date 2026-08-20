@@ -1,0 +1,507 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>方向性2：部位リスト｜レシピ機能プロトタイプ｜30ML COMMUNITY</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;500;600;700&family=Noto+Sans+JP:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <script>
+      tailwind.config = {
+        theme: {
+          spacing: {
+            0: '0px', 1: '1px', 2: '2px', 4: '4px', 6: '6px', 8: '8px',
+            10: '10px', 12: '12px', 14: '14px', 16: '16px', 18: '18px',
+            20: '20px', 24: '24px', 28: '28px', 32: '32px', 36: '36px',
+            40: '40px', 44: '44px', 48: '48px', 52: '52px', 56: '56px',
+            60: '60px', 64: '64px', 72: '72px', 80: '80px', 88: '88px',
+            96: '96px', 112: '112px', 128: '128px',
+            px: '1px', 0.5: '2px',
+          },
+          borderRadius: { none: '0px', xs: '2px', DEFAULT: '4px', sm: '4px', md: '8px', lg: '16px', full: '9999px' },
+          extend: {
+            fontFamily: { sans: ['Open Sans', 'Noto Sans JP', 'system-ui', 'sans-serif'] },
+            colors: {
+              ink: {
+                900: '#1A1A1A', 700: '#474747', 600: '#5C5C5C', 500: '#737373',
+                400: '#949494', 300: '#B3B3B3', 200: '#D1D1D1', 100: '#E8E8E8',
+                50: '#F5F5F5', 25: '#FAFAFA',
+              },
+              brand: {
+                25: '#FCF7FF', 50: '#F9EDFF', 100: '#F0D7FC', 300: '#D79DF5',
+                500: '#A93DE0', 600: '#8C21C2', 700: '#6E05A3',
+              },
+              gold: '#C6A35A',
+              like: '#E5097B',
+              ok: '#15803D',
+              warn: '#B45309',
+            },
+            boxShadow: {
+              card: '0px 0px 4px rgba(0,0,0,0.08), 0px 0px 8px rgba(0,0,0,0.06)',
+              cardLg: '0px 0px 8px rgba(0,0,0,0.08), 0px 0px 16px rgba(0,0,0,0.06)',
+            },
+          },
+        },
+      };
+    </script>
+    <style>
+      body { font-family: 'Open Sans', 'Noto Sans JP', system-ui, sans-serif; background: #fafafa; color: #1a1a1a; }
+      .scrollbar-hide::-webkit-scrollbar { display: none; }
+      .scrollbar-hide { scrollbar-width: none; }
+      .bodymap-part { cursor: pointer; fill: #E8E8E8; stroke: #B3B3B3; stroke-width: 1; transition: fill 0.15s ease; }
+      .bodymap-part:hover { fill: #F0D7FC; }
+      .bodymap-part.active { fill: #A93DE0; stroke: #6E05A3; }
+      .bodymap-part.has-kits { fill: #F0D7FC; stroke: #D79DF5; }
+      .bodymap-part.has-kits:hover { fill: #D79DF5; }
+      .bodymap-part.has-kits.active { fill: #A93DE0; stroke: #6E05A3; }
+      .chip { transition: all 0.12s ease; }
+      .fade-in { animation: fadein 0.2s ease-out; }
+      @keyframes fadein { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+    </style>
+  </head>
+  <body class="min-h-screen">
+    <!-- ===================== Password Gate ===================== -->
+    <div id="gate" class="fixed inset-0 z-50 flex items-center justify-center bg-ink-900 px-24">
+      <div class="w-full max-w-[360px] rounded-lg bg-white p-24 shadow-cardLg">
+        <div class="mb-16 flex items-center gap-10">
+          <span class="flex h-36 w-36 items-center justify-center rounded-md bg-gradient-to-br from-brand-600 to-brand-300 font-bold text-white">30</span>
+          <div class="leading-tight">
+            <div class="text-[15px] font-bold tracking-wide">30ML COMMUNITY</div>
+            <div class="text-[10px] tracking-widest text-ink-500">POWERED BY BUILDERS NOTE</div>
+          </div>
+        </div>
+        <div class="text-[14px] font-bold">このページは限定公開です</div>
+        <p class="mt-2 text-[12px] text-ink-500">合言葉を入力してください。</p>
+        <form id="gate-form" class="mt-14">
+          <input id="gate-input" type="password" autocomplete="off" placeholder="合言葉"
+            class="h-40 w-full rounded-md border border-ink-100 bg-ink-25 px-12 text-[14px] text-ink-900 focus:border-brand-500 focus:outline-none" />
+          <p id="gate-error" class="mt-6 hidden text-[12px] font-semibold text-like">合言葉が違います。</p>
+          <button type="submit" class="mt-12 h-40 w-full rounded-full bg-brand-600 text-[14px] font-bold text-white hover:bg-brand-700">入る</button>
+        </form>
+      </div>
+    </div>
+    <script>
+      (function () {
+        var KEY = 'db_gate_ok'; var PASS = 'gaudiy00';
+        var gate = document.getElementById('gate');
+        function unlock() { gate.style.display = 'none'; document.body.style.overflow = ''; }
+        if (sessionStorage.getItem(KEY) === '1') { unlock(); } else { document.body.style.overflow = 'hidden'; }
+        document.getElementById('gate-form').addEventListener('submit', function (e) {
+          e.preventDefault();
+          if (document.getElementById('gate-input').value.trim() === PASS) { sessionStorage.setItem(KEY, '1'); unlock(); }
+          else { document.getElementById('gate-error').classList.remove('hidden'); }
+        });
+      })();
+    </script>
+
+    <!-- ===================== Header ===================== -->
+    <header class="fixed inset-x-0 top-0 z-20 flex h-48 items-center justify-between border-b border-ink-50 bg-white px-16">
+      <a href="recipe-demo.html" class="flex items-center gap-6 text-[13px] font-semibold text-ink-700 hover:text-ink-900">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="m15 6-6 6 6 6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" /></svg>
+        プロトタイプ一覧
+      </a>
+      <div class="flex items-center gap-8">
+        <span class="flex h-24 w-24 items-center justify-center rounded bg-gradient-to-br from-brand-600 to-brand-300 text-[11px] font-bold text-white">30</span>
+        <span class="text-[13px] font-bold tracking-wide">レシピ機能 PROTO</span>
+      </div>
+      <span class="rounded-full bg-brand-600 px-10 py-4 text-[11px] font-bold text-white">案2</span>
+    </header>
+
+    <div class="mx-auto max-w-[640px] px-0 pb-96 pt-48 lg:px-16">
+      <!-- 説明バナー -->
+      <div class="mx-16 mt-16 rounded-lg border border-brand-100 bg-brand-25 p-16 lg:mx-0">
+        <div class="text-[14px] font-bold text-brand-700">方向性2：リストを部位で詳細化する</div>
+        <p class="mt-6 text-[12px] leading-relaxed text-ink-600">
+          キットごとに「頭部・胴体・腕・腰・脚・その他」の使用部位を持たせます。
+          粒度の分岐（<b>キット起点</b>で書くか、<b>部位起点</b>で書くか）は、閲覧・投稿の両方で切り替えて比較できるようにしています。<b>データは同一で、見せ方・入力方向だけが違う</b>のがポイントです。
+        </p>
+      </div>
+
+      <!-- モード切替 -->
+      <div class="mx-16 mt-16 grid grid-cols-2 gap-4 rounded-full bg-ink-50 p-4 lg:mx-0">
+        <button id="tab-view" class="rounded-full bg-white py-10 text-[13px] font-bold text-ink-900 shadow-card">閲覧する側の体験</button>
+        <button id="tab-post" class="rounded-full py-10 text-[13px] font-bold text-ink-500">投稿する側の体験</button>
+      </div>
+
+      <!-- ============================================================ -->
+      <!-- 閲覧モード -->
+      <!-- ============================================================ -->
+      <section id="mode-view" class="mt-16">
+        <article class="overflow-hidden bg-white shadow-card lg:rounded-lg">
+          <div class="flex items-center gap-12 px-16 pt-16">
+            <span class="grid h-40 w-40 shrink-0 place-items-center rounded-full bg-gradient-to-br from-brand-500 via-brand-300 to-gold text-[14px] font-bold text-white">3</span>
+            <div class="min-w-0">
+              <div class="text-[14px] font-bold">323号</div>
+              <div class="text-[11px] text-ink-500">@323go · 2026/03/29</div>
+            </div>
+            <button class="ml-auto h-32 rounded-full bg-ink-900 px-14 text-[12px] font-bold text-white">フォロー</button>
+          </div>
+          <h1 class="mt-12 px-16 text-[20px] font-bold leading-snug">ライダースーツ ルルチェ&ミコルル</h1>
+          <img src="images/IMG_6320.jpeg" alt="" class="mt-12 block w-full" loading="lazy" />
+
+          <!-- 使用キット＆部位 -->
+          <section class="px-16 pb-20 pt-16">
+            <div class="rounded-lg border border-brand-100 bg-brand-25">
+              <header class="border-b border-brand-100 px-14 py-10">
+                <div class="flex items-center justify-between">
+                  <div class="flex items-center gap-8">
+                    <span class="grid h-24 w-24 place-items-center rounded-md bg-brand-500 text-white">
+                      <svg width="13" height="13" viewBox="0 0 24 24" fill="none"><path d="M4 7 12 3l8 4-8 4-8-4Zm0 5 8 4 8-4M4 17l8 4 8-4" stroke="white" stroke-width="1.6" stroke-linejoin="round" /></svg>
+                    </span>
+                    <span class="text-[14px] font-bold text-brand-700">使用キット & 部位</span>
+                  </div>
+                  <span class="rounded-full bg-white px-8 py-2 text-[11px] font-semibold text-brand-700 ring-1 ring-brand-100">6アイテム</span>
+                </div>
+                <!-- 粒度切替 -->
+                <div class="mt-10 grid grid-cols-2 gap-4 rounded-full bg-white p-4 ring-1 ring-brand-100">
+                  <button id="gran-kit" class="rounded-full bg-brand-600 py-6 text-[12px] font-bold text-white">キット別に見る</button>
+                  <button id="gran-part" class="rounded-full py-6 text-[12px] font-bold text-ink-500">部位別に見る</button>
+                </div>
+              </header>
+
+              <!-- キット別ビュー -->
+              <div id="view-bykit" class="flex flex-col gap-8 p-12"></div>
+
+              <!-- 部位別ビュー -->
+              <div id="view-bypart" class="hidden p-12">
+                <div class="flex gap-12">
+                  <!-- 部位マップ -->
+                  <div class="shrink-0">
+                    <svg id="bodymap-view" width="96" height="216" viewBox="0 0 96 216">
+                      <circle data-part="頭部" class="bodymap-part" cx="48" cy="22" r="16" />
+                      <rect data-part="胴体" class="bodymap-part" x="30" y="44" width="36" height="48" rx="8" />
+                      <rect data-part="腕" class="bodymap-part" x="8" y="46" width="16" height="60" rx="8" />
+                      <rect data-part="腕" class="bodymap-part" x="72" y="46" width="16" height="60" rx="8" />
+                      <rect data-part="腰" class="bodymap-part" x="30" y="97" width="36" height="22" rx="6" />
+                      <rect data-part="脚" class="bodymap-part" x="29" y="124" width="17" height="66" rx="8" />
+                      <rect data-part="脚" class="bodymap-part" x="50" y="124" width="17" height="66" rx="8" />
+                      <rect data-part="その他" class="bodymap-part" x="18" y="198" width="60" height="16" rx="8" />
+                      <text x="48" y="210" text-anchor="middle" font-size="9" fill="#5C5C5C" pointer-events="none">その他</text>
+                    </svg>
+                    <div class="mt-4 text-center text-[10px] text-ink-400">タップで絞り込み</div>
+                  </div>
+                  <!-- 部位別リスト -->
+                  <div id="partlist" class="min-w-0 flex-1 flex flex-col gap-10"></div>
+                </div>
+              </div>
+
+              <footer class="flex items-center justify-between gap-12 border-t border-brand-100 bg-white px-14 py-10 rounded-b-lg">
+                <span class="text-[11px] text-ink-500">合計 <span class="font-bold text-ink-900">¥9,438</span></span>
+                <button class="inline-flex shrink-0 items-center gap-6 rounded-full bg-brand-500 px-14 py-8 text-[12px] font-bold text-white hover:bg-brand-600">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M5 7h14l-1.5 10a2 2 0 0 1-2 1.7H8.5a2 2 0 0 1-2-1.7L5 7Z" stroke="white" stroke-width="1.6" /><circle cx="9" cy="20" r="1.4" fill="white" /><circle cx="16" cy="20" r="1.4" fill="white" /></svg>
+                  まとめてカートに追加
+                </button>
+              </footer>
+            </div>
+          </section>
+        </article>
+      </section>
+
+      <!-- ============================================================ -->
+      <!-- 投稿モード -->
+      <!-- ============================================================ -->
+      <section id="mode-post" class="mt-16 hidden">
+        <article class="overflow-hidden bg-white shadow-card lg:rounded-lg">
+          <header class="flex items-center justify-between border-b border-ink-50 px-16 py-12">
+            <span class="text-[15px] font-bold">作品を投稿する</span>
+            <span class="text-[11px] text-ink-400">3/3 ステップ：部位の指定（任意）</span>
+          </header>
+
+          <div class="border-b border-ink-50 bg-ink-25 px-16 py-10">
+            <div class="text-[12px] font-semibold text-ink-700">
+              登録済みキットに使用部位をタップで付けるだけ。<b class="text-brand-700">未指定でも投稿できます。</b>
+            </div>
+          </div>
+
+          <!-- 入力粒度切替（分岐の比較用） -->
+          <div class="px-16 pt-14">
+            <div class="text-[11px] font-bold tracking-widest text-ink-500">入力方式の比較（粒度の分岐）</div>
+            <div class="mt-8 grid grid-cols-2 gap-4 rounded-full bg-ink-50 p-4">
+              <button id="input-bykit" class="rounded-full bg-white py-8 text-[12px] font-bold text-ink-900 shadow-card">A. キット→部位を選ぶ</button>
+              <button id="input-bypart" class="rounded-full py-8 text-[12px] font-bold text-ink-500">B. 部位→キットを選ぶ</button>
+            </div>
+          </div>
+
+          <!-- A: キット起点入力 -->
+          <div id="post-bykit" class="flex flex-col gap-10 p-16"></div>
+
+          <!-- B: 部位起点入力 -->
+          <div id="post-bypart" class="hidden flex-col gap-10 p-16"></div>
+
+          <div class="px-16 pb-16">
+            <div class="grid grid-cols-2 gap-8">
+              <button class="rounded-full border-[1.5px] border-ink-200 py-12 text-[13px] font-bold text-ink-600 hover:bg-ink-25">スキップ</button>
+              <button class="rounded-full bg-brand-600 py-12 text-[13px] font-bold text-white hover:bg-brand-700">投稿する</button>
+            </div>
+          </div>
+        </article>
+
+        <!-- 検証メモ -->
+        <div class="mx-16 mt-16 rounded-lg border border-ink-100 bg-white p-14 lg:mx-0">
+          <div class="text-[12px] font-bold text-ink-700">検証ポイント（粒度の分岐）</div>
+          <ul class="mt-6 list-disc pl-18 text-[12px] leading-relaxed text-ink-600">
+            <li><b>A/Bどちらで入力しても保存されるデータは同じ</b>（キット×部位のマトリクス）。切り替えると入力内容が引き継がれるのを確認できます</li>
+            <li>A（キット起点）：キット数が少ない作品向き。キット登録の流れのまま部位チップを足すだけ</li>
+            <li>B（部位起点）：ミキシングが多い作品向き。「頭はどれ？」という閲覧者の疑問と同じ方向で書ける</li>
+            <li>部位を1つも付けないキットは従来どおり「使用キット」として表示</li>
+          </ul>
+        </div>
+      </section>
+    </div>
+
+    <script>
+      // ============ データ ============
+      const PARTS = ['頭部', '胴体', '腕', '腰', '脚', 'その他'];
+      const KITS = [
+        {
+          id: 1, short: 'ターボコスチュームα [カラーB]', name: '30MS オプションパーツセット22', sub: '(ターボコスチュームα)[カラーB]',
+          price: '¥1,650', brand: '30MS OPTION', mark: '●',
+          img: 'https://m.media-amazon.com/images/I/61uY56WJ2iL._AC_SX522_.jpg',
+          parts: { '胴体': 'ルルチェのスーツ本体', '腕': '', '脚': '' },
+        },
+        {
+          id: 2, short: 'ターボコスチュームβ [カラーA]', name: '30MS オプションパーツセット24', sub: '(ターボコスチュームβ)[カラーA]',
+          price: '¥1,650', brand: '30MS OPTION', mark: '●',
+          img: 'https://m.media-amazon.com/images/I/617bucW+q+L._AC_SX679_.jpg',
+          parts: { '胴体': 'ミコルルのスーツ本体', '脚': 'ブーツ' },
+        },
+        {
+          id: 3, short: 'ターボコスチュームγ [カラーC]', name: '30MS オプションパーツセット25', sub: '(ターボコスチュームγ)[カラーC]',
+          price: '¥1,650', brand: '30MS OPTION', mark: '●',
+          img: 'https://m.media-amazon.com/images/I/61PxfxsqmtL._AC_SX679_.jpg',
+          parts: { '腕': '肩アーマー', '腰': 'アクセント' },
+        },
+        {
+          id: 4, short: 'クライムユニット [カラーC]', name: '30MS オプションパーツセット26', sub: '(クライムユニット)[カラーC]',
+          price: '¥1,650', brand: '30MS OPTION', mark: '●',
+          img: 'https://m.media-amazon.com/images/I/61ghPVPDQqL._AC_SX679_.jpg',
+          parts: { '頭部': 'ヘルメット', 'その他': '手持ち小物' },
+        },
+        {
+          id: 5, short: 'キャノンバイクVer.', name: '30MM 1/144 エグザビークル', sub: '(キャノンバイクVer.)',
+          price: '¥858', brand: '30MM VEHICLE', mark: '▲',
+          img: 'https://m.media-amazon.com/images/I/61XHIRVKhtL._AC_SX679_.jpg',
+          parts: { 'その他': 'ビークル' },
+        },
+        {
+          id: 6, short: 'ブーストワイルドバイクVer.', name: '30MM 1/144 エグザビークル', sub: '(ブーストワイルドバイクVer.)',
+          price: '¥1,980', brand: '30MM VEHICLE', mark: '▲',
+          img: 'https://m.media-amazon.com/images/I/61PxECyrujL._AC_SX679_.jpg',
+          parts: { 'その他': 'ビークル' },
+        },
+      ];
+      const PART_ICONS = { '頭部': '👤', '胴体': '🦺', '腕': '💪', '腰': '🩳', '脚': '🦵', 'その他': '📦' };
+
+      // ============ タブ切替 ============
+      const tabView = document.getElementById('tab-view');
+      const tabPost = document.getElementById('tab-post');
+      function setMode(isView) {
+        document.getElementById('mode-view').classList.toggle('hidden', !isView);
+        document.getElementById('mode-post').classList.toggle('hidden', isView);
+        tabView.className = isView
+          ? 'rounded-full bg-white py-10 text-[13px] font-bold text-ink-900 shadow-card'
+          : 'rounded-full py-10 text-[13px] font-bold text-ink-500';
+        tabPost.className = !isView
+          ? 'rounded-full bg-white py-10 text-[13px] font-bold text-ink-900 shadow-card'
+          : 'rounded-full py-10 text-[13px] font-bold text-ink-500';
+      }
+      tabView.addEventListener('click', () => setMode(true));
+      tabPost.addEventListener('click', () => setMode(false));
+
+      // ============ 閲覧：粒度切替 ============
+      const granKit = document.getElementById('gran-kit');
+      const granPart = document.getElementById('gran-part');
+      function setGran(byKit) {
+        document.getElementById('view-bykit').classList.toggle('hidden', !byKit);
+        document.getElementById('view-bypart').classList.toggle('hidden', byKit);
+        granKit.className = byKit ? 'rounded-full bg-brand-600 py-6 text-[12px] font-bold text-white' : 'rounded-full py-6 text-[12px] font-bold text-ink-500';
+        granPart.className = !byKit ? 'rounded-full bg-brand-600 py-6 text-[12px] font-bold text-white' : 'rounded-full py-6 text-[12px] font-bold text-ink-500';
+      }
+      granKit.addEventListener('click', () => setGran(true));
+      granPart.addEventListener('click', () => setGran(false));
+
+      // ============ 閲覧：キット別 ============
+      function renderViewByKit() {
+        const wrap = document.getElementById('view-bykit');
+        wrap.innerHTML = '';
+        KITS.forEach((kit) => {
+          const partKeys = Object.keys(kit.parts);
+          const el = document.createElement('a');
+          el.href = 'kit.html';
+          el.className = 'flex gap-10 rounded-md bg-white p-10 shadow-card hover:shadow-cardLg';
+          el.innerHTML = `
+            <img src="${kit.img}" alt="" class="h-64 w-64 shrink-0 rounded bg-white object-contain ring-1 ring-ink-50" loading="lazy" />
+            <div class="min-w-0 flex-1">
+              <div class="text-[10px] font-semibold tracking-widest ${kit.mark === '●' ? 'text-brand-600' : 'text-gold'}">${kit.mark} ${kit.brand}</div>
+              <div class="text-[12.5px] font-bold leading-snug">${kit.name} <span class="font-semibold text-ink-700">${kit.sub}</span></div>
+              <div class="mt-6 flex flex-wrap gap-4">
+                ${partKeys.map((p) => `<span class="rounded-full bg-brand-50 px-8 py-2 text-[10.5px] font-bold text-brand-700">${p}${kit.parts[p] ? `<span class="font-semibold text-ink-500">｜${kit.parts[p]}</span>` : ''}</span>`).join('')}
+              </div>
+              <div class="mt-6 text-[12px] font-bold">${kit.price} <span class="text-[10px] font-normal text-ink-500">税込</span></div>
+            </div>`;
+          wrap.appendChild(el);
+        });
+      }
+
+      // ============ 閲覧：部位別 ============
+      let activePart = null;
+      function kitsForPart(part) {
+        return KITS.filter((k) => Object.keys(k.parts).includes(part));
+      }
+      function renderViewByPart() {
+        // 部位マップの状態
+        document.querySelectorAll('#bodymap-view .bodymap-part').forEach((el) => {
+          const part = el.dataset.part;
+          el.classList.toggle('has-kits', kitsForPart(part).length > 0);
+          el.classList.toggle('active', activePart === part);
+        });
+        // リスト
+        const wrap = document.getElementById('partlist');
+        wrap.innerHTML = '';
+        const parts = activePart ? [activePart] : PARTS;
+        parts.forEach((part) => {
+          const kits = kitsForPart(part);
+          if (kits.length === 0 && !activePart) return;
+          const sec = document.createElement('div');
+          sec.className = 'fade-in';
+          sec.innerHTML = `
+            <div class="flex items-center gap-6 text-[12px] font-bold text-ink-700">
+              <span>${PART_ICONS[part]}</span> ${part}
+              <span class="text-[10px] font-semibold text-ink-400">${kits.length}キット</span>
+              ${activePart ? '<button id="clear-part" class="ml-auto text-[11px] font-semibold text-brand-700">すべて表示</button>' : ''}
+            </div>
+            <div class="mt-6 flex flex-col gap-6">
+              ${kits.length === 0
+                ? '<div class="rounded-md bg-ink-25 px-10 py-8 text-[11px] text-ink-400">この部位の指定はありません</div>'
+                : kits.map((kit) => `
+                  <a href="kit.html" class="flex items-center gap-8 rounded-md bg-white p-8 shadow-card hover:shadow-cardLg">
+                    <img src="${kit.img}" alt="" class="h-36 w-36 shrink-0 rounded bg-white object-contain ring-1 ring-ink-50" loading="lazy" />
+                    <div class="min-w-0 flex-1">
+                      <div class="truncate text-[12px] font-bold">${kit.short}</div>
+                      ${kit.parts[part] ? `<div class="truncate text-[10.5px] text-ink-500">${kit.parts[part]}</div>` : ''}
+                    </div>
+                    <span class="shrink-0 text-[11px] font-bold">${kit.price}</span>
+                  </a>`).join('')}
+            </div>`;
+          wrap.appendChild(sec);
+        });
+        const clearBtn = document.getElementById('clear-part');
+        if (clearBtn) clearBtn.addEventListener('click', () => { activePart = null; renderViewByPart(); });
+      }
+      document.querySelectorAll('#bodymap-view .bodymap-part').forEach((el) => {
+        el.addEventListener('click', () => {
+          const part = el.dataset.part;
+          activePart = activePart === part ? null : part;
+          renderViewByPart();
+        });
+      });
+
+      // ============ 投稿：共有ステート ============
+      // postState[kitId] = Set(部位)
+      const postState = {};
+      KITS.forEach((k) => { postState[k.id] = new Set(); });
+      // デモ用に2キットだけ初期値
+      postState[1].add('胴体');
+      postState[4].add('頭部');
+
+      const inputByKitBtn = document.getElementById('input-bykit');
+      const inputByPartBtn = document.getElementById('input-bypart');
+      function setInputMode(byKit) {
+        document.getElementById('post-bykit').classList.toggle('hidden', !byKit);
+        document.getElementById('post-bykit').classList.toggle('flex', byKit);
+        document.getElementById('post-bypart').classList.toggle('hidden', byKit);
+        document.getElementById('post-bypart').classList.toggle('flex', !byKit);
+        inputByKitBtn.className = byKit ? 'rounded-full bg-white py-8 text-[12px] font-bold text-ink-900 shadow-card' : 'rounded-full py-8 text-[12px] font-bold text-ink-500';
+        inputByPartBtn.className = !byKit ? 'rounded-full bg-white py-8 text-[12px] font-bold text-ink-900 shadow-card' : 'rounded-full py-8 text-[12px] font-bold text-ink-500';
+        renderPostByKit();
+        renderPostByPart();
+      }
+      inputByKitBtn.addEventListener('click', () => setInputMode(true));
+      inputByPartBtn.addEventListener('click', () => setInputMode(false));
+
+      // ============ 投稿A：キット起点 ============
+      function renderPostByKit() {
+        const wrap = document.getElementById('post-bykit');
+        wrap.innerHTML = '';
+        KITS.forEach((kit) => {
+          const el = document.createElement('div');
+          el.className = 'rounded-md border border-ink-50 bg-white p-10';
+          el.innerHTML = `
+            <div class="flex items-center gap-8">
+              <img src="${kit.img}" alt="" class="h-40 w-40 shrink-0 rounded bg-white object-contain ring-1 ring-ink-50" loading="lazy" />
+              <div class="min-w-0 flex-1">
+                <div class="truncate text-[12.5px] font-bold">${kit.short}</div>
+                <div class="text-[10.5px] text-ink-500">${postState[kit.id].size === 0 ? '部位未指定（そのまま投稿もOK）' : [...postState[kit.id]].join('・') + ' に使用'}</div>
+              </div>
+            </div>
+            <div class="mt-8 flex flex-wrap gap-4">
+              ${PARTS.map((p) => {
+                const on = postState[kit.id].has(p);
+                return `<button data-kit="${kit.id}" data-part="${p}" class="chip rounded-full px-10 py-4 text-[11px] font-bold ${on ? 'bg-brand-600 text-white' : 'bg-ink-25 text-ink-600 ring-1 ring-inset ring-ink-100 hover:bg-brand-50 hover:text-brand-700'}">${p}</button>`;
+              }).join('')}
+            </div>`;
+          wrap.appendChild(el);
+        });
+        wrap.querySelectorAll('button[data-kit]').forEach((btn) => {
+          btn.addEventListener('click', () => {
+            const set = postState[Number(btn.dataset.kit)];
+            const part = btn.dataset.part;
+            set.has(part) ? set.delete(part) : set.add(part);
+            renderPostByKit();
+          });
+        });
+      }
+
+      // ============ 投稿B：部位起点 ============
+      function renderPostByPart() {
+        const wrap = document.getElementById('post-bypart');
+        wrap.innerHTML = '';
+        PARTS.forEach((part) => {
+          const selected = KITS.filter((k) => postState[k.id].has(part));
+          const el = document.createElement('details');
+          el.className = 'rounded-md border border-ink-50 bg-white';
+          el.innerHTML = `
+            <summary class="flex cursor-pointer list-none items-center gap-8 p-12">
+              <span class="text-[15px]">${PART_ICONS[part]}</span>
+              <span class="text-[13px] font-bold">${part}</span>
+              <span class="min-w-0 flex-1 truncate text-right text-[11px] ${selected.length ? 'font-bold text-brand-700' : 'text-ink-400'}">
+                ${selected.length ? selected.map((k) => k.short.split(' [')[0]).join('、') : '未指定'}
+              </span>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" class="shrink-0"><path d="m6 9 6 6 6-6" stroke="#949494" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </summary>
+            <div class="flex flex-col gap-6 border-t border-ink-50 p-10">
+              ${KITS.map((kit) => {
+                const on = postState[kit.id].has(part);
+                return `
+                  <label class="flex cursor-pointer items-center gap-8 rounded-md px-8 py-6 ${on ? 'bg-brand-25' : 'hover:bg-ink-25'}">
+                    <input type="checkbox" data-kit="${kit.id}" data-part="${part}" ${on ? 'checked' : ''} class="h-16 w-16 accent-[#8C21C2]" style="width:16px;height:16px;" />
+                    <img src="${kit.img}" alt="" class="h-32 w-32 shrink-0 rounded bg-white object-contain ring-1 ring-ink-50" loading="lazy" />
+                    <span class="min-w-0 flex-1 truncate text-[12px] font-semibold">${kit.short}</span>
+                  </label>`;
+              }).join('')}
+            </div>`;
+          wrap.appendChild(el);
+        });
+        wrap.querySelectorAll('input[data-kit]').forEach((cb) => {
+          cb.addEventListener('change', () => {
+            const set = postState[Number(cb.dataset.kit)];
+            const part = cb.dataset.part;
+            cb.checked ? set.add(part) : set.delete(part);
+            renderPostByPart();
+          });
+        });
+      }
+
+      // 初期描画
+      renderViewByKit();
+      renderViewByPart();
+      renderPostByKit();
+      renderPostByPart();
+    </script>
+  </body>
+</html>
