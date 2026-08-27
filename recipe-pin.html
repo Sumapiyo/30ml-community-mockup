@@ -95,6 +95,16 @@
       .fade-in { animation: fadein 0.2s ease-out; }
       @keyframes fadein { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
       .kit-thumb.selected { outline: 2px solid #5D5EED; outline-offset: -2px; }
+      /* Figma風: 左下の尖った角がアンカー地点を指す */
+      .pinshape-point .pin {
+        border-radius: 13px 13px 13px 2px;
+        transform: translate(0, -100%);
+        transform-origin: 0 100%;
+      }
+      .pinshape-point .pin:hover { transform: translate(0, -100%) scale(1.1); }
+      .pinshape-point .pin.active { transform: translate(0, -100%) scale(1.15); }
+      .pinshape-point .pin.active::after { border-radius: inherit; }
+      .pinshape-point .pin.pending { animation: none; transform: translate(0, -100%); }
       details.acc > summary { list-style: none; }
       details.acc > summary::-webkit-details-marker { display: none; }
     </style>
@@ -158,6 +168,21 @@
       <!-- 閲覧モード：Figmaデザイン準拠の投稿詳細 -->
       <!-- ============================================================ -->
       <section id="mode-view" class="mt-16">
+        <!-- 比較用: ミニカードの表示位置 -->
+        <div class="mx-auto mb-12 max-w-[400px] px-16 lg:px-0">
+          <div class="text-[11px] font-bold tracking-widest text-ink-500">比較用：ピン形状</div>
+          <div id="pin-shape-toggle" class="mt-6 grid grid-cols-2 gap-4 rounded-full bg-ink-50 p-4">
+            <button data-pinshape="circle" class="rounded-full py-8 text-[11px] font-bold">● 丸（現行）</button>
+            <button data-pinshape="point" class="rounded-full py-8 text-[11px] font-bold">◥ Figma風（先端で指す）</button>
+          </div>
+          <div class="mt-8 text-[11px] font-bold tracking-widest text-ink-500">比較用：選択時カードの位置</div>
+          <div id="card-mode-toggle" class="mt-6 grid grid-cols-4 gap-4 rounded-full bg-ink-50 p-4">
+            <button data-cardmode="inside" class="rounded-full py-8 text-[11px] font-bold">画像内</button>
+            <button data-cardmode="below" class="rounded-full py-8 text-[11px] font-bold">案2 直下</button>
+            <button data-cardmode="bubble" class="rounded-full py-8 text-[11px] font-bold">案3 吹き出し</button>
+            <button data-cardmode="sheet" class="rounded-full py-8 text-[11px] font-bold">案4 シート</button>
+          </div>
+        </div>
         <div class="relative mx-auto max-w-[400px] overflow-hidden bg-white ring-1 ring-ink-100 lg:rounded-xl">
           <!-- App Header -->
           <div class="flex h-48 items-center px-16">
@@ -489,6 +514,16 @@
       </section>
     </div>
 
+    <!-- 選択キットの下部固定シート（案4） -->
+    <div id="peek-sheet" class="fixed inset-x-0 z-30 hidden" style="bottom:12px;">
+      <div class="mx-auto max-w-[400px] px-8">
+        <div class="sheet-enter rounded-xl bg-white p-10 shadow-cardLg ring-1 ring-ink-100">
+          <div class="mx-auto mb-6 h-4 w-36 rounded-full bg-ink-100"></div>
+          <div id="peek-sheet-body"></div>
+        </div>
+      </div>
+    </div>
+
     <!-- ===== キット選択シート（Figma 4014:6480） ===== -->
     <div id="kit-sheet" class="fixed inset-0 z-40 hidden">
       <div class="absolute inset-0 bg-ink-900/40" data-sheet-close></div>
@@ -596,6 +631,8 @@
       let selectedKit = null;
       let pinsVisible = true;
       let recipeOpen = false;
+      let cardMode = 'inside'; // inside | below | bubble | sheet
+      let pinShape = 'circle'; // circle | point
 
       // ============ タブ切替 ============
       const tabView = document.getElementById('tab-view');
@@ -603,6 +640,8 @@
       function setMode(isView) {
         document.getElementById('mode-view').classList.toggle('hidden', !isView);
         document.getElementById('mode-post').classList.toggle('hidden', isView);
+        if (!isView) document.getElementById('peek-sheet').classList.add('hidden');
+        else renderMiniCards();
         tabView.className = isView
           ? 'rounded-full bg-white py-10 text-[13px] font-bold text-ink-900 shadow-card'
           : 'rounded-full py-10 text-[13px] font-bold text-ink-500';
@@ -631,7 +670,13 @@
             <span class="absolute left-10 top-10 rounded-full bg-ink-800/70 px-8 py-2 text-[10px] font-bold text-white">写真${idx + 1}</span>
             <button class="pin-toggle absolute right-10 top-10 inline-flex items-center gap-4 rounded-full bg-ink-800/70 px-10 py-4 text-[10px] font-bold text-white backdrop-blur"></button>
             <div class="pins absolute inset-0" style="pointer-events:none;"></div>
+            <div class="bubble-layer absolute inset-0" style="pointer-events:none;z-index:9;"></div>
             <div class="minicard absolute inset-x-8 bottom-8 hidden" style="z-index:8;"></div>`;
+          if (!cont.nextElementSibling || !cont.nextElementSibling.classList.contains('minicard-out')) {
+            const out = document.createElement('div');
+            out.className = 'minicard-out mt-8 hidden';
+            cont.insertAdjacentElement('afterend', out);
+          }
           cont.querySelector('img').addEventListener('click', () => selectKit(null));
           cont.querySelector('.pin-toggle').addEventListener('click', (e) => {
             e.stopPropagation();
@@ -669,25 +714,79 @@
       }
 
       function renderMiniCards() {
+        // 案4: 下部固定シート（画像単位ではなく選択キット単位で集約表示）
+        const peek = document.getElementById('peek-sheet');
+        const peekBody = document.getElementById('peek-sheet-body');
+        peek.classList.add('hidden'); peekBody.innerHTML = '';
+        if (cardMode === 'sheet' && selectedKit !== null) {
+          const kit = KITS.find((k) => k.id === selectedKit);
+          const locs = kit.pins.map((p) => `${p.label}<span class="text-ink-400">（写真${p.img + 1}）</span>`).join(' ／ ');
+          peek.classList.remove('hidden');
+          peekBody.innerHTML = `
+            <div class="flex items-center gap-8">
+              <span class="grid shrink-0 place-items-center rounded-full bg-fl text-[11px] font-bold text-white" style="width:22px;height:22px;">${kit.id}</span>
+              <img src="${kit.img}" alt="" class="h-44 w-44 shrink-0 rounded bg-white object-contain ring-1 ring-ink-50" />
+              <div class="min-w-0 flex-1">
+                <div class="truncate text-[12px] font-bold">${kit.name}</div>
+                <div class="mt-1 text-[10.5px] leading-relaxed text-fl">${locs}</div>
+              </div>
+              ${kit.action === 'store' ? '<a href="kit.html" class="shrink-0 rounded-full bg-fl px-10 py-6 text-[10px] font-bold text-white">ストア</a>' : ''}
+              <button class="grid h-24 w-24 shrink-0 place-items-center rounded-full bg-ink-50" onclick="selectKit(null)">
+                <svg width="10" height="10" viewBox="0 0 24 24" fill="none"><path d="M5 5l14 14M19 5L5 19" stroke="#5C5C5C" stroke-width="2.5" stroke-linecap="round"/></svg>
+              </button>
+            </div>`;
+        }
         imageEls.forEach((cont) => {
           const idx = Number(cont.dataset.idx);
           const mc = cont.querySelector('.minicard');
-          if (selectedKit === null) { mc.classList.add('hidden'); mc.innerHTML = ''; return; }
+          const out = cont.nextElementSibling && cont.nextElementSibling.classList.contains('minicard-out') ? cont.nextElementSibling : null;
+          const bl = cont.querySelector('.bubble-layer');
+          mc.classList.add('hidden'); mc.innerHTML = '';
+          if (out) { out.classList.add('hidden'); out.innerHTML = ''; }
+          bl.innerHTML = '';
+          if (selectedKit === null) return;
           const kit = KITS.find((k) => k.id === selectedKit);
           const here = kit.pins.filter((p) => p.img === idx);
-          if (here.length === 0) { mc.classList.add('hidden'); mc.innerHTML = ''; return; }
+          if (here.length === 0) return;
           const others = [...new Set(kit.pins.filter((p) => p.img !== idx).map((p) => p.img + 1))];
-          mc.classList.remove('hidden');
-          mc.innerHTML = `
-            <div class="fade-in flex items-center gap-8 rounded-md bg-white/95 p-8 shadow-cardLg backdrop-blur">
+          const cardInner = `
               <span class="grid shrink-0 place-items-center rounded-full bg-fl text-[11px] font-bold text-white" style="width:22px;height:22px;">${kit.id}</span>
               <img src="${kit.img}" alt="" class="h-40 w-40 shrink-0 rounded bg-white object-contain ring-1 ring-ink-50" />
               <div class="min-w-0 flex-1">
                 <div class="truncate text-[11.5px] font-bold">${kit.name}</div>
                 <div class="mt-1 truncate text-[10.5px] text-fl">${here.map((p) => p.label).join(' ／ ')}${others.length ? `<span class="text-ink-400">　他の写真: ${others.join(',')}枚目</span>` : ''}</div>
               </div>
-              ${kit.action === 'store' ? '<a href="kit.html" class="shrink-0 rounded-full bg-fl px-10 py-6 text-[10px] font-bold text-white">ストア</a>' : ''}
-            </div>`;
+              ${kit.action === 'store' ? '<a href="kit.html" class="shrink-0 rounded-full bg-fl px-10 py-6 text-[10px] font-bold text-white">ストア</a>' : ''}`;
+
+          if (cardMode === 'inside') {
+            mc.classList.remove('hidden');
+            mc.innerHTML = `<div class="fade-in flex items-center gap-8 rounded-md bg-white/95 p-8 shadow-cardLg backdrop-blur">${cardInner}</div>`;
+          } else if (cardMode === 'below') {
+            if (out) {
+              out.classList.remove('hidden');
+              out.innerHTML = `<div class="fade-in flex items-center gap-8 rounded-md border border-fl-100 bg-fl-50/60 p-8">${cardInner}</div>`;
+            }
+          } else if (cardMode === 'bubble') {
+            // bubble: 選択キットの最初のピンの近くに吹き出し
+            const p = here[0];
+            const el = document.createElement('div');
+            el.className = 'fade-in absolute';
+            el.style.cssText = `left:${p.x}%;top:${p.y}%;pointer-events:auto;z-index:9;width:max-content;max-width:78%;`;
+            const tx = p.x > 50 ? '-100%' : '-12%';
+            const ty = p.y > 58 ? 'calc(-100% - 22px)' : '22px';
+            el.style.transform = `translate(${tx}, 0) translateY(${ty === '22px' ? '22px' : '0'})`;
+            if (ty !== '22px') el.style.transform = `translate(${tx}, calc(-100% - 22px))`;
+            el.innerHTML = `
+              <div class="flex items-center gap-6 rounded-md bg-white/95 p-6 shadow-cardLg backdrop-blur" style="border:1.5px solid rgba(93,94,237,0.35);">
+                <img src="${kit.img}" alt="" class="h-28 w-28 shrink-0 rounded bg-white object-contain ring-1 ring-ink-50" />
+                <div class="min-w-0">
+                  <div class="truncate text-[10.5px] font-bold" style="max-width:150px;">${kit.name}</div>
+                  <div class="truncate text-[9.5px] text-fl">${here.map((q) => q.label).join('／')}${others.length ? ` ・他${others.length}枚` : ''}</div>
+                </div>
+                ${kit.action === 'store' ? '<a href="kit.html" class="shrink-0 rounded-full bg-fl px-8 py-4 text-[9px] font-bold text-white">ストア</a>' : ''}
+              </div>`;
+            bl.appendChild(el);
+          }
         });
       }
 
@@ -1252,9 +1351,44 @@
         window.scrollTo({ top: 0 });
       });
 
+      // ============ カード位置トグル ============
+      function renderCardModeToggle() {
+        document.querySelectorAll('#card-mode-toggle button').forEach((b) => {
+          const on = b.dataset.cardmode === cardMode;
+          b.className = on
+            ? 'rounded-full bg-white py-8 text-[11.5px] font-bold text-fl shadow-card'
+            : 'rounded-full py-8 text-[11.5px] font-bold text-ink-500';
+        });
+      }
+      document.querySelectorAll('#card-mode-toggle button').forEach((b) => {
+        b.addEventListener('click', () => {
+          cardMode = b.dataset.cardmode;
+          renderCardModeToggle();
+      renderPinShapeToggle();
+          renderMiniCards();
+        });
+      });
+      function renderPinShapeToggle() {
+        document.querySelectorAll('#pin-shape-toggle button').forEach((b) => {
+          const on = b.dataset.pinshape === pinShape;
+          b.className = on
+            ? 'rounded-full bg-white py-8 text-[11px] font-bold text-fl shadow-card'
+            : 'rounded-full py-8 text-[11px] font-bold text-ink-500';
+        });
+        document.body.classList.toggle('pinshape-point', pinShape === 'point');
+      }
+      document.querySelectorAll('#pin-shape-toggle button').forEach((b) => {
+        b.addEventListener('click', () => {
+          pinShape = b.dataset.pinshape;
+          renderPinShapeToggle();
+        });
+      });
+
       // ============ 初期化 ============
       buildImages();
       renderAll();
+      renderCardModeToggle();
+      renderPinShapeToggle();
       renderEditor();
     </script>
   </body>
