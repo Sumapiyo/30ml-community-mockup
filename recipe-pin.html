@@ -90,7 +90,11 @@
       @keyframes sheetup { from { transform: translateY(100%); } to { transform: translateY(0); } }
       .fade-in { animation: fadein 0.2s ease-out; }
       @keyframes fadein { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
-      .kit-thumb.selected { outline: 2px solid #5D5EED; outline-offset: -2px; }
+      /* 購入可能（永続属性）= accentの線 */
+      .kit-thumb.buyable { box-shadow: inset 0 0 0 1.5px #5D5EED; }
+      /* 選択中（一時状態）= 外側ハロー（画像ピンの選択リングと同じ言語） */
+      .kit-thumb.selected { box-shadow: 0 0 0 4px rgba(93, 94, 237, 0.28); }
+      .kit-thumb.buyable.selected { box-shadow: inset 0 0 0 1.5px #5D5EED, 0 0 0 4px rgba(93, 94, 237, 0.28); }
       /* Figma風: 左下の尖った角がアンカー地点を指す */
       .pinshape-point .pin {
         border-radius: 13px 13px 13px 2px;
@@ -795,7 +799,7 @@
           ? `<span class="absolute left-2 top-2 grid place-items-center rounded-full text-[10px] font-bold ${sel ? 'bg-fl text-white' : 'text-ink-800'}" style="width:18px;height:18px;${sel ? 'border:1.5px solid #DFDFFB;' : 'background:rgba(255,255,255,0.95);border:1.5px solid #fff;'}box-shadow:0 1px 4px rgba(0,0,0,0.35);">${kit.id}</span>`
           : '';
         return `
-          <span class="kit-thumb relative block shrink-0 overflow-hidden rounded-md ring-1 ring-ink-100 ${sel ? 'selected' : ''}" style="width:${size}px;height:${size}px;">
+          <span class="kit-thumb relative block shrink-0 overflow-hidden rounded-md ${kit.action === 'store' ? 'buyable' : 'ring-1 ring-ink-100'} ${sel ? 'selected' : ''}" style="width:${size}px;height:${size}px;">
             <img src="${kit.img}" alt="" class="h-full w-full bg-white object-contain ${kit.stock ? '' : 'opacity-40'}" loading="lazy" />
             ${!kit.stock ? '<span class="absolute inset-0 grid place-items-center text-[9px] font-bold text-ink-700">在庫なし</span>' : ''}
             ${kit.qty ? `<span class="absolute bottom-0 left-0 rounded-tr bg-ink-800/80 px-4 py-1 text-[9px] font-bold text-white">${kit.qty}</span>` : ''}
