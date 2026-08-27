@@ -90,8 +90,8 @@
       @keyframes sheetup { from { transform: translateY(100%); } to { transform: translateY(0); } }
       .fade-in { animation: fadein 0.2s ease-out; }
       @keyframes fadein { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
-      /* 購入可能（永続属性）= accentの線。選択中の表現はフロートカード＋ピンに集約し、レシピ内では枠スタイルを使わない */
-      .kit-thumb.buyable { box-shadow: inset 0 0 0 1.5px #5D5EED; }
+      /* 購入可能（永続属性）= 強めのニュートラル線（DSの border/strong / object/tertiary 相当）。レシピ内は選択と連動させず常に静的 */
+      .kit-thumb.buyable { box-shadow: inset 0 0 0 1.5px #737373; }
       /* Figma風: 左下の尖った角がアンカー地点を指す */
       .pinshape-point .pin {
         border-radius: 13px 13px 13px 2px;
@@ -791,9 +791,8 @@
       const rowsEl = document.getElementById('kit-rows');
 
       function thumbHtml(kit, size, withNum) {
-        const sel = selectedKit === kit.id;
         const numPin = withNum
-          ? `<span class="absolute left-2 top-2 grid place-items-center rounded-full text-[10px] font-bold ${sel ? 'bg-fl text-white' : 'text-ink-800'}" style="width:18px;height:18px;${sel ? 'border:1.5px solid #DFDFFB;' : 'background:rgba(255,255,255,0.95);border:1.5px solid #fff;'}box-shadow:0 1px 4px rgba(0,0,0,0.35);">${kit.id}</span>`
+          ? `<span class="absolute left-0 top-0 grid place-items-center rounded-br bg-ink-800/70 text-[10px] font-bold text-white" style="width:18px;height:18px;border-top-left-radius:6px;">${kit.id}</span>`
           : '';
         return `
           <span class="kit-thumb relative block shrink-0 overflow-hidden rounded-md ${kit.action === 'store' ? 'buyable' : 'ring-1 ring-ink-100'}" style="width:${size}px;height:${size}px;">
@@ -830,8 +829,7 @@
           const row = document.createElement('div');
           row.className = 'flex cursor-pointer items-center gap-12 px-16 py-8';
           row.innerHTML = `
-            <span class="w-14 shrink-0 text-center text-[12px] font-bold ${selectedKit === kit.id ? 'text-fl' : 'text-ink-500'}">${kit.id}</span>
-            ${thumbHtml(kit, 56)}
+            ${thumbHtml(kit, 56, true)}
             <div class="min-w-0 flex-1">
               <div class="line-clamp-2 text-[14px] font-bold leading-[1.4]">${kit.name}</div>
               <div class="mt-1 flex flex-wrap items-center gap-x-8 text-[12px] text-ink-600">
@@ -1313,8 +1311,10 @@
           const row = document.createElement('div');
           row.className = 'flex items-center gap-12 py-10';
           row.innerHTML = `
-            <span class="w-14 shrink-0 text-center text-[12px] font-bold text-ink-500">${i + 1}</span>
-            <img src="${k.img}" alt="" class="h-52 w-52 shrink-0 rounded bg-white object-contain ring-1 ring-ink-50" />
+            <span class="relative shrink-0 overflow-hidden rounded-md ring-1 ring-ink-50" style="width:52px;height:52px;">
+              <img src="${k.img}" alt="" class="h-full w-full bg-white object-contain" />
+              <span class="absolute left-0 top-0 grid place-items-center rounded-br bg-ink-800/70 text-[10px] font-bold text-white" style="width:18px;height:18px;border-top-left-radius:6px;">${i + 1}</span>
+            </span>
             <div class="min-w-0 flex-1">
               <div class="line-clamp-2 text-[13.5px] font-bold leading-snug">${k.name}</div>
               <div class="mt-1 flex items-center gap-6 text-[11px] text-ink-500">${brandOf(k)}${pinCount ? `<span class="font-bold text-fl">📍ピン${pinCount}箇所</span>` : ''}</div>
