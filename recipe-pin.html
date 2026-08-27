@@ -180,7 +180,7 @@
             <button data-cardmode="inside" class="rounded-full py-8 text-[11px] font-bold">画像内</button>
             <button data-cardmode="below" class="rounded-full py-8 text-[11px] font-bold">案2 直下</button>
             <button data-cardmode="bubble" class="rounded-full py-8 text-[11px] font-bold">案3 吹き出し</button>
-            <button data-cardmode="sheet" class="rounded-full py-8 text-[11px] font-bold">案4 シート</button>
+            <button data-cardmode="sheet" class="rounded-full py-8 text-[11px] font-bold">案4 フロート</button>
           </div>
         </div>
         <div class="relative mx-auto max-w-[400px] overflow-hidden bg-white ring-1 ring-ink-100 lg:rounded-xl">
@@ -514,7 +514,7 @@
       </section>
     </div>
 
-    <!-- 選択キットの下部固定シート（案4） -->
+    <!-- 選択キットの下部フロートカード（案4） -->
     <div id="peek-sheet" class="fixed inset-x-0 z-30 hidden" style="bottom:12px;">
       <div class="mx-auto max-w-[400px] px-8">
         <div class="sheet-enter rounded-xl bg-white p-10 shadow-cardLg ring-1 ring-ink-100">
@@ -720,7 +720,7 @@
         peek.classList.add('hidden'); peekBody.innerHTML = '';
         if (cardMode === 'sheet' && selectedKit !== null) {
           const kit = KITS.find((k) => k.id === selectedKit);
-          const locs = kit.pins.map((p) => `${p.label}<span class="text-ink-400">（写真${p.img + 1}）</span>`).join(' ／ ');
+          const locs = kit.pins.map((p) => `${p.label}<button class="font-bold text-fl underline decoration-fl/40" onclick="jumpToImage(${p.img})">（写真${p.img + 1}）</button>`).join(' ／ ');
           peek.classList.remove('hidden');
           peekBody.innerHTML = `
             <div class="flex items-center gap-8">
@@ -888,6 +888,13 @@
           }
         }
       }
+
+      function jumpToImage(i) {
+        const el = imageEls.find((e) => Number(e.dataset.idx) === i);
+        if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+      window.jumpToImage = jumpToImage;
+      window.selectKit = selectKit;
 
       function renderAll() {
         renderImagePins();
