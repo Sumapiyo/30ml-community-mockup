@@ -69,13 +69,9 @@
       .pin:hover { transform: translate(-50%, -50%) scale(1.12); }
       .pin.active {
         background: #5D5EED; color: #fff; border-color: #DFDFFB;
-        transform: translate(-50%, -50%) scale(1.18);
+        transform: translate(-50%, -50%) scale(1.1);
+        box-shadow: 0 0 0 4px rgba(93, 94, 237, 0.25), 0 1px 6px rgba(0, 0, 0, 0.35);
         z-index: 6;
-      }
-      .pin.active::after {
-        content: ''; position: absolute; inset: -8px; border-radius: 9999px;
-        border: 2px solid rgba(93, 94, 237, 0.6);
-        animation: pinpulse 1.4s ease-out infinite;
       }
       .pin.dim { opacity: 0.35; }
       @keyframes pinpulse {
@@ -102,8 +98,7 @@
         transform-origin: 0 100%;
       }
       .pinshape-point .pin:hover { transform: translate(0, -100%) scale(1.1); }
-      .pinshape-point .pin.active { transform: translate(0, -100%) scale(1.15); }
-      .pinshape-point .pin.active::after { border-radius: inherit; }
+      .pinshape-point .pin.active { transform: translate(0, -100%) scale(1.08); }
       .pinshape-point .pin.pending { animation: none; transform: translate(0, -100%); }
       details.acc > summary { list-style: none; }
       details.acc > summary::-webkit-details-marker { display: none; }
@@ -800,7 +795,6 @@
           <span class="kit-thumb relative block shrink-0 overflow-hidden rounded-md ring-1 ring-ink-100 ${sel ? 'selected' : ''}" style="width:${size}px;height:${size}px;">
             <img src="${kit.img}" alt="" class="h-full w-full bg-white object-contain ${kit.stock ? '' : 'opacity-40'}" loading="lazy" />
             ${!kit.stock ? '<span class="absolute inset-0 grid place-items-center text-[9px] font-bold text-ink-700">在庫なし</span>' : ''}
-            <span class="pointer-events-none absolute left-0 top-0 grid place-items-center rounded-br bg-ink-800/70 text-[9px] font-bold text-white" style="width:16px;height:16px;">${kit.id}</span>
             ${kit.qty ? `<span class="absolute bottom-0 left-0 rounded-tr bg-ink-800/80 px-4 py-1 text-[9px] font-bold text-white">${kit.qty}</span>` : ''}
             ${kit.owned ? '<span class="absolute right-2 top-2"><img src="images/icons/icon-check.svg" alt="所持" style="width:13px;height:13px;" /></span>' : ''}
           </span>`;
@@ -811,14 +805,14 @@
         stripEl.innerHTML = '';
         shown.forEach((kit) => {
           const btn = document.createElement('button');
-          btn.innerHTML = thumbHtml(kit, 56);
+          btn.className = 'flex shrink-0 flex-col items-center gap-2';
+          btn.innerHTML = `${thumbHtml(kit, 56)}<span class="text-[11px] font-bold leading-none ${selectedKit === kit.id ? 'text-fl' : 'text-ink-500'}">${kit.id}</span>`;
           btn.addEventListener('click', () => selectKit(selectedKit === kit.id ? null : kit.id));
           stripEl.appendChild(btn);
         });
         const more = document.createElement('button');
-        more.className = 'grid shrink-0 place-items-center rounded-md bg-ink-50 text-[12px] font-bold text-ink-800';
-        more.style.cssText = 'width:56px;height:56px;';
-        more.textContent = '+2';
+        more.className = 'flex shrink-0 flex-col items-center gap-2';
+        more.innerHTML = `<span class="grid place-items-center rounded-md bg-ink-50 text-[12px] font-bold text-ink-800" style="width:56px;height:56px;">+2</span><span class="text-[11px] leading-none text-transparent">・</span>`;
         more.addEventListener('click', () => setRecipeOpen(true));
         stripEl.appendChild(more);
       }
@@ -830,6 +824,7 @@
           const row = document.createElement('div');
           row.className = 'flex cursor-pointer items-center gap-12 px-16 py-8' + (selectedKit === kit.id ? ' bg-fl-50/40' : '');
           row.innerHTML = `
+            <span class="w-14 shrink-0 text-center text-[12px] font-bold ${selectedKit === kit.id ? 'text-fl' : 'text-ink-500'}">${kit.id}</span>
             ${thumbHtml(kit, 56)}
             <div class="min-w-0 flex-1">
               <div class="line-clamp-2 text-[14px] font-bold leading-[1.4]">${kit.name}</div>
@@ -1312,10 +1307,8 @@
           const row = document.createElement('div');
           row.className = 'flex items-center gap-12 py-10';
           row.innerHTML = `
-            <span class="relative shrink-0">
-              <img src="${k.img}" alt="" class="h-52 w-52 rounded bg-white object-contain ring-1 ring-ink-50" />
-              <span class="pointer-events-none absolute left-0 top-0 grid place-items-center rounded-br bg-ink-800/70 text-[9px] font-bold text-white" style="width:16px;height:16px;">${i + 1}</span>
-            </span>
+            <span class="w-14 shrink-0 text-center text-[12px] font-bold text-ink-500">${i + 1}</span>
+            <img src="${k.img}" alt="" class="h-52 w-52 shrink-0 rounded bg-white object-contain ring-1 ring-ink-50" />
             <div class="min-w-0 flex-1">
               <div class="line-clamp-2 text-[13.5px] font-bold leading-snug">${k.name}</div>
               <div class="mt-1 flex items-center gap-6 text-[11px] text-ink-500">${brandOf(k)}${pinCount ? `<span class="font-bold text-fl">📍ピン${pinCount}箇所</span>` : ''}</div>
