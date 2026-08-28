@@ -164,9 +164,10 @@
       <!-- 閲覧モード：Figmaデザイン準拠の投稿詳細 -->
       <!-- ============================================================ -->
       <section id="mode-view" class="mt-16">
-        <!-- 比較用: ミニカードの表示位置 -->
-        <div class="mx-auto mb-12 max-w-[400px] px-16 lg:px-0">
-          <div class="text-[11px] font-bold tracking-widest text-ink-500">比較用：ピン形状</div>
+        <!-- 検証用: 表示切替（決定済み構成がデフォルト） -->
+        <details class="mx-auto mb-12 max-w-[400px] px-16 lg:px-0">
+          <summary class="cursor-pointer text-[11px] font-bold tracking-widest text-ink-400">検証用トグル（決定: Figma風ピン × 画像一体バー × フロート）</summary>
+          <div class="mt-4 text-[11px] font-bold tracking-widest text-ink-500">比較用：ピン形状</div>
           <div id="pin-shape-toggle" class="mt-6 grid grid-cols-2 gap-4 rounded-full bg-ink-50 p-4">
             <button data-pinshape="circle" class="rounded-full py-8 text-[11px] font-bold">● 丸（現行）</button>
             <button data-pinshape="point" class="rounded-full py-8 text-[11px] font-bold">◥ Figma風（先端で指す）</button>
@@ -183,7 +184,7 @@
             <button data-cardmode="bubble" class="rounded-full py-8 text-[11px] font-bold">案3 吹き出し</button>
             <button data-cardmode="sheet" class="rounded-full py-8 text-[11px] font-bold">案4 フロート</button>
           </div>
-        </div>
+        </details>
         <div class="relative mx-auto max-w-[400px] overflow-hidden bg-white ring-1 ring-ink-100 lg:rounded-xl">
           <!-- App Header -->
           <div class="flex h-48 items-center px-16">
@@ -631,10 +632,10 @@
       // ============ 状態 ============
       let selectedKit = null;
       const hiddenPinImgs = new Set(); // 写真単位のピン非表示（エフェメラル・デフォルト全表示）
-      let metaStyle = 'bar'; // float | bar
+      let metaStyle = 'bar'; // 決定: 画像一体バー（float | bar）
       let recipeOpen = false;
-      let cardMode = 'inside'; // inside | below | bubble | sheet
-      let pinShape = 'circle'; // circle | point
+      let cardMode = 'sheet'; // 決定: フロート（inside | below | bubble | sheet）
+      let pinShape = 'point'; // 決定: Figma風・先端で指す（circle | point）
 
       // ============ タブ切替 ============
       const tabView = document.getElementById('tab-view');
