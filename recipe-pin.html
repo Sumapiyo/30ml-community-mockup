@@ -171,6 +171,11 @@
             <button data-pinshape="circle" class="rounded-full py-8 text-[11px] font-bold">● 丸（現行）</button>
             <button data-pinshape="point" class="rounded-full py-8 text-[11px] font-bold">◥ Figma風（先端で指す）</button>
           </div>
+          <div class="mt-8 text-[11px] font-bold tracking-widest text-ink-500">比較用：写真メタ行のスタイル</div>
+          <div id="meta-style-toggle" class="mt-6 grid grid-cols-2 gap-4 rounded-full bg-ink-50 p-4">
+            <button data-metastyle="float" class="rounded-full py-8 text-[11px] font-bold">浮き行（余白で分離）</button>
+            <button data-metastyle="bar" class="rounded-full py-8 text-[11px] font-bold">画像一体バー</button>
+          </div>
           <div class="mt-8 text-[11px] font-bold tracking-widest text-ink-500">比較用：選択時カードの位置</div>
           <div id="card-mode-toggle" class="mt-6 grid grid-cols-4 gap-4 rounded-full bg-ink-50 p-4">
             <button data-cardmode="inside" class="rounded-full py-8 text-[11px] font-bold">画像内</button>
@@ -249,13 +254,13 @@
             <p>ターボコスチュームを使って、2人のライダースーツを作ってみました。</p>
             <p>カラーは白と黒で、手足はクライムユニットの物でまとめました。</p>
             <p>ライダースーツなのに露出が多いので安全性が大丈夫かなと心配になりますが、キレイにまとまってるし似合ってるからヨシ！</p>
-            <div class="post-image relative my-12 overflow-hidden rounded-lg" data-idx="1"></div>
+            <div class="post-image relative mb-12 overflow-hidden rounded-lg" data-idx="1"></div>
             <p>メット時の前髪は白+マホガニーで塗装してます。</p>
-            <div class="post-image relative my-12 overflow-hidden rounded-lg" data-idx="2"></div>
+            <div class="post-image relative mb-12 overflow-hidden rounded-lg" data-idx="2"></div>
             <p>カラーは黒と紫で、手足はミコルルの物でまとめました。</p>
             <p>紫が入ったのはミキシング時のパーツ配分によるところもありますが、多分僕の中でまだステルスアーマーの印象が尾を引いていますね。</p>
             <p>メット時の前髪は無加工で付いています。バイザーをずらした時に横側が禿げて見えるのは気にしてはいけません。</p>
-            <div class="post-image relative my-12 overflow-hidden rounded-lg" data-idx="3"></div>
+            <div class="post-image relative mb-12 overflow-hidden rounded-lg" data-idx="3"></div>
             <p>ルルチェは新しく大型のワイルドバイク、ミコルルはおさがりのキャノンバイクです。</p>
             <p>いずれはそれぞれ彼女ら仕様に改造しようと思います。</p>
           </div>
@@ -391,7 +396,7 @@
             <li>画像はサムネイル＋<b>本文中に縦挿入</b>の形式で、全4枚それぞれにピンが打ってあります</li>
             <li>ピン⇄レシピカードのサムネイル/リストが双方向リンク。キット選択中は該当ピンのある写真へ縦スクロールでジャンプ</li>
             <li>レシピカードは「レシピを開く/閉じる」でFigmaの2状態（サムネイルストリップ⇄詳細リスト）を切替</li>
-            <li>選択中キットのサムネイルには青枠（Figmaの選択状態）が付きます</li>
+            <li>各写真の直上にメタ行（写真n＋📍ピンnチップ）。チップでその写真だけピンをON/OFF（写真単位・その場だけ）</li>
           </ul>
         </div>
       </section>
@@ -625,7 +630,8 @@
 
       // ============ 状態 ============
       let selectedKit = null;
-      let pinsVisible = true;
+      const hiddenPinImgs = new Set(); // 写真単位のピン非表示（エフェメラル・デフォルト全表示）
+      let metaStyle = 'bar'; // float | bar
       let recipeOpen = false;
       let cardMode = 'inside'; // inside | below | bubble | sheet
       let pinShape = 'circle'; // circle | point
@@ -663,21 +669,54 @@
           const im = IMAGES[idx];
           cont.innerHTML = `
             <img src="${im.src}" alt="${im.alt}" class="block w-full" draggable="false" loading="${idx ? 'lazy' : 'eager'}" />
-            <span class="absolute left-10 top-10 rounded-full bg-ink-800/70 px-8 py-2 text-[10px] font-bold text-white">写真${idx + 1}</span>
-            <button class="pin-toggle absolute right-10 top-10 inline-flex items-center gap-4 rounded-full bg-ink-800/70 px-10 py-4 text-[10px] font-bold text-white backdrop-blur"></button>
             <div class="pins absolute inset-0" style="pointer-events:none;"></div>
             <div class="bubble-layer absolute inset-0" style="pointer-events:none;z-index:9;"></div>
             <div class="minicard absolute inset-x-8 bottom-8 hidden" style="z-index:8;"></div>`;
+          if (!cont.previousElementSibling || !cont.previousElementSibling.classList.contains('metarow-e3')) {
+            const row = document.createElement('div');
+            row.className = 'metarow-e3 mb-6 flex items-center justify-between' + (idx === 0 ? '' : ' mt-16');
+            row.style.minHeight = '28px';
+            row.dataset.idx = idx;
+            cont.insertAdjacentElement('beforebegin', row);
+          }
           if (!cont.nextElementSibling || !cont.nextElementSibling.classList.contains('minicard-out')) {
             const out = document.createElement('div');
             out.className = 'minicard-out mt-8 hidden';
             cont.insertAdjacentElement('afterend', out);
           }
           cont.querySelector('img').addEventListener('click', () => selectKit(null));
-          cont.querySelector('.pin-toggle').addEventListener('click', (e) => {
-            e.stopPropagation();
-            pinsVisible = !pinsVisible;
-            if (!pinsVisible) selectedKit = null;
+        });
+      }
+
+      // メタ行（E-3 / P2: ラベル + ピン数チップ=トグル）
+      // サイズはDS対応: ラベル=12px Bold(text/secondary), チップ=h28・12px Bold（フォローするボタンと同じ subtle accent 面）
+      function renderMetaRows() {
+        document.querySelectorAll('.metarow-e3').forEach((row) => {
+          const idx = Number(row.dataset.idx);
+          const cont = row.nextElementSibling;
+          const count = pinsForImage(idx).length;
+          const hidden = hiddenPinImgs.has(idx);
+          if (metaStyle === 'bar') {
+            row.className = 'metarow-e3 flex items-center justify-between rounded-t-lg bg-white px-12' + (idx === 0 ? '' : ' mt-16');
+            row.style.cssText = 'min-height:40px;box-shadow:inset 0 0 0 1px #E8E8E8;';
+            cont.classList.remove('rounded-lg');
+            cont.classList.add('rounded-b-lg');
+          } else {
+            row.className = 'metarow-e3 mb-6 flex items-center justify-between' + (idx === 0 ? '' : ' mt-16');
+            row.style.cssText = 'min-height:28px;';
+            cont.classList.add('rounded-lg');
+            cont.classList.remove('rounded-b-lg');
+          }
+          row.innerHTML = `
+            <span class="text-[12px] font-bold text-ink-600">写真${idx + 1}</span>
+            ${count > 0 ? `
+              <button class="inline-flex items-center gap-4 rounded-full px-12 text-[12px] font-bold ${hidden ? 'bg-ink-50 text-ink-400' : 'bg-fl-50 text-fl'}" style="height:28px;">
+                📍 ピン${count}${hidden ? '・非表示' : ''}
+              </button>` : ''}`;
+          const btn = row.querySelector('button');
+          if (btn) btn.addEventListener('click', () => {
+            if (hiddenPinImgs.has(idx)) hiddenPinImgs.delete(idx);
+            else hiddenPinImgs.add(idx);
             renderAll();
           });
         });
@@ -687,13 +726,11 @@
         imageEls.forEach((cont) => {
           const idx = Number(cont.dataset.idx);
           const pinsC = cont.querySelector('.pins');
-          const toggle = cont.querySelector('.pin-toggle');
-          toggle.innerHTML = pinsVisible
-            ? '<svg width="11" height="11" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="10" r="3" stroke="white" stroke-width="1.8"/><path d="M12 2a8 8 0 0 1 8 8c0 5.3-8 12-8 12S4 15.3 4 10a8 8 0 0 1 8-8Z" stroke="white" stroke-width="1.8" stroke-linejoin="round"/></svg>ピン表示中'
-            : '<svg width="11" height="11" viewBox="0 0 24 24" fill="none"><path d="M3 3l18 18" stroke="white" stroke-width="1.8" stroke-linecap="round"/><circle cx="12" cy="10" r="3" stroke="white" stroke-width="1.8"/></svg>ピン非表示';
           pinsC.innerHTML = '';
-          if (!pinsVisible) return;
+          const hidden = hiddenPinImgs.has(idx);
           pinsForImage(idx).forEach(({ kit, p }) => {
+            // 非表示中の写真でも、選択中キットのピンだけは表示（リストからの逆引きを壊さない）
+            if (hidden && selectedKit !== kit.id) return;
             const el = document.createElement('button');
             el.className = 'pin' + (selectedKit === kit.id ? ' active' : selectedKit !== null ? ' dim' : '');
             el.style.left = p.x + '%';
@@ -896,6 +933,7 @@
       window.selectKit = selectKit;
 
       function renderAll() {
+        renderMetaRows();
         renderImagePins();
         renderMiniCards();
         renderStrip();
@@ -1371,9 +1409,26 @@
           cardMode = b.dataset.cardmode;
           renderCardModeToggle();
       renderPinShapeToggle();
+      renderMetaStyleToggle();
           renderMiniCards();
         });
       });
+      function renderMetaStyleToggle() {
+        document.querySelectorAll('#meta-style-toggle button').forEach((b) => {
+          const on = b.dataset.metastyle === metaStyle;
+          b.className = on
+            ? 'rounded-full bg-white py-8 text-[11px] font-bold text-fl shadow-card'
+            : 'rounded-full py-8 text-[11px] font-bold text-ink-500';
+        });
+      }
+      document.querySelectorAll('#meta-style-toggle button').forEach((b) => {
+        b.addEventListener('click', () => {
+          metaStyle = b.dataset.metastyle;
+          renderMetaStyleToggle();
+          renderAll();
+        });
+      });
+
       function renderPinShapeToggle() {
         document.querySelectorAll('#pin-shape-toggle button').forEach((b) => {
           const on = b.dataset.pinshape === pinShape;
@@ -1395,6 +1450,7 @@
       renderAll();
       renderCardModeToggle();
       renderPinShapeToggle();
+      renderMetaStyleToggle();
       renderEditor();
     </script>
   </body>
