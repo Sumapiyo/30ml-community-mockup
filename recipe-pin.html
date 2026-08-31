@@ -541,7 +541,7 @@
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="1.8"/><path d="m20 20-3.5-3.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
             <input id="kit-search" placeholder="キット名で検索" class="flex-1 bg-transparent text-[14px] text-ink-900 placeholder:text-ink-400 focus:outline-none" />
           </label>
-          <div id="kit-filters" class="scrollbar-hide -mx-16 mt-10 flex gap-8 overflow-x-auto px-16"></div>
+          <div id="kit-filters-slot"><div id="kit-filters" class="scrollbar-hide -mx-16 mt-10 flex gap-8 overflow-x-auto px-16"></div></div>
         </div>
         <div id="sheet-kitlist" class="flex-1 overflow-y-auto px-16 pb-32 pt-4"></div>
       </div>
@@ -1220,7 +1220,7 @@
             ? `<span class="inline-flex shrink-0 items-center gap-6 whitespace-nowrap rounded-full border-[1.5px] border-fl bg-white px-12 py-6 text-[12px] font-bold text-fl">${label}<svg width="10" height="10" viewBox="0 0 24 24" fill="none"><path d="M5 5l14 14M19 5L5 19" stroke="#5D5EED" stroke-width="2.5" stroke-linecap="round"/></svg></span>`
             : `<span class="inline-flex shrink-0 items-center whitespace-nowrap rounded-full bg-ink-50 px-12 py-6 text-[12px] font-bold text-ink-700">${label}</span>`;
         wrap.innerHTML = `
-          <button data-f="used">${chip('この投稿で選択済み', sheetFilters.used)}</button>
+          ${sheetMode === 'add' ? `<button data-f="used">${chip('この投稿で選択済み', sheetFilters.used)}</button>` : ''}
           <button data-f="mine">${chip('マイキットのみ表示', sheetFilters.mine)}</button>
           <button data-f="30MM">${chip('30MM', sheetFilters.brand === '30MM')}</button>
           <button data-f="30MS">${chip('30MS', sheetFilters.brand === '30MS')}</button>
@@ -1284,12 +1284,20 @@
         } else {
           groups.push([null, cands]);
         }
+        // 属性フィルタのスコープ=「すべてのキット」なので、セクションがある場合はチップ行を見出し直下へ移動する
+        const filtersEl = document.getElementById('kit-filters');
+        const hasSections = groups.some(([label]) => label === 'すべてのキット');
+        if (!hasSections) document.getElementById('kit-filters-slot').appendChild(filtersEl);
         groups.forEach(([label, kits]) => {
           if (label) {
             const h = document.createElement('div');
             h.className = 'pb-4 pt-12 text-[11px] font-bold tracking-widest text-ink-500';
             h.textContent = label;
             listEl.appendChild(h);
+            if (label === 'すべてのキット') {
+              filtersEl.classList.add('pb-6');
+              listEl.appendChild(filtersEl);
+            }
           }
           if (kits.length === 0) {
             const empty = document.createElement('div');
