@@ -1009,7 +1009,7 @@
       }
       function wirePinCanvas(canvas, blockId) {
         canvas.addEventListener('click', (e) => {
-          if (e.target.closest('.pin') || e.target.closest('button')) return;
+          if (e.target.closest('.pin') || e.target.closest('button') || e.target.closest('.img-menu') || e.target.closest('.alt-chip')) return;
           const rect = canvas.getBoundingClientRect();
           pendingPin = {
             blockId,
@@ -1084,29 +1084,54 @@
           div.className = 'overflow-hidden rounded-lg ring-1 ring-ink-100';
           div.innerHTML = `
             <div class="pin-canvas relative select-none" style="cursor: crosshair;" data-block="${b.id}">
-              <img src="${b.src}" alt="" class="block w-full" draggable="false" />
+              <img src="${b.src}" alt="${b.alt || ''}" class="block w-full" draggable="false" />
               <div class="pins absolute inset-0" style="pointer-events:none;"></div>
               ${pinHintHtml(b.id)}
-              <button class="del-block absolute left-10 top-10 grid h-32 w-32 place-items-center rounded-full bg-ink-800/70 backdrop-blur">
-                <svg width="13" height="13" viewBox="0 0 24 24" fill="none"><path d="M5 5l14 14M19 5L5 19" stroke="white" stroke-width="2.4" stroke-linecap="round"/></svg>
+              <span class="absolute left-10 top-10 rounded-full bg-ink-800/70 px-8 py-2 text-[10px] font-bold text-white">写真${i + 2}</span>
+              ${b.alt ? '<span class="alt-chip absolute top-10 rounded bg-ink-800/70 px-6 py-2 text-[10px] font-bold text-white" style="right:52px;cursor:pointer;">ALT ✓</span>' : ''}
+              <button class="img-menu-btn absolute right-10 top-10 grid h-32 w-32 place-items-center rounded-full bg-ink-800/70 backdrop-blur">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="white"><circle cx="5" cy="12" r="1.8"/><circle cx="12" cy="12" r="1.8"/><circle cx="19" cy="12" r="1.8"/></svg>
               </button>
-              <span class="absolute right-10 top-10 rounded-full bg-ink-800/70 px-8 py-2 text-[10px] font-bold text-white">写真${i + 2}</span>
+              <div class="img-menu absolute right-10 top-48 z-10 hidden w-[168px] overflow-hidden rounded-md bg-white shadow-cardLg ring-1 ring-ink-100">
+                <button data-act="alt" class="flex w-full items-center gap-8 px-12 py-10 text-left text-[13px] font-semibold hover:bg-ink-25">ALTを編集${b.alt ? '<span class="ml-auto text-[10px] font-bold text-ok">✓</span>' : ''}</button>
+                <button data-act="crop" class="flex w-full items-center gap-8 px-12 py-10 text-left text-[13px] font-semibold hover:bg-ink-25">クロップ</button>
+                <button data-act="del" class="flex w-full items-center gap-8 px-12 py-10 text-left text-[13px] font-semibold text-pink hover:bg-ink-25">画像を削除</button>
+              </div>
               ${pinCountBadge(b.id)}
             </div>
-            <textarea rows="2" class="caption-input w-full resize-none bg-ink-25 px-12 py-10 text-[13px] leading-relaxed text-ink-900 placeholder:text-ink-400 focus:bg-white focus:outline-none" placeholder="この画像の説明を入力（作業内容・使用キットなど）">${b.caption || ''}</textarea>`;
+            <textarea rows="3" class="caption-input w-full resize-none bg-ink-25 px-12 py-10 text-[13px] leading-relaxed text-ink-900 placeholder:text-ink-400 focus:bg-white focus:outline-none" style="min-height:80px;" placeholder="この画像の説明を入力（作業内容・使用キット・塗装など、長文OK）">${b.caption || ''}</textarea>
+            <div class="caption-count bg-ink-25 px-12 pb-6 text-right text-[10px] text-ink-400">文字数: ${(b.caption || '').length}</div>`;
           const canvas = div.querySelector('.pin-canvas');
           renderPinsInto(div.querySelector('.pins'), b.id);
           wirePinCanvas(canvas, b.id);
-          div.querySelector('.del-block').addEventListener('click', (e) => {
+          const menu = div.querySelector('.img-menu');
+          div.querySelector('.img-menu-btn').addEventListener('click', (e) => {
             e.stopPropagation();
-            if (confirm('この画像を削除しますか？（画像上のピンも削除されます）')) {
-              postPins = postPins.filter((q) => q.blockId !== b.id);
-              blocks = blocks.filter((q) => q !== b);
-              renderEditor();
-            }
+            menu.classList.toggle('hidden');
+          });
+          const editAlt = () => {
+            const v = prompt('画像の代替テキスト（ALT）を入力', b.alt || '');
+            if (v !== null) { b.alt = v.trim(); renderEditor(); }
+          };
+          const altChip = div.querySelector('.alt-chip');
+          if (altChip) altChip.addEventListener('click', (e) => { e.stopPropagation(); editAlt(); });
+          menu.querySelectorAll('button').forEach((mi) => {
+            mi.addEventListener('click', (e) => {
+              e.stopPropagation();
+              menu.classList.add('hidden');
+              const act = mi.dataset.act;
+              if (act === 'alt') editAlt();
+              else if (act === 'crop') alert('クロップはモック未実装です（実装時は画像編集画面を開く想定）');
+              else if (act === 'del' && confirm('この画像を削除しますか？（画像上のピンも削除されます）')) {
+                postPins = postPins.filter((q) => q.blockId !== b.id);
+                blocks = blocks.filter((q) => q !== b);
+                renderEditor();
+              }
+            });
           });
           const cap = div.querySelector('.caption-input');
-          cap.addEventListener('input', () => { b.caption = cap.value; autoGrow(cap); });
+          const cnt = div.querySelector('.caption-count');
+          cap.addEventListener('input', () => { b.caption = cap.value; cnt.textContent = '文字数: ' + cap.value.length; autoGrow(cap); });
           blocksEl.appendChild(div);
         });
       }
