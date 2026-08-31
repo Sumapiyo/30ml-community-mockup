@@ -1275,7 +1275,9 @@
         const usedIds = postKits.map((e) => e.kitId);
         const groups = [];
         if (sheetMode === 'pin' && !sheetFilters.used && usedIds.length) {
-          const used = cands.filter((k) => usedIds.includes(k.id));
+          // 選択済みセクションはコンテキストのショートカットなので、属性フィルタ（マイキット/ブランド）は適用しない。
+          // 検索クエリだけは両セクションに効かせる。
+          const used = CATALOG.filter((k) => usedIds.includes(k.id) && (!sheetFilters.q || k.name.includes(sheetFilters.q)));
           const rest = cands.filter((k) => !usedIds.includes(k.id));
           if (used.length) groups.push(['この投稿で選択済み', used]);
           groups.push(['すべてのキット', rest]);
