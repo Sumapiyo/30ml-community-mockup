@@ -434,9 +434,9 @@
 
             <!-- 画像+文章ブロック（GUNSTA型・枚数無制限） -->
             <div id="editor-blocks" class="flex flex-col gap-16 pt-4"></div>
-            <button id="add-image-block" class="mt-12 flex h-52 w-full items-center justify-center gap-8 rounded-lg border-2 border-dashed border-ink-200 text-[13px] font-bold text-ink-500 hover:border-fl hover:text-fl">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
-              画像を追加（枚数制限なし）
+            <button id="add-image-block" class="mt-12 flex h-48 w-full items-center justify-center gap-8 rounded-full bg-ink-50 text-[14px] font-bold text-ink-900 hover:bg-ink-100">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><rect x="3" y="5" width="18" height="14" rx="2" stroke="#1A1A1A" stroke-width="1.8"/><circle cx="8.5" cy="10" r="1.5" fill="#1A1A1A"/><path d="m5 17 4.5-4.5 3 3L16 12l3 3" stroke="#1A1A1A" stroke-width="1.8" stroke-linejoin="round"/></svg>
+              画像を追加
             </button>
 
             <div class="flex items-center justify-between pb-14 pt-8">
@@ -491,7 +491,7 @@
         <div class="mx-16 mt-16 rounded-lg border border-ink-100 bg-white p-14 lg:mx-auto lg:max-w-[400px]">
           <div class="text-[12px] font-bold text-ink-700">検証ポイント（投稿フロー）</div>
           <ul class="mt-6 list-disc pl-18 text-[12px] leading-relaxed text-ink-600">
-            <li>GUNSTA型：<b>画像＋文章のセット</b>が基本単位（枚数無制限）。画像をタップするとピン追加→キット選択</li>
+            <li>GUNSTA型：<b>画像＋文章のセット</b>が基本単位（枚数無制限）。ピンは「📍 ピンを編集」で入る<b>画像ごとの編集モード</b>内でのみ追加/削除（通常時の画像タップは無反応=誤操作防止）</li>
             <li>キット選択シートは<b>「この投稿で選択済み」「マイキットのみ」「全キット検索」</b>の3ソースから選べます</li>
             <li>ピンでリンクしたキットは「次へ」先の使用キットに自動追加。タグ・使用キットの確定は最後（Figma準拠）</li>
           </ul>
@@ -661,46 +661,51 @@
             <div class="pins absolute inset-0" style="pointer-events:none;"></div>
             <div class="bubble-layer absolute inset-0" style="pointer-events:none;z-index:9;"></div>
             <div class="minicard absolute inset-x-8 bottom-8 hidden" style="z-index:8;"></div>`;
-          if (!cont.previousElementSibling || !cont.previousElementSibling.classList.contains('metarow-e3')) {
-            const row = document.createElement('div');
-            row.className = 'metarow-e3 mb-6 flex items-center justify-between' + (idx === 0 ? '' : ' mt-16');
-            row.style.minHeight = '28px';
+          let row = cont.nextElementSibling;
+          if (!row || !row.classList.contains('metarow-e3')) {
+            row = document.createElement('div');
+            row.className = 'metarow-e3';
             row.dataset.idx = idx;
-            cont.insertAdjacentElement('beforebegin', row);
+            cont.insertAdjacentElement('afterend', row);
           }
-          if (!cont.nextElementSibling || !cont.nextElementSibling.classList.contains('minicard-out')) {
+          if (!row.nextElementSibling || !row.nextElementSibling.classList.contains('minicard-out')) {
             const out = document.createElement('div');
             out.className = 'minicard-out mt-8 hidden';
-            cont.insertAdjacentElement('afterend', out);
+            row.insertAdjacentElement('afterend', out);
           }
           cont.querySelector('img').addEventListener('click', () => selectKit(null));
         });
       }
 
-      // メタ行（E-3 / P2: ラベル + ピン数チップ=トグル）
-      // サイズはDS対応: ラベル=12px Bold(text/secondary), チップ=h28・12px Bold（フォローするボタンと同じ subtle accent 面）
+      // メタ行（E-3 / P2: 画像の直下に一体バー。作成側のピンバーと同じ配置）
+      // トグルはChipでなくButton（フォローする⇄フォロー中と同じ「ラベル＋バリアント切替」idiom）
+      // サイズはDS対応: ラベル=12px Bold(text/secondary), ボタン=xsmall h-32・12px Bold
       function renderMetaRows() {
         document.querySelectorAll('.metarow-e3').forEach((row) => {
           const idx = Number(row.dataset.idx);
-          const cont = row.nextElementSibling;
+          const cont = row.previousElementSibling;
           const count = pinsForImage(idx).length;
           const hidden = hiddenPinImgs.has(idx);
           if (metaStyle === 'bar') {
-            row.className = 'metarow-e3 flex items-center justify-between rounded-t-lg bg-white px-12' + (idx === 0 ? '' : ' mt-16');
-            row.style.cssText = 'min-height:40px;box-shadow:inset 0 0 0 1px #E8E8E8;';
-            cont.classList.remove('rounded-lg');
-            cont.classList.add('rounded-b-lg');
+            row.className = 'metarow-e3 flex items-center justify-between rounded-b-lg bg-white px-12';
+            row.style.cssText = 'min-height:44px;box-shadow:inset 0 0 0 1px #E8E8E8;' + (idx === 0 ? '' : 'margin-bottom:16px;');
+            cont.classList.remove('rounded-lg', 'rounded-b-lg');
+            cont.style.borderRadius = '12px 12px 0 0';
+            cont.style.marginBottom = '0';
+            if (idx !== 0) cont.style.marginTop = '16px';
           } else {
-            row.className = 'metarow-e3 mb-6 flex items-center justify-between' + (idx === 0 ? '' : ' mt-16');
-            row.style.cssText = 'min-height:28px;';
+            row.className = 'metarow-e3 mt-6 flex items-center justify-between';
+            row.style.cssText = 'min-height:32px;' + (idx === 0 ? '' : 'margin-bottom:16px;');
             cont.classList.add('rounded-lg');
-            cont.classList.remove('rounded-b-lg');
+            cont.style.borderRadius = '';
+            cont.style.marginBottom = '0';
+            if (idx !== 0) cont.style.marginTop = '16px';
           }
           row.innerHTML = `
             <span class="text-[12px] font-bold text-ink-600">写真${idx + 1}</span>
             ${count > 0 ? `
-              <button class="inline-flex items-center gap-4 rounded-full px-12 text-[12px] font-bold ${hidden ? 'bg-ink-50 text-ink-400' : 'bg-fl-50 text-fl'}" style="height:28px;">
-                📍 ピン${count}${hidden ? '・非表示' : ''}
+              <button class="flex h-32 items-center gap-4 rounded-full px-12 text-[12px] font-bold ${hidden ? 'bg-ink-50 text-ink-900 hover:bg-ink-100' : 'bg-fl-50 text-fl'}">
+                📍 ${hidden ? `ピン${count}を表示` : `ピン${count}・表示中`}
               </button>` : ''}`;
           const btn = row.querySelector('button');
           if (btn) btn.addEventListener('click', () => {
@@ -761,7 +766,8 @@
         imageEls.forEach((cont) => {
           const idx = Number(cont.dataset.idx);
           const mc = cont.querySelector('.minicard');
-          const out = cont.nextElementSibling && cont.nextElementSibling.classList.contains('minicard-out') ? cont.nextElementSibling : null;
+          const afterRow = cont.nextElementSibling && cont.nextElementSibling.classList.contains('metarow-e3') ? cont.nextElementSibling.nextElementSibling : cont.nextElementSibling;
+          const out = afterRow && afterRow.classList.contains('minicard-out') ? afterRow : null;
           const bl = cont.querySelector('.bubble-layer');
           mc.classList.add('hidden'); mc.innerHTML = '';
           if (out) { out.classList.add('hidden'); out.innerHTML = ''; }
@@ -948,6 +954,7 @@
       let postTopics = ['ミキシング', '塗装'];
       let spoiler = true;
       let pendingPin = null; // {blockId, x, y}
+      let pinEditBlock = null; // ピン編集モード中の blockId（'thumb' 含む）。null=通常モード
       let sheetMode = 'add'; // 'pin' | 'add'
       const sheetFilters = { mine: false, used: false, brand: null, q: '' };
 
@@ -988,14 +995,18 @@
           el.style.top = pp.y + '%';
           el.style.pointerEvents = 'auto';
           el.textContent = kitNumber(pp.kitId);
-          el.title = 'タップで削除';
-          el.addEventListener('click', (e) => {
-            e.stopPropagation();
-            if (confirm('このピンを削除しますか？（キット自体は使用キットに残ります）')) {
-              postPins = postPins.filter((q) => q !== pp);
-              renderEditor();
-            }
-          });
+          if (pinEditBlock === blockId) {
+            el.title = 'タップで削除';
+            el.addEventListener('click', (e) => {
+              e.stopPropagation();
+              if (confirm('このピンを削除しますか？（キット自体は使用キットに残ります）')) {
+                postPins = postPins.filter((q) => q !== pp);
+                renderEditor();
+              }
+            });
+          } else {
+            el.style.pointerEvents = 'none';
+          }
           pinsC.appendChild(el);
         });
         if (pendingPin && pendingPin.blockId === blockId) {
@@ -1008,7 +1019,9 @@
         }
       }
       function wirePinCanvas(canvas, blockId) {
+        canvas.style.cursor = pinEditBlock === blockId ? 'crosshair' : 'default';
         canvas.addEventListener('click', (e) => {
+          if (pinEditBlock !== blockId) return;
           if (e.target.closest('.pin') || e.target.closest('button') || e.target.closest('.img-menu') || e.target.closest('.alt-chip')) return;
           const rect = canvas.getBoundingClientRect();
           pendingPin = {
@@ -1020,16 +1033,45 @@
           openKitSheet('pin');
         });
       }
+      // 編集モード中のみヒントを表示（通常モードの画像タップは何もしない）
       const pinHintHtml = (blockId) =>
-        postPins.some((p) => p.blockId === blockId) || (pendingPin && pendingPin.blockId === blockId)
-          ? ''
-          : `<div class="pointer-events-none absolute inset-x-0 bottom-10 grid place-items-center">
-               <span class="rounded-full bg-ink-800/75 px-14 py-6 text-[12px] font-bold text-white backdrop-blur">画像をタップして使用キットのピンを追加</span>
-             </div>`;
-      const pinCountBadge = (blockId) => {
+        pinEditBlock === blockId
+          ? `<div class="pointer-events-none absolute inset-x-0 top-0 flex justify-center">
+               <span class="rounded-b-md bg-fl px-14 py-6 text-[12px] font-bold text-white">タップでピン追加 ／ ピンをタップで削除</span>
+             </div>`
+          : '';
+      const pinEditRing = (blockId) => (pinEditBlock === blockId ? ' ring-2 ring-fl' : ' ring-1 ring-ink-100');
+      // 画像一体バー（画像の下・閲覧側と同位置）。通常=ラベル+ピン数+操作 / 編集モード=ヒント+完了
+      function pinBarHtml(blockId, label, menuHtml) {
         const n = postPins.filter((p) => p.blockId === blockId).length;
-        return n ? `<span class="absolute bottom-10 left-10 rounded-full bg-ink-800/70 px-8 py-2 text-[10px] font-bold text-white">📍 ${n}</span>` : '';
-      };
+        const editing = pinEditBlock === blockId;
+        if (editing) {
+          return `
+            <div class="flex h-44 items-center justify-between border-t border-fl-100 bg-fl-50 px-12">
+              <span class="text-[12px] font-bold text-fl">タップでピン追加 ／ ピンをタップで削除</span>
+              <button data-pinedit="${blockId}" class="flex h-32 items-center rounded-full bg-fl px-16 text-[12px] font-bold text-white">完了</button>
+            </div>`;
+        }
+        return `
+          <div class="flex h-44 items-center justify-between border-t border-ink-50 bg-white px-12">
+            <span class="text-[12px] font-bold text-ink-600">${label}${n ? ` <span class="text-fl">📍${n}</span>` : ''}</span>
+            <div class="flex items-center gap-6">
+              <button data-pinedit="${blockId}" class="flex h-32 items-center gap-4 rounded-full bg-ink-50 px-12 text-[12px] font-bold text-ink-900 hover:bg-ink-100">📍 ピンを編集</button>
+              ${menuHtml || ''}
+            </div>
+          </div>`;
+      }
+      function wirePinEditRow(scope) {
+        scope.querySelectorAll('[data-pinedit]').forEach((btn) => {
+          btn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const id = btn.dataset.pinedit;
+            pinEditBlock = pinEditBlock === id ? null : id;
+            pendingPin = null;
+            renderEditor();
+          });
+        });
+      }
 
       function renderThumbPicker() {
         const wrap = document.getElementById('thumb-picker');
@@ -1041,23 +1083,31 @@
             </button>`;
           wrap.querySelector('#pick-thumb').addEventListener('click', () => openImageSheet('thumb'));
         } else {
+          const thumbMenu = `
+              <div class="relative">
+                <button class="img-menu-btn grid h-32 w-32 place-items-center rounded-full bg-ink-50 hover:bg-ink-100">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="#1A1A1A"><circle cx="5" cy="12" r="1.8"/><circle cx="12" cy="12" r="1.8"/><circle cx="19" cy="12" r="1.8"/></svg>
+                </button>
+                <div class="img-menu absolute right-0 top-36 z-10 hidden w-[176px] overflow-hidden rounded-md bg-white shadow-cardLg ring-1 ring-ink-100">
+                  <button class="del-thumb flex w-full items-center gap-8 px-12 py-10 text-left text-[13px] font-semibold text-pink hover:bg-ink-25">サムネイルを削除</button>
+                </div>
+              </div>`;
           wrap.innerHTML = `
-            <div class="relative overflow-hidden rounded-lg ring-1 ring-ink-100">
-              <div class="pin-canvas relative select-none" style="cursor: crosshair;">
+            <div class="overflow-hidden rounded-lg${pinEditRing('thumb')}">
+              <div class="pin-canvas relative select-none">
                 <img src="${postThumb}" alt="サムネイル" class="block w-full" draggable="false" />
                 <div class="pins absolute inset-0" style="pointer-events:none;"></div>
-                <button class="del-thumb absolute left-10 top-10 grid h-32 w-32 place-items-center rounded-full bg-ink-800/70 backdrop-blur">
-                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none"><path d="M5 5l14 14M19 5L5 19" stroke="white" stroke-width="2.4" stroke-linecap="round"/></svg>
-                </button>
-                <span class="absolute left-52 top-10 inline-flex h-32 items-center rounded-full bg-ink-800/70 px-12 text-[11px] font-bold text-white backdrop-blur">サムネイル</span>
-                ${pinHintHtml('thumb')}
-                ${pinCountBadge('thumb')}
               </div>
+              ${pinBarHtml('thumb', 'サムネイル', thumbMenu)}
             </div>`;
           const canvas = wrap.querySelector('.pin-canvas');
           renderPinsInto(wrap.querySelector('.pins'), 'thumb');
           wirePinCanvas(canvas, 'thumb');
-          wrap.querySelector('.del-thumb').addEventListener('click', (e) => {
+          wirePinEditRow(wrap);
+          const tMenuBtn = wrap.querySelector('.img-menu-btn');
+          if (tMenuBtn) tMenuBtn.addEventListener('click', (e) => { e.stopPropagation(); wrap.querySelector('.img-menu').classList.toggle('hidden'); });
+          const tDel = wrap.querySelector('.del-thumb');
+          if (tDel) tDel.addEventListener('click', (e) => {
             e.stopPropagation();
             if (confirm('サムネイルを削除しますか？（サムネイル上のピンも削除されます）')) {
               postPins = postPins.filter((q) => q.blockId !== 'thumb');
@@ -1081,31 +1131,35 @@
         blocksEl.innerHTML = '';
         blocks.forEach((b, i) => {
           const div = document.createElement('div');
-          div.className = 'overflow-hidden rounded-lg ring-1 ring-ink-100';
+          const blockMenu = `
+              <div class="relative">
+                <button class="img-menu-btn grid h-32 w-32 place-items-center rounded-full bg-ink-50 hover:bg-ink-100">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="#1A1A1A"><circle cx="5" cy="12" r="1.8"/><circle cx="12" cy="12" r="1.8"/><circle cx="19" cy="12" r="1.8"/></svg>
+                </button>
+                <div class="img-menu absolute right-0 top-36 z-10 hidden w-[176px] overflow-hidden rounded-md bg-white shadow-cardLg ring-1 ring-ink-100">
+                  <button data-act="alt" class="flex w-full items-center gap-8 px-12 py-10 text-left text-[13px] font-semibold hover:bg-ink-25">ALTを編集${b.alt ? '<span class="ml-auto text-[10px] font-bold text-ok">✓</span>' : ''}</button>
+                  <button data-act="crop" class="flex w-full items-center gap-8 px-12 py-10 text-left text-[13px] font-semibold hover:bg-ink-25">クロップ</button>
+                  <button data-act="del" class="flex w-full items-center gap-8 px-12 py-10 text-left text-[13px] font-semibold text-pink hover:bg-ink-25">画像を削除</button>
+                </div>
+              </div>`;
           div.innerHTML = `
-            <div class="pin-canvas relative select-none" style="cursor: crosshair;" data-block="${b.id}">
-              <img src="${b.src}" alt="${b.alt || ''}" class="block w-full" draggable="false" />
-              <div class="pins absolute inset-0" style="pointer-events:none;"></div>
-              ${pinHintHtml(b.id)}
-              <span class="absolute left-10 top-10 rounded-full bg-ink-800/70 px-8 py-2 text-[10px] font-bold text-white">写真${i + 2}</span>
-              ${b.alt ? '<span class="alt-chip absolute top-10 rounded bg-ink-800/70 px-6 py-2 text-[10px] font-bold text-white" style="right:52px;cursor:pointer;">ALT ✓</span>' : ''}
-              <button class="img-menu-btn absolute right-10 top-10 grid h-32 w-32 place-items-center rounded-full bg-ink-800/70 backdrop-blur">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="white"><circle cx="5" cy="12" r="1.8"/><circle cx="12" cy="12" r="1.8"/><circle cx="19" cy="12" r="1.8"/></svg>
-              </button>
-              <div class="img-menu absolute right-10 top-48 z-10 hidden w-[168px] overflow-hidden rounded-md bg-white shadow-cardLg ring-1 ring-ink-100">
-                <button data-act="alt" class="flex w-full items-center gap-8 px-12 py-10 text-left text-[13px] font-semibold hover:bg-ink-25">ALTを編集${b.alt ? '<span class="ml-auto text-[10px] font-bold text-ok">✓</span>' : ''}</button>
-                <button data-act="crop" class="flex w-full items-center gap-8 px-12 py-10 text-left text-[13px] font-semibold hover:bg-ink-25">クロップ</button>
-                <button data-act="del" class="flex w-full items-center gap-8 px-12 py-10 text-left text-[13px] font-semibold text-pink hover:bg-ink-25">画像を削除</button>
+            <div class="overflow-hidden rounded-lg${pinEditRing(b.id)}">
+              <div class="pin-canvas relative select-none" data-block="${b.id}">
+                <img src="${b.src}" alt="${b.alt || ''}" class="block w-full" draggable="false" />
+                <div class="pins absolute inset-0" style="pointer-events:none;"></div>
               </div>
-              ${pinCountBadge(b.id)}
+              ${pinBarHtml(b.id, '写真' + (i + 2), blockMenu)}
             </div>
-            <textarea rows="3" class="caption-input w-full resize-none bg-ink-25 px-12 py-10 text-[13px] leading-relaxed text-ink-900 placeholder:text-ink-400 focus:bg-white focus:outline-none" style="min-height:80px;" placeholder="この画像の説明を入力（作業内容・使用キット・塗装など、長文OK）">${b.caption || ''}</textarea>
-            <div class="caption-count bg-ink-25 px-12 pb-6 text-right text-[10px] text-ink-400">文字数: ${(b.caption || '').length}</div>`;
+            <div class="mt-8 rounded-lg bg-ink-25 focus-within:bg-white focus-within:ring-1 focus-within:ring-fl">
+              <textarea rows="4" class="caption-input w-full resize-none bg-transparent px-12 pt-10 text-[14px] leading-[1.7] text-ink-900 placeholder:text-ink-400 focus:outline-none" style="min-height:96px;" placeholder="文章を入力（この画像の説明・作業内容・塗装など）">${b.caption || ''}</textarea>
+              <div class="caption-count px-12 pb-8 text-right text-[10px] text-ink-400">文字数: ${(b.caption || '').length}</div>
+            </div>`;
           const canvas = div.querySelector('.pin-canvas');
           renderPinsInto(div.querySelector('.pins'), b.id);
           wirePinCanvas(canvas, b.id);
           const menu = div.querySelector('.img-menu');
-          div.querySelector('.img-menu-btn').addEventListener('click', (e) => {
+          const menuBtn = div.querySelector('.img-menu-btn');
+          if (menuBtn) menuBtn.addEventListener('click', (e) => {
             e.stopPropagation();
             menu.classList.toggle('hidden');
           });
@@ -1113,9 +1167,7 @@
             const v = prompt('画像の代替テキスト（ALT）を入力', b.alt || '');
             if (v !== null) { b.alt = v.trim(); renderEditor(); }
           };
-          const altChip = div.querySelector('.alt-chip');
-          if (altChip) altChip.addEventListener('click', (e) => { e.stopPropagation(); editAlt(); });
-          menu.querySelectorAll('button').forEach((mi) => {
+          if (menu) menu.querySelectorAll('button').forEach((mi) => {
             mi.addEventListener('click', (e) => {
               e.stopPropagation();
               menu.classList.add('hidden');
@@ -1129,6 +1181,7 @@
               }
             });
           });
+          wirePinEditRow(div);
           const cap = div.querySelector('.caption-input');
           const cnt = div.querySelector('.caption-count');
           cap.addEventListener('input', () => { b.caption = cap.value; cnt.textContent = '文字数: ' + cap.value.length; autoGrow(cap); });
